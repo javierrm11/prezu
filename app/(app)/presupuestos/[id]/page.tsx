@@ -14,6 +14,7 @@ import { etiquetaEvento } from "@/lib/eventos";
 import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
+import { BotonCopiarEnlace } from "@/components/ui/BotonCopiarEnlace";
 import { BotonConvertirFactura } from "../_componentes/boton-convertir-factura";
 import { AccionesEstadoPresupuesto } from "../_componentes/acciones-estado-presupuesto";
 
@@ -39,7 +40,7 @@ export default async function PresupuestoDetallePage({
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, estado, cliente_id, factura_id, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre, telefono)",
+      "id, numero, anio, estado, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre, telefono)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -53,6 +54,7 @@ export default async function PresupuestoDetallePage({
         estado: string;
         cliente_id: string | null;
         factura_id: string | null;
+        token_publico: string;
         fecha_emision: string | null;
         valido_hasta: string | null;
         base_imponible: number;
@@ -93,11 +95,13 @@ export default async function PresupuestoDetallePage({
     presupuesto.anio,
   );
 
+  const enlacePublico = `${process.env.NEXT_PUBLIC_APP_URL}/p/${presupuesto.token_publico}`;
+
   const telefonoCliente = presupuesto.clientes?.telefono;
   const enlaceWhatsApp = telefonoCliente
     ? construirEnlaceWhatsApp(
         telefonoCliente,
-        `Hola ${presupuesto.clientes?.nombre}, te paso el presupuesto ${etiquetaNumero} de ${empresa?.nombre ?? "mi negocio"} por un importe de ${formatearEuros(Number(presupuesto.total))}. Cualquier duda, aquí me tienes.`,
+        `Hola ${presupuesto.clientes?.nombre}, te paso el presupuesto ${etiquetaNumero} de ${empresa?.nombre ?? "mi negocio"} por un importe de ${formatearEuros(Number(presupuesto.total))}. Puedes verlo y aceptarlo aquí: ${enlacePublico}`,
       )
     : null;
 
@@ -191,6 +195,7 @@ export default async function PresupuestoDetallePage({
           )}
 
           <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
+            <BotonCopiarEnlace url={enlacePublico} />
             <a href={`/api/presupuestos/${presupuesto.id}/pdf`}>
               <Boton variante="secundario" className="inline-flex items-center gap-2">
                 <Download size={16} />

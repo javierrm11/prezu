@@ -11,6 +11,8 @@ import {
   type LineaConId,
 } from "@/components/ui/TablaPartidas";
 import { Boton } from "@/components/ui/Boton";
+import { CajaVoz } from "@/components/ui/CajaVoz";
+import { interpretarTexto, type ItemCatalogoBase } from "@/lib/interpretarPartida";
 
 const VALIDEZ_DIAS = [15, 30, 60];
 
@@ -28,6 +30,7 @@ type FormularioPresupuestoProps = {
   empresaId: string;
   clientes: ClienteOpcion[];
   ivaDefecto: number;
+  catalogo: ItemCatalogoBase[];
   presupuestoExistente?: PresupuestoExistente;
 };
 
@@ -47,6 +50,7 @@ export function FormularioPresupuesto({
   empresaId,
   clientes,
   ivaDefecto,
+  catalogo,
   presupuestoExistente,
 }: FormularioPresupuestoProps) {
   const router = useRouter();
@@ -58,6 +62,7 @@ export function FormularioPresupuesto({
   const [lineas, setLineas] = useState<LineaConId[]>(() =>
     lineasIniciales(presupuestoExistente, ivaDefecto),
   );
+  const [notaVoz, setNotaVoz] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -76,6 +81,17 @@ export function FormularioPresupuesto({
       ...actuales,
       { ...lineaVacia(ivaDefecto), idLocal: crypto.randomUUID() },
     ]);
+  }
+
+  function enviarNotaVoz() {
+    if (!notaVoz.trim()) return;
+
+    const interpretada = interpretarTexto(notaVoz, catalogo, ivaDefecto);
+    setLineas((actuales) => [
+      ...actuales,
+      { ...interpretada, idLocal: crypto.randomUUID() },
+    ]);
+    setNotaVoz("");
   }
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
@@ -231,6 +247,13 @@ export function FormularioPresupuesto({
           </select>
         </div>
       </div>
+
+      <CajaVoz
+        value={notaVoz}
+        onChange={setNotaVoz}
+        onEnviar={enviarNotaVoz}
+        placeholder="Describe el trabajo o dicta por voz…"
+      />
 
       <TablaPartidas
         lineas={lineas}

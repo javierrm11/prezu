@@ -1,39 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prezu
 
-## Getting Started
+PWA de presupuestos y facturas por voz para autónomos de oficios (fontaneros, electricistas, talleres, reformas). Ver [AGENTS.md](./AGENTS.md) para las reglas de negocio inviolables, la estructura del proyecto y el sistema de diseño.
 
-First, run the development server:
+## Empezar
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Migraciones
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+El SQL de `supabase/migrations/` (`0001` a `0006`, en orden) hay que ejecutarlo a mano en el editor SQL de Supabase — no se aplican solas. Sin ellas, gran parte de la app falla en silencio por falta de políticas RLS.
 
-## Learn More
+## Próximos pasos
 
-To learn more about Next.js, take a look at the following resources:
+- **Página pública de aceptación** (`app/p/[token]/`) — el cliente final acepta el presupuesto sin login; todavía no existe, así que hoy un presupuesto solo llega a `aceptado`/`rechazado` si lo marcas tú a mano desde el panel.
+- **Flujo de voz con IA real** (`lib/ia/extraccion.ts`) — la cajita de "Nuevo presupuesto" ya dicta y captura texto, pero interpreta con reglas + coincidencia contra el catálogo, no con un modelo de lenguaje. Falta transcripción + extracción real cuando se decida incorporar esa dependencia.
+- **Numerar y enviar presupuestos** — falta el paso `borrador → enviado`, que asignaría `P-2026-XXX` vía `siguiente_numero()`. Hoy los presupuestos pasan directo a `facturado`, o se marcan `aceptado`/`rechazado` manualmente.
+- **Envío real por WhatsApp** — el botón actual abre un enlace `wa.me` con mensaje predefinido; falta integrar la API de WhatsApp Business para mandar el PDF adjunto automáticamente (`WHATSAPP_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` en `.env`).
+- **Guardar el PDF generado** — cada descarga se regenera al vuelo; falta subirlo a Supabase Storage y rellenar `pdf_url` para tener un enlace persistente. "Ver PDF" ya existe en facturas, falta añadirlo también en presupuestos.
+- **Subir logo del negocio** — el campo `logo_url` ya existe en `empresas`, pero hace falta configurar Supabase Storage.
+- **Facturas rectificativas** — la vía correcta para corregir una factura ya emitida (las facturas son inmutables por regla de negocio).
+- **Series de presupuestos/facturas personalizables** — hoy la numeración usa siempre el código fijo `P`/`F`; permitir personalizarlas necesitaría columnas nuevas en `empresas`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Aprender más sobre Next.js
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-gmail
+Pensado para desplegar en [Vercel](https://vercel.com/new). Ver la [documentación de deploy de Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para más detalles.

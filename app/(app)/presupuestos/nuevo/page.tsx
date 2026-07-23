@@ -28,6 +28,11 @@ export default async function NuevoPresupuestoPage() {
     .eq("id", empresaId)
     .single();
 
+  const { data: catalogo } = await supabase
+    .from("catalogo")
+    .select("concepto, unidad, precio_unitario, tipo_iva")
+    .eq("empresa_id", empresaId);
+
   return (
     <div>
       <div className="mb-4 flex items-center gap-3">
@@ -56,6 +61,12 @@ export default async function NuevoPresupuestoPage() {
           empresaId={empresaId}
           clientes={clientes}
           ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
+          catalogo={(catalogo ?? []).map((item) => ({
+            concepto: item.concepto,
+            unidad: item.unidad,
+            precioUnitario: Number(item.precio_unitario),
+            tipoIva: Number(item.tipo_iva),
+          }))}
         />
       )}
     </div>
