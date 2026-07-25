@@ -26,8 +26,14 @@ const PATRONES_UNIDAD: { patron: RegExp; unidad: string }[] = [
   { patron: /(\d+(?:[.,]\d+)?)\s*(?:unidades?|uds?)\b/i, unidad: "ud" },
 ];
 
+// Sin \b tras la alternativa: "€" no es un carácter de palabra, así
+// que un \b ahí nunca coincide cuando le sigue un espacio, un signo
+// o el final de la cadena ("180€" o "180€ + 10% iva" no matcheaban).
 const PATRON_PRECIO =
-  /(?:por|son|unos?|unas?|cuestan?|vale[n]?|a)?\s*(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)\b/i;
+  /(?:por|son|unos?|unas?|cuestan?|vale[n]?|a)?\s*(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i;
+
+const PATRON_IVA_DESPUES = /\+?\s*(\d+(?:[.,]\d+)?)\s*%\s*(?:de\s*)?iva\b/i;
+const PATRON_IVA_ANTES = /iva\s+(?:del?\s+)?(\d+(?:[.,]\d+)?)\s*%/i;
 
 function aNumero(texto: string) {
   return parseFloat(texto.replace(",", "."));
@@ -82,6 +88,7 @@ export function interpretarTexto(
   let cantidad = 1;
   let unidad = "ud";
   let precioUnitario: number | null = null;
+  let tipoIva: number | null = null;
 
   for (const { patron, unidad: unidadPatron } of PATRONES_UNIDAD) {
     const coincidencia = texto.match(patron);
@@ -91,6 +98,12 @@ export function interpretarTexto(
       texto = texto.replace(coincidencia[0], " ");
       break;
     }
+  }
+
+  const coincidenciaIva = texto.match(PATRON_IVA_DESPUES) ?? texto.match(PATRON_IVA_ANTES);
+  if (coincidenciaIva) {
+    tipoIva = aNumero(coincidenciaIva[1]);
+    texto = texto.replace(coincidenciaIva[0], " ");
   }
 
   const coincidenciaPrecio = texto.match(PATRON_PRECIO);
@@ -115,6 +128,6 @@ export function interpretarTexto(
     cantidad,
     unidad: coincidenciaCatalogo?.unidad ?? unidad,
     precioUnitario: precioUnitario ?? coincidenciaCatalogo?.precioUnitario ?? 0,
-    tipoIva: coincidenciaCatalogo?.tipoIva ?? ivaDefecto,
+    tipoIva: tipoIva ?? coincidenciaCatalogo?.tipoIva ?? ivaDefecto,
   };
 }

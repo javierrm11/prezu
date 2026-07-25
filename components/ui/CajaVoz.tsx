@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Send, Square } from "lucide-react";
+import { Loader2, Mic, Send, Square } from "lucide-react";
 
 type ResultadoVoz = {
   isFinal: boolean;
@@ -34,6 +34,7 @@ type CajaVozProps = {
   value: string;
   onChange: (valor: string) => void;
   onEnviar?: () => void;
+  enviando?: boolean;
   placeholder?: string;
 };
 
@@ -42,7 +43,13 @@ type CajaVozProps = {
 // poco fiable, así que el botón de micrófono solo se muestra si
 // el navegador la soporta; si no, la cajita sigue funcionando como
 // simple cuadro de texto.
-export function CajaVoz({ value, onChange, onEnviar, placeholder }: CajaVozProps) {
+export function CajaVoz({
+  value,
+  onChange,
+  onEnviar,
+  enviando = false,
+  placeholder,
+}: CajaVozProps) {
   const [grabando, setGrabando] = useState(false);
   const [soportado, setSoportado] = useState(false);
   const reconocimientoRef = useRef<ReconocimientoVoz | null>(null);
@@ -132,11 +139,11 @@ export function CajaVoz({ value, onChange, onEnviar, placeholder }: CajaVozProps
               <button
                 type="button"
                 onClick={onEnviar}
-                disabled={!value.trim()}
+                disabled={!value.trim() || enviando}
                 aria-label="Enviar"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-acento text-primario transition-colors hover:bg-acento-hover disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <Send size={15} />
+                {enviando ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
               </button>
             )}
           </div>

@@ -6,6 +6,7 @@ type FilaFacturaDB = {
   id: string;
   numero: number;
   anio: number;
+  serie: string;
   cliente_nombre: string;
   fecha_emision: string;
   vencimiento: string | null;
@@ -29,7 +30,7 @@ export default async function FacturasPage() {
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, cliente_nombre, fecha_emision, vencimiento, total, estado_cobro, factura_lineas(concepto)",
+      "id, numero, anio, serie, cliente_nombre, fecha_emision, vencimiento, total, estado_cobro, factura_lineas(concepto)",
     )
     .eq("empresa_id", empresaId)
     .order("orden", { foreignTable: "factura_lineas" })
@@ -42,6 +43,7 @@ export default async function FacturasPage() {
     id: fila.id,
     numero: fila.numero,
     anio: fila.anio,
+    serie: fila.serie,
     cliente: fila.cliente_nombre,
     concepto: fila.factura_lineas[0]?.concepto ?? "",
     fechaEmision: fila.fecha_emision,

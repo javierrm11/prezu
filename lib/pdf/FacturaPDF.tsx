@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image } from "@react-pdf/renderer";
 import { formatearEuros, formatearFecha } from "@/lib/formato";
 import { obtenerIniciales } from "@/lib/texto";
 import {
@@ -46,9 +46,16 @@ export function FacturaPDF({
       <Page size="A4" style={estilos.pagina}>
         <View style={estilos.cabecera}>
           <View style={estilos.filaCabecera}>
-            <View style={estilos.logoChip}>
-              <Text style={estilos.logoTexto}>{obtenerIniciales(empresa.nombre)}</Text>
-            </View>
+            {empresa.logoUrl ? (
+              // No es una imagen DOM: es el primitivo de @react-pdf/renderer,
+              // que no acepta (ni necesita) la prop "alt".
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={empresa.logoUrl} style={estilos.logoImagen} />
+            ) : (
+              <View style={estilos.logoChip}>
+                <Text style={estilos.logoTexto}>{obtenerIniciales(empresa.nombre)}</Text>
+              </View>
+            )}
             <View>
               <Text style={estilos.nombreNegocio}>{empresa.nombre}</Text>
               {empresa.direccion && <Text style={estilos.textoSecundario}>{empresa.direccion}</Text>}
@@ -98,10 +105,10 @@ export function FacturaPDF({
           {lineas.map((linea, indice) => (
             <View key={indice} style={estilos.tablaFila}>
               <Text style={estilos.colConcepto}>{linea.concepto}</Text>
-              <Text style={estilos.colCantidad}>
+              <Text style={estilos.colCantidadDato}>
                 {linea.cantidad} {linea.unidad}
               </Text>
-              <Text style={estilos.colPrecio}>{formatearEuros(linea.precioUnitario)}</Text>
+              <Text style={estilos.colPrecioDato}>{formatearEuros(linea.precioUnitario)}</Text>
               <Text style={estilos.colImporte}>{formatearEuros(linea.importe)}</Text>
             </View>
           ))}

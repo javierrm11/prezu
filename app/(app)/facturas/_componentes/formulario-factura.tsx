@@ -11,7 +11,10 @@ import {
   type CamposLinea,
   type LineaConId,
 } from "@/components/ui/TablaPartidas";
+import type { ItemCatalogoSelector } from "@/components/ui/SelectorConceptosPredefinidos";
 import { Boton } from "@/components/ui/Boton";
+import { CajaVoz } from "@/components/ui/CajaVoz";
+import { interpretarNotaVoz } from "@/lib/ia/notaVoz";
 
 export type ClienteOpcion = { id: string; nombre: string };
 
@@ -19,6 +22,8 @@ type FormularioFacturaProps = {
   empresaId: string;
   clientes: ClienteOpcion[];
   ivaDefecto: number;
+  serieFactura: string;
+  catalogo?: ItemCatalogoSelector[];
 };
 
 function hoyISO() {
@@ -31,7 +36,13 @@ function sumarDias(fechaISO: string, dias: number) {
   return fecha.toISOString().slice(0, 10);
 }
 
-export function FormularioFactura({ empresaId, clientes, ivaDefecto }: FormularioFacturaProps) {
+export function FormularioFactura({
+  empresaId,
+  clientes,
+  ivaDefecto,
+  serieFactura,
+  catalogo,
+}: FormularioFacturaProps) {
   const router = useRouter();
   const [clienteId, setClienteId] = useState(clientes[0]?.id ?? "");
   const [fecha, setFecha] = useState(hoyISO());
@@ -40,6 +51,8 @@ export function FormularioFactura({ empresaId, clientes, ivaDefecto }: Formulari
   const [lineas, setLineas] = useState<LineaConId[]>(() => [
     { ...lineaVacia(ivaDefecto), idLocal: "inicial-0" },
   ]);
+  const [notaVoz, setNotaVoz] = useState("");
+  const [interpretandoVoz, setInterpretandoVoz] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -53,11 +66,27 @@ export function FormularioFactura({ empresaId, clientes, ivaDefecto }: Formulari
     setLineas((actuales) => actuales.filter((linea) => linea.idLocal !== idLocal));
   }
 
-  function anadirLinea() {
+  function anadirLinea(prefill?: Partial<CamposLinea>) {
     setLineas((actuales) => [
       ...actuales,
-      { ...lineaVacia(ivaDefecto), idLocal: crypto.randomUUID() },
+      { ...lineaVacia(ivaDefecto), ...prefill, idLocal: crypto.randomUUID() },
     ]);
+  }
+
+  async function enviarNotaVoz() {
+    if (!notaVoz.trim()) return;
+
+    setInterpretandoVoz(true);
+    const partidas = await interpretarNotaVoz(notaVoz, ivaDefecto);
+    setInterpretandoVoz(false);
+
+    if (partidas.length === 0) return;
+
+    setLineas((actuales) => [
+      ...actuales,
+      ...partidas.map((partida) => ({ ...partida, idLocal: crypto.randomUUID() })),
+    ]);
+    setNotaVoz("");
   }
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
@@ -103,7 +132,7 @@ export function FormularioFactura({ empresaId, clientes, ivaDefecto }: Formulari
     const { data: numero, error: errorNumero } = await supabase.rpc("siguiente_numero", {
       p_empresa: empresaId,
       p_tipo: "factura",
-      p_codigo: "F",
+      p_codigo: serieFactura,
       p_anio: anio,
     });
 
@@ -120,7 +149,7 @@ export function FormularioFactura({ empresaId, clientes, ivaDefecto }: Formulari
         cliente_id: clienteId,
         presupuesto_id: null,
         numero,
-        serie: "F",
+        serie: serieFactura,
         anio,
         tipo: "completa",
         fecha_emision: fecha,
@@ -236,11 +265,20 @@ export function FormularioFactura({ empresaId, clientes, ivaDefecto }: Formulari
         </div>
       </div>
 
+      <CajaVoz
+        value={notaVoz}
+        onChange={setNotaVoz}
+        onEnviar={enviarNotaVoz}
+        enviando={interpretandoVoz}
+        placeholder="Describe el trabajo o dicta por voz…"
+      />
+
       <TablaPartidas
         lineas={lineas}
         onActualizarLinea={actualizarLinea}
         onEliminarLinea={eliminarLinea}
         onAnadirLinea={anadirLinea}
+        catalogo={catalogo}
       />
 
       {error && <p className="text-sm text-peligro">{error}</p>}

@@ -71,10 +71,19 @@ export default async function EditarPresupuestoPage({
     .eq("id", empresaId)
     .single();
 
-  const { data: catalogo } = await supabase
+  const { data: catalogoDB } = await supabase
     .from("catalogo")
     .select("concepto, unidad, precio_unitario, tipo_iva")
-    .eq("empresa_id", empresaId);
+    .eq("empresa_id", empresaId)
+    .order("veces_usado", { ascending: false })
+    .order("concepto");
+
+  const catalogo = (catalogoDB ?? []).map((item) => ({
+    concepto: item.concepto,
+    unidad: item.unidad,
+    precioUnitario: Number(item.precio_unitario),
+    tipoIva: Number(item.tipo_iva),
+  }));
 
   const fechaEmision = presupuesto.fecha_emision ?? new Date().toISOString().slice(0, 10);
 
@@ -111,12 +120,7 @@ export default async function EditarPresupuestoPage({
         empresaId={empresaId}
         clientes={clientes ?? []}
         ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
-        catalogo={(catalogo ?? []).map((item) => ({
-          concepto: item.concepto,
-          unidad: item.unidad,
-          precioUnitario: Number(item.precio_unitario),
-          tipoIva: Number(item.tipo_iva),
-        }))}
+        catalogo={catalogo}
         presupuestoExistente={presupuestoExistente}
       />
     </div>

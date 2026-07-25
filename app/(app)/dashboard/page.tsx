@@ -85,7 +85,7 @@ export default async function DashboardPage() {
 
   const { data: facturasPendientesDB } = await supabase
     .from("facturas")
-    .select("id, numero, anio, cliente_nombre, vencimiento, total, estado_cobro")
+    .select("id, numero, anio, serie, cliente_nombre, vencimiento, total, estado_cobro")
     .eq("empresa_id", empresaId)
     .neq("estado_cobro", "cobrada")
     .order("vencimiento", { ascending: true, nullsFirst: false });
@@ -211,7 +211,7 @@ export default async function DashboardPage() {
                       {factura.cliente_nombre}
                     </div>
                     <div className="text-[13px] text-texto-secundario">
-                      {formatearNumeroDocumento("F", factura.numero, factura.anio)}
+                      {formatearNumeroDocumento(factura.serie, factura.numero, factura.anio)}
                       {factura.vencimiento && ` · vence ${formatearFecha(factura.vencimiento)}`}
                     </div>
                   </div>

@@ -36,7 +36,7 @@ export default async function FacturaDetallePage({
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total, clientes(telefono)",
+      "id, numero, anio, serie, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total, clientes(telefono)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -47,6 +47,7 @@ export default async function FacturaDetallePage({
         id: string;
         numero: number;
         anio: number;
+        serie: string;
         fecha_emision: string;
         vencimiento: string | null;
         estado_cobro: string;
@@ -83,7 +84,7 @@ export default async function FacturaDetallePage({
     .eq("entidad_id", id)
     .order("created_at", { ascending: true });
 
-  const etiquetaNumero = formatearNumeroDocumento("F", factura.numero, factura.anio);
+  const etiquetaNumero = formatearNumeroDocumento(factura.serie, factura.numero, factura.anio);
   const estadoEfectivo = estadoCobroEfectivo(factura.estado_cobro, factura.vencimiento);
 
   const telefonoCliente = factura.clientes?.telefono;

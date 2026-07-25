@@ -1,6 +1,7 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
+import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearNumeroDocumento } from "@/lib/formato";
 import { PresupuestoPDF, type LineaPDF } from "@/lib/pdf/PresupuestoPDF";
 
@@ -23,6 +24,8 @@ type FilaPresupuestoDB = {
     telefono: string | null;
     email: string | null;
     condiciones_defecto: string | null;
+    logo_url: string | null;
+    serie_presupuesto: string;
   } | null;
 };
 
@@ -41,7 +44,7 @@ export async function GET(
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto)",
+      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -71,7 +74,12 @@ export async function GET(
   const etiquetaIva =
     tiposIvaUsados.size === 1 ? `IVA ${[...tiposIvaUsados][0]} %` : "IVA";
 
-  const numeroDocumento = formatearNumeroDocumento("P", presupuesto.numero, presupuesto.anio);
+  const numeroDocumento = formatearNumeroDocumento(
+    presupuesto.empresas?.serie_presupuesto ?? "P",
+    presupuesto.numero,
+    presupuesto.anio,
+  );
+  const urlLogo = await crearUrlFirmadaLogo(supabase, presupuesto.empresas?.logo_url ?? null);
 
   const buffer = await renderToBuffer(
     <PresupuestoPDF
@@ -82,6 +90,7 @@ export async function GET(
         ciudad: presupuesto.empresas?.ciudad ?? null,
         telefono: presupuesto.empresas?.telefono ?? null,
         email: presupuesto.empresas?.email ?? null,
+        logoUrl: urlLogo,
       }}
       cliente={{
         nombre: presupuesto.clientes?.nombre ?? "Sin cliente",

@@ -36,6 +36,12 @@ export default async function PresupuestosPage() {
     .limit(1, { foreignTable: "presupuesto_lineas" })
     .order("created_at", { ascending: false });
 
+  const { data: empresa } = await supabase
+    .from("empresas")
+    .select("serie_presupuesto")
+    .eq("id", empresaId)
+    .single();
+
   const filas = (data as unknown as FilaPresupuestoDB[] | null) ?? [];
 
   const presupuestos: PresupuestoFila[] = filas.map((fila) => ({
@@ -49,5 +55,10 @@ export default async function PresupuestosPage() {
     concepto: fila.presupuesto_lineas[0]?.concepto ?? "",
   }));
 
-  return <ListaPresupuestos presupuestos={presupuestos} />;
+  return (
+    <ListaPresupuestos
+      presupuestos={presupuestos}
+      seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
+    />
+  );
 }

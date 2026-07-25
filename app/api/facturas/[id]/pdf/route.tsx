@@ -1,6 +1,7 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
+import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearNumeroDocumento } from "@/lib/formato";
 import { FacturaPDF, type LineaPDF } from "@/lib/pdf/FacturaPDF";
 
@@ -8,6 +9,7 @@ type FilaFacturaDB = {
   id: string;
   numero: number;
   anio: number;
+  serie: string;
   fecha_emision: string;
   vencimiento: string | null;
   forma_pago: string | null;
@@ -25,6 +27,7 @@ type FilaFacturaDB = {
     telefono: string | null;
     email: string | null;
     condiciones_defecto: string | null;
+    logo_url: string | null;
   } | null;
 };
 
@@ -43,7 +46,7 @@ export async function GET(
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto)",
+      "id, numero, anio, serie, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -73,7 +76,8 @@ export async function GET(
   const etiquetaIva =
     tiposIvaUsados.size === 1 ? `IVA ${[...tiposIvaUsados][0]} %` : "IVA";
 
-  const numeroDocumento = formatearNumeroDocumento("F", factura.numero, factura.anio);
+  const numeroDocumento = formatearNumeroDocumento(factura.serie, factura.numero, factura.anio);
+  const urlLogo = await crearUrlFirmadaLogo(supabase, factura.empresas?.logo_url ?? null);
 
   const buffer = await renderToBuffer(
     <FacturaPDF
@@ -84,6 +88,7 @@ export async function GET(
         ciudad: factura.empresas?.ciudad ?? null,
         telefono: factura.empresas?.telefono ?? null,
         email: factura.empresas?.email ?? null,
+        logoUrl: urlLogo,
       }}
       cliente={{
         nombre: factura.cliente_nombre,

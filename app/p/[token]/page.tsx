@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import { Check } from "lucide-react";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
+import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearEuros, formatearFecha, formatearNumeroDocumento } from "@/lib/formato";
-import { obtenerIniciales } from "@/lib/texto";
 import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
 import { Logo } from "@/components/ui/Logo";
 import { Boton } from "@/components/ui/Boton";
+import { LogoNegocio } from "@/components/ui/LogoNegocio";
 import { PanelAceptar } from "./_componentes/panel-aceptar";
 
 // Página pública: no debe aparecer en buscadores (regla 5, datos
@@ -39,6 +40,8 @@ type FilaPublica = {
     telefono: string | null;
     email: string | null;
     condiciones_defecto: string | null;
+    logo_url: string | null;
+    serie_presupuesto: string;
   } | null;
 };
 
@@ -55,7 +58,7 @@ export default async function PaginaPublicaPresupuesto({
   const { data } = await admin
     .from("presupuestos")
     .select(
-      "id, empresa_id, numero, anio, estado, fecha_emision, valido_hasta, base_imponible, total_iva, total, visto_at, aceptado_at, aceptado_por, condiciones, clientes(nombre), empresas(nombre, nif, direccion, telefono, email, condiciones_defecto)",
+      "id, empresa_id, numero, anio, estado, fecha_emision, valido_hasta, base_imponible, total_iva, total, visto_at, aceptado_at, aceptado_por, condiciones, clientes(nombre), empresas(nombre, nif, direccion, telefono, email, condiciones_defecto, logo_url, serie_presupuesto)",
     )
     .eq("token_publico", token)
     .maybeSingle();
@@ -88,8 +91,13 @@ export default async function PaginaPublicaPresupuesto({
     .eq("presupuesto_id", presupuesto.id)
     .order("orden");
 
-  const etiquetaNumero = formatearNumeroDocumento("P", presupuesto.numero, presupuesto.anio);
+  const etiquetaNumero = formatearNumeroDocumento(
+    presupuesto.empresas?.serie_presupuesto ?? "P",
+    presupuesto.numero,
+    presupuesto.anio,
+  );
   const negocio = presupuesto.empresas?.nombre ?? "tu proveedor";
+  const urlLogo = await crearUrlFirmadaLogo(admin, presupuesto.empresas?.logo_url ?? null);
   const yaAceptado = presupuesto.estado === "aceptado";
   const yaResuelto = ESTADOS_RESUELTOS.includes(presupuesto.estado);
   const condiciones = presupuesto.condiciones ?? presupuesto.empresas?.condiciones_defecto;
@@ -104,9 +112,7 @@ export default async function PaginaPublicaPresupuesto({
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[560px] flex-1 flex-col">
       <div className="flex items-center gap-3 border-b border-borde bg-superficie p-4">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primario font-heading text-base font-bold text-acento">
-          {obtenerIniciales(negocio)}
-        </div>
+        <LogoNegocio nombre={negocio} urlLogo={urlLogo} size={44} />
         <div className="min-w-0">
           <div className="truncate text-[15px] font-semibold text-texto">{negocio}</div>
           {presupuesto.empresas?.telefono && (

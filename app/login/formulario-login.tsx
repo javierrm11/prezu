@@ -64,7 +64,7 @@ export function FormularioLogin() {
         ¿Has olvidado la contraseña?
       </a>
       <p className="text-center text-[13px] text-texto-secundario">
-        ¿Aún no tienes cuenta? <a href="#">Crea una gratis</a>
+        ¿Aún no tienes cuenta? <a href="/registro">Crea una gratis</a>
       </p>
     </form>
   );

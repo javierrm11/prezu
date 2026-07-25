@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus } from "lucide-react";
+import { ListPlus, Pencil, Plus } from "lucide-react";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { formatearEuros } from "@/lib/formato";
 import { Boton } from "@/components/ui/Boton";
+import { UNIDADES } from "@/components/ui/TablaPartidas";
+import { SelectorConceptosPredefinidos } from "@/components/ui/SelectorConceptosPredefinidos";
 
 export type ItemCatalogo = {
   id: string;
@@ -26,7 +28,9 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
   const router = useRouter();
   const [nuevoAbierto, setNuevoAbierto] = useState(false);
   const [nuevoConcepto, setNuevoConcepto] = useState("");
+  const [nuevaUnidad, setNuevaUnidad] = useState("ud");
   const [nuevoPrecio, setNuevoPrecio] = useState("");
+  const [selectorAbierto, setSelectorAbierto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [editConcepto, setEditConcepto] = useState("");
   const [editPrecio, setEditPrecio] = useState("");
@@ -47,7 +51,7 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
       empresa_id: empresaId,
       concepto: nuevoConcepto,
       precio_unitario: parseFloat(nuevoPrecio) || 0,
-      unidad: "ud",
+      unidad: nuevaUnidad,
       tipo_iva: ivaDefecto,
     });
 
@@ -59,6 +63,7 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
     }
 
     setNuevoConcepto("");
+    setNuevaUnidad("ud");
     setNuevoPrecio("");
     setNuevoAbierto(false);
     router.refresh();
@@ -101,14 +106,35 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
         <h1 className="font-heading text-2xl font-bold text-primario">
           Catálogo de precios
         </h1>
-        <Boton
-          variante="secundario"
-          className="flex-shrink-0"
-          onClick={() => setNuevoAbierto((abierto) => !abierto)}
-        >
-          Añadir partida
-        </Boton>
+        <div className="flex flex-shrink-0 gap-2.5">
+          <Boton
+            variante="secundario"
+            className="inline-flex items-center gap-1.5"
+            onClick={() => setSelectorAbierto(true)}
+          >
+            <ListPlus size={16} />
+            Elegir de la lista
+          </Boton>
+          <Boton
+            variante="secundario"
+            onClick={() => setNuevoAbierto((abierto) => !abierto)}
+          >
+            Añadir partida
+          </Boton>
+        </div>
       </div>
+
+      {selectorAbierto && (
+        <SelectorConceptosPredefinidos
+          onSeleccionar={(concepto) => {
+            setNuevoConcepto(concepto.concepto);
+            setNuevaUnidad(concepto.unidad);
+            setNuevoAbierto(true);
+            setSelectorAbierto(false);
+          }}
+          onCerrar={() => setSelectorAbierto(false)}
+        />
+      )}
 
       <div className="mb-4 flex items-center gap-2.5 rounded-lg bg-[#E8EDFB] px-4 py-3 text-[13px] text-secundario">
         <Plus size={16} className="flex-shrink-0" />
@@ -125,6 +151,20 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
               placeholder="Ej.: Cambio de sifón"
               className="h-11 w-full rounded-lg border border-borde px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
             />
+          </div>
+          <div className="w-[110px]">
+            <label className="mb-1.5 block text-[13px] font-medium text-texto">Unidad</label>
+            <select
+              value={nuevaUnidad}
+              onChange={(evento) => setNuevaUnidad(evento.target.value)}
+              className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+            >
+              {UNIDADES.map((unidad) => (
+                <option key={unidad.valor} value={unidad.valor}>
+                  {unidad.etiqueta}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="w-[120px]">
             <label className="mb-1.5 block text-[13px] font-medium text-texto">Precio (€)</label>

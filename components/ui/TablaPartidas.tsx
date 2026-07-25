@@ -1,8 +1,13 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ListPlus, Plus, Trash2 } from "lucide-react";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
 import { formatearEuros } from "@/lib/formato";
+import {
+  SelectorConceptosPredefinidos,
+  type ItemCatalogoSelector,
+} from "./SelectorConceptosPredefinidos";
 
 export const UNIDADES = [
   { valor: "ud", etiqueta: "ud" },
@@ -34,7 +39,8 @@ type TablaPartidasProps = {
   lineas: LineaConId[];
   onActualizarLinea: (idLocal: string, cambios: Partial<CamposLinea>) => void;
   onEliminarLinea: (idLocal: string) => void;
-  onAnadirLinea: () => void;
+  onAnadirLinea: (prefill?: Partial<CamposLinea>) => void;
+  catalogo?: ItemCatalogoSelector[];
 };
 
 export function TablaPartidas({
@@ -42,7 +48,9 @@ export function TablaPartidas({
   onActualizarLinea,
   onEliminarLinea,
   onAnadirLinea,
+  catalogo,
 }: TablaPartidasProps) {
+  const [selectorAbierto, setSelectorAbierto] = useState(false);
   const totales = calcularTotales(lineas);
   const tiposIvaUsados = new Set(lineas.map((linea) => linea.tipoIva));
   const etiquetaIva =
@@ -78,7 +86,7 @@ export function TablaPartidas({
               <input
                 type="number"
                 min={0}
-                step="0.01"
+                step="1"
                 value={linea.cantidad}
                 onChange={(evento) =>
                   onActualizarLinea(linea.idLocal, {
@@ -145,16 +153,42 @@ export function TablaPartidas({
           </div>
         );
       })}
-      <div className="p-3">
+      <div className="flex flex-wrap gap-4 p-3">
         <button
           type="button"
-          onClick={onAnadirLinea}
+          onClick={() => onAnadirLinea()}
           className="flex items-center gap-1.5 text-sm font-medium text-secundario hover:text-primario"
         >
           <Plus size={16} />
           Añadir partida
         </button>
+        <button
+          type="button"
+          onClick={() => setSelectorAbierto(true)}
+          className="flex items-center gap-1.5 text-sm font-medium text-secundario hover:text-primario"
+        >
+          <ListPlus size={16} />
+          Elegir de la lista
+        </button>
       </div>
+
+      {selectorAbierto && (
+        <SelectorConceptosPredefinidos
+          catalogo={catalogo}
+          onSeleccionar={(concepto) => {
+            onAnadirLinea({
+              concepto: concepto.concepto,
+              unidad: concepto.unidad,
+              ...(concepto.precioUnitario !== undefined && {
+                precioUnitario: concepto.precioUnitario,
+                tipoIva: concepto.tipoIva,
+              }),
+            });
+            setSelectorAbierto(false);
+          }}
+          onCerrar={() => setSelectorAbierto(false)}
+        />
+      )}
       <div className="flex justify-end border-t border-borde bg-fondo p-4">
         <div className="flex w-full max-w-[260px] flex-col gap-2">
           <div className="flex justify-between text-sm text-texto-secundario">

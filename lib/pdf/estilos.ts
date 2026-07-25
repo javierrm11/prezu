@@ -21,6 +21,7 @@ export const estilosDocumento = StyleSheet.create({
     marginRight: 10,
   },
   logoTexto: { color: COLOR_ACENTO, fontFamily: "Helvetica-Bold", fontSize: 14 },
+  logoImagen: { width: 34, height: 34, borderRadius: 8, marginRight: 10, objectFit: "cover" },
   nombreNegocio: { fontFamily: "Helvetica-Bold", fontSize: 15, color: COLOR_PRIMARIO },
   textoSecundario: { color: COLOR_TEXTO_SECUNDARIO, fontSize: 9 },
   datosNegocio: { textAlign: "right", color: COLOR_TEXTO_SECUNDARIO, fontSize: 9, lineHeight: 1.7 },
@@ -63,8 +64,13 @@ export const estilosDocumento = StyleSheet.create({
     fontSize: 10,
   },
   colConcepto: { flex: 3 },
-  colCantidad: { width: 60, textAlign: "right", color: COLOR_TEXTO_SECUNDARIO },
-  colPrecio: { width: 70, textAlign: "right", color: COLOR_TEXTO_SECUNDARIO },
+  // Sin color propio: en la cabecera deben heredar el blanco de
+  // tablaCabecera. El gris de texto secundario en las filas de datos
+  // se aplica aparte con colCantidadDato/colPrecioDato.
+  colCantidad: { width: 60, textAlign: "right" },
+  colPrecio: { width: 70, textAlign: "right" },
+  colCantidadDato: { width: 60, textAlign: "right", color: COLOR_TEXTO_SECUNDARIO },
+  colPrecioDato: { width: 70, textAlign: "right", color: COLOR_TEXTO_SECUNDARIO },
   colImporte: { width: 80, textAlign: "right", fontFamily: "Helvetica-Bold" },
   totales: {
     alignSelf: "flex-end",
@@ -113,4 +119,5 @@ export type EmpresaPDF = {
   ciudad: string | null;
   telefono: string | null;
   email: string | null;
+  logoUrl?: string | null;
 };

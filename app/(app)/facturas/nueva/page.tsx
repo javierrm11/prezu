@@ -24,9 +24,23 @@ export default async function NuevaFacturaPage() {
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("iva_defecto")
+    .select("iva_defecto, serie_factura")
     .eq("id", empresaId)
     .single();
+
+  const { data: catalogoDB } = await supabase
+    .from("catalogo")
+    .select("concepto, unidad, precio_unitario, tipo_iva")
+    .eq("empresa_id", empresaId)
+    .order("veces_usado", { ascending: false })
+    .order("concepto");
+
+  const catalogo = (catalogoDB ?? []).map((item) => ({
+    concepto: item.concepto,
+    unidad: item.unidad,
+    precioUnitario: Number(item.precio_unitario),
+    tipoIva: Number(item.tipo_iva),
+  }));
 
   return (
     <div>
@@ -56,6 +70,8 @@ export default async function NuevaFacturaPage() {
           empresaId={empresaId}
           clientes={clientes}
           ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
+          serieFactura={empresa?.serie_factura ?? "F"}
+          catalogo={catalogo}
         />
       )}
     </div>

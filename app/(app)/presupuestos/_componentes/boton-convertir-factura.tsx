@@ -23,6 +23,7 @@ type BotonConvertirFacturaProps = {
   baseImponible: number;
   totalIva: number;
   total: number;
+  serieFactura: string;
 };
 
 export function BotonConvertirFactura({
@@ -33,6 +34,7 @@ export function BotonConvertirFactura({
   baseImponible,
   totalIva,
   total,
+  serieFactura,
 }: BotonConvertirFacturaProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export function BotonConvertirFactura({
 
     const { data: numero, error: errorNumero } = await supabase.rpc(
       "siguiente_numero",
-      { p_empresa: empresaId, p_tipo: "factura", p_codigo: "F", p_anio: anio },
+      { p_empresa: empresaId, p_tipo: "factura", p_codigo: serieFactura, p_anio: anio },
     );
 
     if (errorNumero || numero == null) {
@@ -86,7 +88,7 @@ export function BotonConvertirFactura({
         cliente_id: clienteId,
         presupuesto_id: presupuestoId,
         numero,
-        serie: "F",
+        serie: serieFactura,
         anio,
         tipo: "completa",
         fecha_emision: new Date().toISOString().slice(0, 10),

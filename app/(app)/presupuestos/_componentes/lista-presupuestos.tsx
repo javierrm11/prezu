@@ -42,7 +42,13 @@ const FILTROS: Filtro[] = [
   },
 ];
 
-export function ListaPresupuestos({ presupuestos }: { presupuestos: PresupuestoFila[] }) {
+export function ListaPresupuestos({
+  presupuestos,
+  seriePresupuesto,
+}: {
+  presupuestos: PresupuestoFila[];
+  seriePresupuesto: string;
+}) {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivo, setFiltroActivo] = useState("todos");
 
@@ -54,14 +60,18 @@ export function ListaPresupuestos({ presupuestos }: { presupuestos: PresupuestoF
       if (!filtro.coincide(presupuesto.estado)) return false;
       if (!texto) return true;
 
-      const etiqueta = formatearNumeroDocumento("P", presupuesto.numero, presupuesto.anio);
+      const etiqueta = formatearNumeroDocumento(
+        seriePresupuesto,
+        presupuesto.numero,
+        presupuesto.anio,
+      );
       return (
         presupuesto.cliente.toLowerCase().includes(texto) ||
         presupuesto.concepto.toLowerCase().includes(texto) ||
         etiqueta.toLowerCase().includes(texto)
       );
     });
-  }, [presupuestos, busqueda, filtroActivo]);
+  }, [presupuestos, busqueda, filtroActivo, seriePresupuesto]);
 
   return (
     <div>
@@ -122,7 +132,7 @@ export function ListaPresupuestos({ presupuestos }: { presupuestos: PresupuestoF
           </div>
           {filtrados.map((presupuesto) => {
             const etiquetaNumero = formatearNumeroDocumento(
-              "P",
+              seriePresupuesto,
               presupuesto.numero,
               presupuesto.anio,
             );

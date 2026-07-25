@@ -70,7 +70,7 @@ export default async function PresupuestoDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("nombre")
+    .select("nombre, serie_presupuesto, serie_factura")
     .eq("id", empresaId)
     .single();
 
@@ -90,7 +90,7 @@ export default async function PresupuestoDetallePage({
     .order("created_at", { ascending: true });
 
   const etiquetaNumero = formatearNumeroDocumento(
-    "P",
+    empresa?.serie_presupuesto ?? "P",
     presupuesto.numero,
     presupuesto.anio,
   );
@@ -236,6 +236,7 @@ export default async function PresupuestoDetallePage({
                 baseImponible={Number(presupuesto.base_imponible)}
                 totalIva={Number(presupuesto.total_iva)}
                 total={Number(presupuesto.total)}
+                serieFactura={empresa?.serie_factura ?? "F"}
               />
             )}
           </div>

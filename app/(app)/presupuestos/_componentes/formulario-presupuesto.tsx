@@ -10,9 +10,10 @@ import {
   type CamposLinea,
   type LineaConId,
 } from "@/components/ui/TablaPartidas";
+import type { ItemCatalogoSelector } from "@/components/ui/SelectorConceptosPredefinidos";
 import { Boton } from "@/components/ui/Boton";
 import { CajaVoz } from "@/components/ui/CajaVoz";
-import { interpretarTexto, type ItemCatalogoBase } from "@/lib/interpretarPartida";
+import { interpretarNotaVoz } from "@/lib/ia/notaVoz";
 
 const VALIDEZ_DIAS = [15, 30, 60];
 
@@ -30,7 +31,7 @@ type FormularioPresupuestoProps = {
   empresaId: string;
   clientes: ClienteOpcion[];
   ivaDefecto: number;
-  catalogo: ItemCatalogoBase[];
+  catalogo?: ItemCatalogoSelector[];
   presupuestoExistente?: PresupuestoExistente;
 };
 
@@ -63,6 +64,7 @@ export function FormularioPresupuesto({
     lineasIniciales(presupuestoExistente, ivaDefecto),
   );
   const [notaVoz, setNotaVoz] = useState("");
+  const [interpretandoVoz, setInterpretandoVoz] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -76,20 +78,25 @@ export function FormularioPresupuesto({
     setLineas((actuales) => actuales.filter((linea) => linea.idLocal !== idLocal));
   }
 
-  function anadirLinea() {
+  function anadirLinea(prefill?: Partial<CamposLinea>) {
     setLineas((actuales) => [
       ...actuales,
-      { ...lineaVacia(ivaDefecto), idLocal: crypto.randomUUID() },
+      { ...lineaVacia(ivaDefecto), ...prefill, idLocal: crypto.randomUUID() },
     ]);
   }
 
-  function enviarNotaVoz() {
+  async function enviarNotaVoz() {
     if (!notaVoz.trim()) return;
 
-    const interpretada = interpretarTexto(notaVoz, catalogo, ivaDefecto);
+    setInterpretandoVoz(true);
+    const partidas = await interpretarNotaVoz(notaVoz, ivaDefecto);
+    setInterpretandoVoz(false);
+
+    if (partidas.length === 0) return;
+
     setLineas((actuales) => [
       ...actuales,
-      { ...interpretada, idLocal: crypto.randomUUID() },
+      ...partidas.map((partida) => ({ ...partida, idLocal: crypto.randomUUID() })),
     ]);
     setNotaVoz("");
   }
@@ -252,6 +259,7 @@ export function FormularioPresupuesto({
         value={notaVoz}
         onChange={setNotaVoz}
         onEnviar={enviarNotaVoz}
+        enviando={interpretandoVoz}
         placeholder="Describe el trabajo o dicta por voz…"
       />
 
@@ -260,6 +268,7 @@ export function FormularioPresupuesto({
         onActualizarLinea={actualizarLinea}
         onEliminarLinea={eliminarLinea}
         onAnadirLinea={anadirLinea}
+        catalogo={catalogo}
       />
 
       {error && <p className="text-sm text-peligro">{error}</p>}

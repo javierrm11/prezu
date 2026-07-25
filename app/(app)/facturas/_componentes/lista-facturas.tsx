@@ -11,6 +11,7 @@ export type FacturaFila = {
   id: string;
   numero: number;
   anio: number;
+  serie: string;
   cliente: string;
   concepto: string;
   fechaEmision: string;
@@ -170,7 +171,11 @@ export function ListaFacturas({ facturas }: { facturas: FacturaFila[] }) {
             <div>COBRO</div>
           </div>
           {filtradas.map((factura) => {
-            const etiquetaNumero = formatearNumeroDocumento("F", factura.numero, factura.anio);
+            const etiquetaNumero = formatearNumeroDocumento(
+              factura.serie,
+              factura.numero,
+              factura.anio,
+            );
             const badge = (
               <Badge tono={tonoFactura(factura.estadoEfectivo)}>{factura.estadoEfectivo}</Badge>
             );
