@@ -12,6 +12,7 @@ import {
 import { tonoPresupuesto } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
 import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
+import { calcularEnlacePdf } from "@/lib/pdf/enlace";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
 import { BotonCopiarEnlace } from "@/components/ui/BotonCopiarEnlace";
@@ -70,9 +71,17 @@ export default async function PresupuestoDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("nombre, serie_presupuesto, serie_factura")
+    .select("nombre, serie_presupuesto, serie_factura, pdf_plantilla, estado_suscripcion")
     .eq("id", empresaId)
     .single();
+
+  const enlacePdf = calcularEnlacePdf({
+    estadoSuscripcion: empresa?.estado_suscripcion,
+    pdfPlantilla: empresa?.pdf_plantilla,
+    rutaDetalle: `/presupuestos/${presupuesto.id}`,
+    rutaApiPdf: `/api/presupuestos/${presupuesto.id}/pdf`,
+    rutaElegirPlantilla: `/presupuestos/${presupuesto.id}/elegir-plantilla`,
+  });
 
   const { data: lineas } = await supabase
     .from("presupuesto_lineas")
@@ -196,7 +205,7 @@ export default async function PresupuestoDetallePage({
 
           <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
             <BotonCopiarEnlace url={enlacePublico} />
-            <a href={`/api/presupuestos/${presupuesto.id}/pdf`}>
+            <a href={enlacePdf}>
               <Boton variante="secundario" className="inline-flex items-center gap-2">
                 <Download size={16} />
                 Descargar PDF

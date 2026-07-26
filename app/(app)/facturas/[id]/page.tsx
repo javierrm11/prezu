@@ -12,6 +12,7 @@ import {
 import { estadoCobroEfectivo, tonoFactura } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
 import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
+import { calcularEnlacePdf } from "@/lib/pdf/enlace";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
 import { BotonMarcarCobrada } from "../_componentes/boton-marcar-cobrada";
@@ -67,9 +68,27 @@ export default async function FacturaDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("nombre")
+    .select("nombre, estado_suscripcion")
     .eq("id", empresaId)
     .single();
+
+  // Las facturas no tienen paso de "elegir plantilla" (usan la que
+  // ya se eligió en un presupuesto o en Ajustes, "clásico" si aún
+  // no se ha elegido ninguna), así que pdfPlantilla aquí es
+  // irrelevante: solo importa si hay suscripción activa.
+  const rutaDetalle = `/facturas/${factura.id}`;
+  const enlaceVerPdf = calcularEnlacePdf({
+    estadoSuscripcion: empresa?.estado_suscripcion,
+    pdfPlantilla: null,
+    rutaDetalle,
+    rutaApiPdf: `/api/facturas/${factura.id}/pdf`,
+  });
+  const enlaceDescargarPdf = calcularEnlacePdf({
+    estadoSuscripcion: empresa?.estado_suscripcion,
+    pdfPlantilla: null,
+    rutaDetalle,
+    rutaApiPdf: `/api/facturas/${factura.id}/pdf?descarga=1`,
+  });
 
   const { data: lineas } = await supabase
     .from("factura_lineas")
@@ -177,13 +196,13 @@ export default async function FacturaDetallePage({
           </div>
 
           <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
-            <a href={`/api/facturas/${factura.id}/pdf`} target="_blank" rel="noopener noreferrer">
+            <a href={enlaceVerPdf} target="_blank" rel="noopener noreferrer">
               <Boton variante="secundario" className="inline-flex items-center gap-2">
                 <Eye size={16} />
                 Ver PDF
               </Boton>
             </a>
-            <a href={`/api/facturas/${factura.id}/pdf?descarga=1`}>
+            <a href={enlaceDescargarPdf}>
               <Boton variante="secundario" className="inline-flex items-center gap-2">
                 <Download size={16} />
                 Descargar PDF

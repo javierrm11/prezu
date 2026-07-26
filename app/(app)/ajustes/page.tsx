@@ -1,8 +1,10 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
+import type { IdPlantillaPDF } from "@/lib/pdf/plantillas";
 import { FormularioAjustes, type EmpresaAjustes } from "./_componentes/formulario-ajustes";
 import { SeccionSuscripcion } from "./_componentes/seccion-suscripcion";
+import { SeccionPlantillaPDF } from "./_componentes/seccion-plantilla-pdf";
 import { BotonCerrarSesion } from "./_componentes/boton-cerrar-sesion";
 
 export default async function AjustesPage() {
@@ -23,7 +25,7 @@ export default async function AjustesPage() {
   const { data: empresa } = await supabase
     .from("empresas")
     .select(
-      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final",
+      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
     )
     .eq("id", empresaId)
     .single();
@@ -66,6 +68,11 @@ export default async function AjustesPage() {
           estado={empresa.estado_suscripcion}
           periodoFin={empresa.suscripcion_periodo_fin}
           cancelaAlFinal={empresa.suscripcion_cancela_al_final}
+        />
+
+        <SeccionPlantillaPDF
+          empresaId={empresaId}
+          plantillaActual={empresa.pdf_plantilla as IdPlantillaPDF | null}
         />
 
         <div className="flex flex-col gap-3 rounded-xl border border-borde bg-superficie p-5 shadow-tarjeta">

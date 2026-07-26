@@ -8,7 +8,11 @@ import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 // empresaId se saca de la sesión, nunca de un parámetro del
 // cliente: así nadie puede generar un pago para el negocio de otro
 // pasando un id ajeno.
-export async function crearSesionCheckout() {
+export async function crearSesionCheckout(returnTo?: string) {
+  // Solo rutas relativas propias: returnTo viaja como query param
+  // desde el navegador, así que no puede usarse para redirigir a
+  // otro dominio tras el pago.
+  const destino = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/dashboard";
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
@@ -47,7 +51,7 @@ export async function crearSesionCheckout() {
     line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
     discounts: [{ coupon: process.env.STRIPE_COUPON_ID! }],
     subscription_data: { trial_period_days: 1 },
-    success_url: `${baseUrl}/dashboard`,
+    success_url: `${baseUrl}${destino}`,
     cancel_url: `${baseUrl}/suscripcion`,
   });
 

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Prezu — Presupuestos por voz para fontaneros, electricistas y talleres</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Dicta el trabajo y tu cliente recibe el presupuesto en PDF por WhatsApp en 30 segundos. Facturas con numeración correlativa, preparado para VeriFactu. 14 días gratis.">
+<meta property="og:title" content="Prezu — Del tajo al presupuesto en 30 segundos">
+<meta property="og:description" content="Dicta el trabajo y tu cliente recibe el presupuesto en PDF por WhatsApp antes de que arranques la furgoneta.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;background:#F8F9FF}
+*{box-sizing:border-box}
+a{color:#2F4FB5;text-decoration:none}a:hover{color:#1A2B6D}
+button,input{font-family:Inter,sans-serif}
+:focus-visible{outline:2px solid #2F4FB5;outline-offset:3px}
+@keyframes wv{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes pulseRec{0%{box-shadow:0 0 0 0 rgba(220,38,38,.28)}70%{box-shadow:0 0 0 18px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+</style>
+</helmet>
+<div style="font-family:Inter,sans-serif;color:#0D1B4B;background:#F8F9FF;-webkit-font-smoothing:antialiased">
+
+  <header style="{{ headerS }}">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center;gap:20px">
+      <a href="#top" style="display:flex;align-items:center;gap:9px;flex-shrink:0">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path><path d="M8.5 10.5v2.5M12 8.5v6M15.5 10v3.5" stroke="#1A2B6D" stroke-width="1.75" stroke-linecap="round"></path></svg>
+        <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Prezu</span>
+      </a>
+      <span style="flex:1"></span>
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:flex;align-items:center;gap:28px">
+          <a href="#como-funciona" style="font-size:15px;font-weight:500;color:#5A6A9A">Cómo funciona</a>
+          <a href="#precios" style="font-size:15px;font-weight:500;color:#5A6A9A">Precios</a>
+          <a href="#preguntas" style="font-size:15px;font-weight:500;color:#5A6A9A">Preguntas</a>
+        </nav>
+      </sc-if>
+      <a href="Prezu.dc.html" style="height:44px;padding:0 20px;background:#F4A623;color:#1A2B6D;border-radius:8px;font-size:15px;font-weight:600;display:flex;align-items:center;flex-shrink:0" style-hover="background:#E09612;color:#1A2B6D">Empezar gratis</a>
+      <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toggleMenu }}" aria-label="Abrir menú" style="width:44px;height:44px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </sc-if>
+    </div>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="border-top:1px solid #D0D8F0;background:#FFFFFF;padding:8px 20px 16px;display:flex;flex-direction:column">
+        <a href="#como-funciona" onClick="{{ closeMenu }}" style="padding:14px 0;font-size:16px;font-weight:500;color:#0D1B4B;border-bottom:1px solid #EEF0F6">Cómo funciona</a>
+        <a href="#precios" onClick="{{ closeMenu }}" style="padding:14px 0;font-size:16px;font-weight:500;color:#0D1B4B;border-bottom:1px solid #EEF0F6">Precios</a>
+        <a href="#preguntas" onClick="{{ closeMenu }}" style="padding:14px 0;font-size:16px;font-weight:500;color:#0D1B4B">Preguntas</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <section id="top" style="{{ heroS }}">
+    <div style="max-width:1200px;margin:0 auto;display:flex;gap:{{ heroGap }};align-items:center;flex-wrap:wrap">
+      <div style="flex:1 1 380px;min-width:min(100%,280px);display:flex;flex-direction:column;gap:{{ heroColGap }}">
+        <h1 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:{{ h1Size }};line-height:1.02;letter-spacing:-0.02em;color:#1A2B6D;margin:0;text-wrap:pretty">Del tajo al presupuesto en 30 segundos.</h1>
+        <p style="font-size:{{ subSize }};line-height:1.45;color:#5A6A9A;margin:0;max-width:34ch;text-wrap:pretty">Dicta el trabajo al salir de la visita y tu cliente recibe un PDF profesional por WhatsApp antes de que arranques la furgoneta.</p>
+        <div style="display:flex;gap:10px;flex-wrap:nowrap;align-items:center;margin-top:2px">
+          <a href="Prezu.dc.html" style="height:52px;padding:0 22px;background:#F4A623;color:#1A2B6D;border-radius:8px;font-size:16px;font-weight:600;display:flex;align-items:center;white-space:nowrap;box-shadow:0 2px 8px rgba(26,43,109,0.08)" style-hover="background:#E09612;color:#1A2B6D">Empezar gratis</a>
+          <a href="#como-funciona" style="height:52px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;white-space:nowrap" style-hover="background:#E8EDFB;color:#2F4FB5">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"></path></svg>
+            {{ verLabel }}</a>
+        </div>
+        <div style="font-size:13px;color:#5A6A9A">14 días de prueba · Sin tarjeta</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:{{ trustSize }};color:#5A6A9A;border-top:1px solid #D0D8F0;padding-top:{{ trustPad }};margin-top:2px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2F4FB5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          Hecho para fontaneros, electricistas, talleres y reformas.
+        </div>
+      </div>
+      <div style="flex:1 1 300px;min-width:min(100%,240px);display:flex;justify-content:center;padding:0">
+        <div style="position:relative;width:{{ heroWrapW }};padding-bottom:{{ heroPhonePadB }};display:flex;flex-direction:column;align-items:center">
+          <div style="width:{{ heroPhoneW }};border-radius:30px;background:#FFFFFF;border:9px solid #1A2B6D;box-shadow:0 16px 44px rgba(26,43,109,0.22);overflow:hidden">
+            <div style="background:#1A2B6D;height:22px;display:flex;align-items:center;justify-content:center"><div style="width:56px;height:5px;border-radius:999px;background:rgba(255,255,255,0.28)"></div></div>
+            <div style="background:#F8F9FF;padding:14px 14px 18px;display:flex;flex-direction:column;align-items:center;gap:12px">
+              <sc-if value="{{ roomy }}" hint-placeholder-val="{{ true }}">
+                <div style="align-self:flex-start;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D">Presupuesto por voz</div>
+              </sc-if>
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#0D1B4B;font-variant-numeric:tabular-nums">0:07</div>
+              <div style="display:flex;align-items:center;gap:3px;height:38px">
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:16px;animation:wv 1.1s ease-in-out 0s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:28px;animation:wv 1.1s ease-in-out .09s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:36px;animation:wv 1.1s ease-in-out .18s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:22px;animation:wv 1.1s ease-in-out .27s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:32px;animation:wv 1.1s ease-in-out .36s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:38px;animation:wv 1.1s ease-in-out .45s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:20px;animation:wv 1.1s ease-in-out .54s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:34px;animation:wv 1.1s ease-in-out .18s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:26px;animation:wv 1.1s ease-in-out .36s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:36px;animation:wv 1.1s ease-in-out .09s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:18px;animation:wv 1.1s ease-in-out .45s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:30px;animation:wv 1.1s ease-in-out .27s infinite"></div>
+              </div>
+              <div style="width:72px;height:72px;border-radius:999px;background:#FCEAEA;border:2px solid #DC2626;display:flex;align-items:center;justify-content:center;animation:pulseRec 1.7s ease-out infinite">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#DC2626" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+              </div>
+              <div style="font-size:13px;font-weight:500;color:#DC2626">Grabando…</div>
+              <sc-if value="{{ roomy }}" hint-placeholder-val="{{ true }}">
+                <div style="width:100%;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.5;color:#5A6A9A">«Para María Dolores: doce metros de tubería a catorce cincuenta…»</div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="position:{{ bubblePos }};right:{{ bubbleRight }};bottom:0;margin-top:{{ bubbleMt }};width:{{ bubbleW }};background:#FFFFFF;border-radius:12px 12px 12px 4px;box-shadow:0 10px 28px rgba(26,43,109,0.22);padding:11px 13px;display:flex;flex-direction:column;gap:8px;animation:floaty 4s ease-in-out infinite">
+            <div style="display:flex;align-items:center;gap:7px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z"></path></svg>
+              <span style="font-size:11px;font-weight:600;color:#5A6A9A">Fontanería Paco García</span>
+            </div>
+            <div style="display:flex;gap:9px;align-items:center">
+              <div style="width:34px;height:40px;border-radius:5px;background:#EEF0F6;border:1px solid #D0D8F0;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+              </div>
+              <div style="min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#0D1B4B;line-height:1.35">Presupuesto · Reforma de baño</div>
+                <div style="font-size:13px;font-weight:600;color:#0D1B4B;font-variant-numeric:tabular-nums;margin-top:2px">960,74 €</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:10px;color:#8A8FA3">
+              12:41
+              <svg width="14" height="10" viewBox="0 0 24 18" fill="none" stroke="#2F4FB5" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4 7 14l-4-4"></path><path d="m21 4-8 10-1.4-1.4"></path></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-fade="1" style="background:#1A2B6D;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:1100px;margin:0 auto">
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(30px,4.6vw,46px);line-height:1.1;color:#FFFFFF;margin:0 0 32px">¿Te suena?</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px">
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F4A623" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6.4 6.4 0 0 0 9 9 9 9 0 1 1-9-9z"></path></svg>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#FFFFFF">Los presupuestos, para la noche.</div>
+          <div style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.72)">Llegas a casa reventado y aún te quedan dos por pasar.</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F4A623" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"></path></svg>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#FFFFFF">El cliente no espera.</div>
+          <div style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.72)">Mientras tardas tres días en mandar el papel, otro ya se lo ha llevado.</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F4A623" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7v6c0 5 3.8 8.4 9 9 5.2-.6 9-4 9-9V7z"></path><path d="M12 9v3M12 15h.01"></path></svg>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#FFFFFF">Y ahora, la ley nueva.</div>
+          <div style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.72)">VeriFactu llega en 2027 y tu Excel de facturas no va a valer.</div>
+        </div>
+      </div>
+      <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(22px,3.4vw,34px);line-height:1.25;color:#F4A623;margin-top:36px;max-width:22ch;text-wrap:pretty">Cada presupuesto que tardas es un trabajo que vuela.</div>
+    </div>
+  </section>
+
+  <section id="como-funciona" data-fade="1" style="background:#F8F9FF;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(40px,6vw,72px)">
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(30px,4.6vw,46px);line-height:1.1;color:#1A2B6D;margin:0">Habla. Revisa. Envía.</h2>
+
+      <div style="display:flex;gap:clamp(24px,4vw,56px);align-items:center;flex-wrap:wrap">
+        <div style="flex:1 1 320px;min-width:min(100%,280px);display:flex;flex-direction:column;gap:14px">
+          <div style="width:44px;height:44px;border-radius:999px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px">1</div>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(22px,2.8vw,28px);color:#1A2B6D">Dicta el trabajo.</div>
+          <div style="font-size:16px;line-height:1.65;color:#5A6A9A;max-width:42ch;text-wrap:pretty">«Para María Dolores: doce metros de tubería a catorce cincuenta, un plato de ducha instalado y ocho horas de mano de obra.»</div>
+        </div>
+        <div style="flex:1 1 260px;min-width:min(100%,240px);display:flex;justify-content:center">
+          <div style="width:min(100%,250px);border-radius:26px;background:#FFFFFF;border:8px solid #1A2B6D;box-shadow:0 10px 30px rgba(26,43,109,0.16);overflow:hidden">
+            <div style="background:#F8F9FF;padding:20px 14px 24px;display:flex;flex-direction:column;align-items:center;gap:14px">
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#0D1B4B;font-variant-numeric:tabular-nums">0:12</div>
+              <div style="display:flex;align-items:center;gap:3px;height:34px">
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:14px;animation:wv 1.1s ease-in-out 0s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:26px;animation:wv 1.1s ease-in-out .12s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:34px;animation:wv 1.1s ease-in-out .24s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:20px;animation:wv 1.1s ease-in-out .36s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:30px;animation:wv 1.1s ease-in-out .48s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:34px;animation:wv 1.1s ease-in-out .12s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:18px;animation:wv 1.1s ease-in-out .36s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:28px;animation:wv 1.1s ease-in-out .24s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:32px;animation:wv 1.1s ease-in-out .48s infinite"></div>
+                <div style="width:4px;border-radius:2px;background:#DC2626;height:16px;animation:wv 1.1s ease-in-out 0s infinite"></div>
+              </div>
+              <div style="width:72px;height:72px;border-radius:999px;background:#FCEAEA;border:2px solid #DC2626;display:flex;align-items:center;justify-content:center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#DC2626" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+              </div>
+              <div style="width:100%;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.55;color:#5A6A9A">doce metros de tubería a catorce cincuenta, un plato de ducha instalado…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:clamp(24px,4vw,56px);align-items:center;flex-wrap:wrap;flex-direction:{{ dirB }}">
+        <div style="flex:1 1 320px;min-width:min(100%,280px);display:flex;flex-direction:column;gap:14px">
+          <div style="width:44px;height:44px;border-radius:999px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px">2</div>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(22px,2.8vw,28px);color:#1A2B6D">Prezu lo convierte en presupuesto.</div>
+          <div style="font-size:16px;line-height:1.65;color:#5A6A9A;max-width:42ch;text-wrap:pretty">Partidas, cantidades, precios y IVA, con TUS precios de siempre. Tú solo revisas y corriges si hace falta.</div>
+        </div>
+        <div style="flex:1 1 320px;min-width:min(100%,280px)">
+          <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(0,3fr) 54px 86px;gap:8px;padding:10px 14px;border-bottom:1px solid #D0D8F0;font-size:10px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+              <div>CONCEPTO</div><div style="text-align:right">CANT.</div><div style="text-align:right">IMPORTE</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,3fr) 54px 86px;gap:8px;padding:0 14px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+              <div style="font-size:13px;display:flex;align-items:center;gap:6px;min-width:0"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0"></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tubería multicapa 20 mm</span></div>
+              <div style="font-size:13px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">12 m</div>
+              <div style="font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">174,00 €</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,3fr) 54px 86px;gap:8px;padding:0 14px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+              <div style="font-size:13px;display:flex;align-items:center;gap:6px;min-width:0"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0"></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Plato de ducha instalado</span></div>
+              <div style="font-size:13px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">1 ud</div>
+              <div style="font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">280,00 €</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,3fr) 54px 86px;gap:8px;padding:0 14px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+              <div style="font-size:13px;display:flex;align-items:center;gap:6px;min-width:0"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0"></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Grifería monomando</span></div>
+              <div style="font-size:13px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">1 ud</div>
+              <div style="font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">60,00 €</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,3fr) 54px 86px;gap:8px;padding:0 14px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+              <div style="font-size:13px;display:flex;align-items:center;gap:6px;min-width:0"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0"></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Mano de obra</span></div>
+              <div style="font-size:13px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">8 h</div>
+              <div style="font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums">280,00 €</div>
+            </div>
+            <div style="padding:14px;background:#F8F9FF;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#5A6A9A"><span>Base imponible</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">794,00 €</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#5A6A9A"><span>IVA (21 %)</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">166,74 €</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:8px"><span style="font-size:13px;font-weight:600">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#1A2B6D;font-variant-numeric:tabular-nums">960,74 €</span></div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#5A6A9A;display:flex;align-items:center;gap:6px;margin-top:10px"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623"></span>Precio sacado de tu catálogo</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:clamp(24px,4vw,56px);align-items:center;flex-wrap:wrap">
+        <div style="flex:1 1 320px;min-width:min(100%,280px);display:flex;flex-direction:column;gap:14px">
+          <div style="width:44px;height:44px;border-radius:999px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px">3</div>
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(22px,2.8vw,28px);color:#1A2B6D">Tu cliente lo recibe por WhatsApp.</div>
+          <div style="font-size:16px;line-height:1.65;color:#5A6A9A;max-width:42ch;text-wrap:pretty">PDF con tu logo y un botón para aceptar. Te avisamos cuando lo ve <span style="color:#2F4FB5;font-weight:600">✓✓</span> y cuando lo acepta.</div>
+        </div>
+        <div style="flex:1 1 260px;min-width:min(100%,240px);display:flex;justify-content:center">
+          <div style="width:min(100%,250px);border-radius:26px;background:#FFFFFF;border:8px solid #1A2B6D;box-shadow:0 10px 30px rgba(26,43,109,0.16);overflow:hidden">
+            <div style="background:#FFFFFF;border-bottom:1px solid #D0D8F0;padding:12px 14px;display:flex;gap:10px;align-items:center">
+              <div style="width:34px;height:34px;border-radius:8px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px">PG</div>
+              <div><div style="font-size:13px;font-weight:600;color:#0D1B4B">Fontanería Paco García</div><div style="font-size:10px;color:#5A6A9A">Villafranca de Córdoba</div></div>
+            </div>
+            <div style="background:#F8F9FF;padding:14px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D">Presupuesto P-2026-014</div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#5A6A9A"><span>Reforma de baño</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">794,00 €</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#5A6A9A"><span>IVA (21 %)</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">166,74 €</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:7px"><span style="font-size:12px;font-weight:600">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D;font-variant-numeric:tabular-nums">960,74 €</span></div>
+              </div>
+              <div style="height:46px;background:#16A34A;color:#FFFFFF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Aceptar presupuesto</div>
+              <div style="height:40px;border:1.5px solid #2F4FB5;color:#2F4FB5;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500">Proponer cambios</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-fade="1" style="background:#FFFFFF;border-top:1px solid #D0D8F0;border-bottom:1px solid #D0D8F0;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:1100px;margin:0 auto;display:flex;gap:clamp(24px,4vw,56px);align-items:center;flex-wrap:wrap">
+      <div style="flex:1 1 340px;min-width:min(100%,300px);display:flex;flex-direction:column;gap:16px">
+        <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(28px,4.2vw,42px);line-height:1.1;color:#1A2B6D;margin:0;text-wrap:pretty">Tu catálogo, tu chapa y pintura.</h2>
+        <p style="font-size:16px;line-height:1.7;color:#5A6A9A;margin:0;max-width:44ch;text-wrap:pretty">La primera vez le dices el precio. La segunda, ya se lo sabe. Prezu guarda tus partidas de siempre — la hora de mano de obra, el metro de tubería, el desplazamiento — y las clava en cada presupuesto. Cuanto más lo usas, más rápido va.</p>
+      </div>
+      <div style="flex:1 1 320px;min-width:min(100%,280px)">
+        <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+          <div style="background:#E8EDFB;padding:11px 14px;font-size:12px;color:#2F4FB5;display:flex;gap:8px;align-items:center">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
+            Prezu usa estos precios cuando dictas.
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #EEF0F6"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">Mano de obra</div><div style="font-size:11px;color:#8A8FA3">Usado 48 veces</div></div><div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">35,00 € / h</div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #EEF0F6"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">Tubería multicapa 20 mm instalada</div><div style="font-size:11px;color:#8A8FA3">Usado 23 veces</div></div><div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">14,50 € / m</div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #EEF0F6"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">Desatasco con máquina</div><div style="font-size:11px;color:#8A8FA3">Usado 19 veces</div></div><div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">120,00 € / ud</div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #EEF0F6"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">Grifería monomando instalada</div><div style="font-size:11px;color:#8A8FA3">Usado 14 veces</div></div><div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">60,00 € / ud</div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">Sustitución termo eléctrico 80 L</div><div style="font-size:11px;color:#8A8FA3">Usado 6 veces</div></div><div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums">340,00 € / ud</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-fade="1" style="background:#1A2B6D;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px;align-items:flex-start">
+      <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(244,166,35,0.16);color:#F4A623;border:1px solid rgba(244,166,35,0.4);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Preparado para VeriFactu</span>
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(30px,4.6vw,46px);line-height:1.1;color:#FFFFFF;margin:0;text-wrap:pretty">Aceptado hoy, facturado hoy.</h2>
+      <p style="font-size:clamp(15px,1.8vw,18px);line-height:1.7;color:rgba(255,255,255,0.75);margin:0;max-width:52ch;text-wrap:pretty">Cuando el cliente acepta, la factura se hace sola: mismo trabajo, mismas partidas, numeración correlativa y sin errores. Y con la vista puesta en <strong style="color:#FFFFFF;font-weight:600">VeriFactu</strong>, la normativa que será obligatoria para los autónomos en julio de 2027. Cuando llegue, tú ya estarás listo.</p>
+      <div style="font-size:13px;color:rgba(255,255,255,0.55);border-top:1px solid rgba(255,255,255,0.16);padding-top:16px;max-width:56ch;text-wrap:pretty">Hoy generas facturas válidas; la conexión con la AEAT se activará cuando la ley lo exija.</div>
+    </div>
+  </section>
+
+  <section data-fade="1" style="background:#F8F9FF;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:28px">
+        <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(28px,4.2vw,42px);line-height:1.1;color:#1A2B6D;margin:0">Los primeros que lo han probado</h2>
+        <span style="background:#FDF3DF;color:#B87A0E;border:1px dashed #F4A623;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600">Textos de ejemplo · no publicar sin testimonios reales</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px">
+        <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:16px;line-height:1.65;color:#0D1B4B;text-wrap:pretty">«Antes perdía la tarde del domingo haciendo presupuestos. Ahora los mando desde la furgoneta.»</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+            <div style="width:44px;height:44px;border-radius:999px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0">PG</div>
+            <div><div style="font-size:14px;font-weight:600">Paco G.</div><div style="font-size:13px;color:#5A6A9A">Fontanero · Córdoba</div></div>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:16px;line-height:1.65;color:#0D1B4B;text-wrap:pretty">«El cliente flipa cuando le llega el PDF a los cinco minutos de irme.»</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+            <div style="width:44px;height:44px;border-radius:999px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0">MR</div>
+            <div><div style="font-size:14px;font-weight:600">Manolo R.</div><div style="font-size:13px;color:#5A6A9A">Electricista · Montoro</div></div>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:16px;line-height:1.65;color:#0D1B4B;text-wrap:pretty">«Lo del doble check para saber si lo han visto vale el dinero él solo.»</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
+            <div style="width:44px;height:44px;border-radius:999px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0">HJ</div>
+            <div><div style="font-size:14px;font-weight:600">Talleres Hnos. Jiménez</div><div style="font-size:13px;color:#5A6A9A">Taller · Villafranca</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="precios" data-fade="1" style="background:#F8F9FF;padding:clamp(40px,6vw,72px) 20px clamp(48px,7vw,88px)">
+    <div style="max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center">
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(30px,4.6vw,46px);line-height:1.1;color:#1A2B6D;margin:0">Un precio. Todo dentro.</h2>
+      <div style="width:100%;background:#FFFFFF;border:2px solid #F4A623;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:clamp(24px,4vw,32px);display:flex;flex-direction:column;gap:20px;text-align:left">
+        <div style="text-align:center">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D">Prezu</div>
+          <div style="display:flex;align-items:baseline;gap:6px;justify-content:center;margin-top:6px">
+            <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(40px,8vw,54px);color:#0D1B4B;font-variant-numeric:tabular-nums">{{ precio }}</span>
+            <span style="font-size:17px;color:#5A6A9A">/mes</span>
+          </div>
+          <div style="font-size:13px;color:#5A6A9A;margin-top:2px">IVA incluido</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:11px;border-top:1px solid #EEF0F6;padding-top:20px">
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Presupuestos y facturas ilimitados</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Dictado por voz</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Envío por WhatsApp</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Aviso de visto y aceptado</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Tu catálogo de precios</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">PDF con tu logo</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size:15px">Soporte por WhatsApp</span></div>
+        </div>
+        <a href="Prezu.dc.html" style="height:56px;background:#F4A623;color:#1A2B6D;border-radius:8px;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center" style-hover="background:#E09612;color:#1A2B6D">Empezar 14 días gratis</a>
+        <div style="font-size:13px;color:#5A6A9A;text-align:center">Sin permanencia. Sin tarjeta para probar. Te vas cuando quieras.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="preguntas" data-fade="1" style="background:#FFFFFF;border-top:1px solid #D0D8F0;padding:clamp(48px,7vw,88px) 20px">
+    <div style="max-width:760px;margin:0 auto">
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(28px,4.2vw,42px);line-height:1.1;color:#1A2B6D;margin:0 0 24px">Preguntas frecuentes</h2>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+          <div style="background:#F8F9FF;border:1px solid #D0D8F0;border-radius:12px;overflow:hidden">
+            <button onClick="{{ f.toggle }}" style="width:100%;min-height:60px;padding:16px 18px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;color:#0D1B4B" style-hover="background:#EEF0F6">
+              <span style="flex:1;font-size:16px;font-weight:600;text-wrap:pretty">{{ f.q }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F4FB5" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;transform:rotate({{ f.rot }}deg);transition:transform .18s" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 18px 18px;font-size:15px;line-height:1.7;color:#5A6A9A;text-wrap:pretty">{{ f.a }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-fade="1" style="background:#1A2B6D;padding:clamp(56px,8vw,104px) 20px">
+    <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center">
+      <h2 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:clamp(32px,6vw,56px);line-height:1.05;color:#FFFFFF;margin:0;text-wrap:pretty">El próximo presupuesto, díctalo.</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a href="Prezu.dc.html" style="height:58px;padding:0 32px;background:#F4A623;color:#1A2B6D;border-radius:8px;font-size:18px;font-weight:600;display:flex;align-items:center" style-hover="background:#E09612;color:#1A2B6D">Empezar gratis</a>
+        <a href="{{ waLink }}" style="height:58px;padding:0 24px;background:#FFFFFF;color:#1A2B6D;border-radius:8px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px" style-hover="background:#EEF0F6;color:#1A2B6D">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z"></path></svg>
+          Escríbenos por WhatsApp</a>
+      </div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.6)">Te contestamos en el día. De persona a persona.</div>
+    </div>
+  </section>
+
+  <footer style="background:#0D1B4B;padding:48px 20px 32px">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:32px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path></svg>
+          <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:#FFFFFF">Prezu</span>
+        </div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;max-width:26ch">Presupuestos y facturas por voz para autónomos de oficios.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,0.45)">PRODUCTO</div>
+        <a href="#como-funciona" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Cómo funciona</a>
+        <a href="#precios" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Precios</a>
+        <a href="#preguntas" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Preguntas</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,0.45)">LEGAL</div>
+        <a href="#top" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Aviso legal</a>
+        <a href="#top" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Privacidad</a>
+        <a href="#top" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">Cookies</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:12px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,0.45)">CONTACTO</div>
+        <a href="{{ waLink }}" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">WhatsApp {{ telefono }}</a>
+        <a href="mailto:hola@prezu.es" style="font-size:14px;color:rgba(255,255,255,0.75)" style-hover="color:#F4A623">hola@prezu.es</a>
+      </div>
+    </div>
+    <div style="max-width:1100px;margin:32px auto 0;border-top:1px solid rgba(255,255,255,0.12);padding-top:20px;font-size:13px;color:rgba(255,255,255,0.5)">Un producto de Molero — Villafranca de Córdoba</div>
+  </footer>
+
+  <sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+    <a href="{{ waLink }}" aria-label="Escríbenos por WhatsApp" style="position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:999px;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(13,27,75,0.28);z-index:60">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z"></path></svg>
+    </a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;precioMensual&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;29 €&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenido&quot;},&quot;telefono&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;657 XX XX XX&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenido&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state={
+      w:typeof window!=='undefined'?window.innerWidth:1200,
+      scrolled:false,pastHero:false,menuOpen:false,open:1
+    };
+  }
+  componentDidMount(){
+    this._rs=()=>this.setState({w:window.innerWidth,menuOpen:false});
+    this._sc=()=>{const y=window.scrollY||document.documentElement.scrollTop;this.setState({scrolled:y>8,pastHero:y>420});};
+    window.addEventListener('resize',this._rs);
+    window.addEventListener('scroll',this._sc,{passive:true});
+    this._io=new IntersectionObserver((es)=>{
+      es.forEach(e=>{ if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='none'; this._io.unobserve(e.target);} });
+    },{threshold:0.06,rootMargin:'0px 0px -40px 0px'});
+    setTimeout(()=>{
+      document.querySelectorAll('[data-fade]').forEach(el=>{
+        const r=el.getBoundingClientRect();
+        el.style.transition='opacity .55s ease-out, transform .55s ease-out';
+        if(r.top>window.innerHeight*0.9){ el.style.opacity='0'; el.style.transform='translateY(18px)'; }
+        this._io.observe(el);
+      });
+    },120);
+  }
+  componentWillUnmount(){
+    window.removeEventListener('resize',this._rs);
+    window.removeEventListener('scroll',this._sc);
+    if(this._io)this._io.disconnect();
+  }
+  renderVals(){
+    const st=this.state,wide=st.w>=860,narrow=!wide;
+    const tel=this.props.telefono??'657 XX XX XX';
+    const digits=tel.replace(/\D/g,'');
+    const waLink=digits.length>=9?'https://wa.me/34'+digits:'https://wa.me/';
+    const tiny=st.w<430;
+    const FAQ=[
+      ['¿Y si no me entiende al dictar?','Siempre revisas antes de enviar. La app te enseña las partidas y las corriges en un toque. Nada sale sin tu visto bueno.'],
+      ['¿Tengo que meter mis precios uno a uno?','No. Los aprende de tus propios presupuestos. Y si tienes una lista, la importamos por ti.'],
+      ['¿Vale para facturas o solo presupuestos?','Para las dos cosas. Presupuesto aceptado se convierte en factura en un clic, con numeración correlativa.'],
+      ['¿Necesito instalar algo?','No. Funciona en el navegador del móvil y puedes añadirla a la pantalla de inicio como una app normal.'],
+      ['¿Esto cumple con la ley de facturación nueva?','Está construido pensando en VeriFactu (obligatorio para autónomos en julio de 2027). Facturas inmutables, numeración correlativa y conexión con la AEAT lista para activarse.'],
+      ['¿Y mis datos?','Son tuyos. Los exportas cuando quieras y cumplimos el RGPD.']
+    ];
+    return {
+      wide,narrow,
+      headerS:'position:sticky;top:0;z-index:50;background:#FFFFFF;border-bottom:1px solid '+(st.scrolled?'#D0D8F0':'transparent')+';box-shadow:'+(st.scrolled?'0 2px 8px rgba(26,43,109,0.08)':'none'),
+      menuOpen:st.menuOpen&&narrow,
+      toggleMenu:()=>this.setState(s=>({menuOpen:!s.menuOpen})),
+      closeMenu:()=>this.setState({menuOpen:false}),
+      dirB:wide?'row-reverse':'row',
+      precio:this.props.precioMensual??'29 €',
+      telefono:tel,
+      waLink,
+      heroS:'background:#F8F9FF;padding:'+(tiny?'12px 18px 26px':'32px 20px 56px'),
+      heroGap:tiny?'14px':'clamp(24px,4vw,64px)',
+      heroColGap:tiny?'12px':'18px',
+      h1Size:tiny?'clamp(28px,8vw,34px)':'clamp(34px,7.4vw,60px)',
+      subSize:tiny?'15px':'clamp(15px,1.6vw,19px)',
+      trustSize:tiny?'13px':'14px',
+      trustPad:tiny?'12px':'16px',
+      verLabel:tiny?'Cómo funciona':'Ver cómo funciona',
+      roomy:!tiny,
+      heroWrapW:tiny?'min(100%,240px)':'min(100%,300px)',
+      heroPhoneW:tiny?'min(100%,158px)':'min(100%,300px)',
+      heroPhonePadB:tiny?'0px':'82px',
+      bubbleW:tiny?'min(100%,232px)':'min(96%,258px)',
+      bubbleRight:tiny?'0px':'-6px',
+      bubblePos:tiny?'relative':'absolute',
+      bubbleMt:tiny?'12px':'0px',
+      showFab:narrow&&st.pastHero,
+      faqs:FAQ.map((f,i)=>({q:f[0],a:f[1],open:st.open===i,rot:st.open===i?180:0,toggle:()=>this.setState(s=>({open:s.open===i?-1:i}))}))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#E9ECF8}
+*{box-sizing:border-box}
+a{color:#2F4FB5;text-decoration:none}a:hover{color:#1A2B6D}
+input,select,textarea,button{font-family:Inter,sans-serif}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#2F4FB5!important;box-shadow:0 0 0 1px #2F4FB5}
+button:focus-visible{outline:2px solid #2F4FB5;outline-offset:2px}
+@keyframes wv{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes shm{0%{background-position:-300px 0}100%{background-position:300px 0}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes dash{to{stroke-dashoffset:0}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}70%{box-shadow:0 0 0 20px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</helmet>
+<div style="font-family:Inter,sans-serif;color:#0D1B4B;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px">
+  <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:8px 12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path><path d="M8.5 10.5v2.5M12 8.5v6M15.5 10v3.5" stroke="#1A2B6D" stroke-width="1.75" stroke-linecap="round"></path></svg>
+      <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;color:#1A2B6D">Prezu</span>
+      <span style="font-size:12px;color:#5A6A9A;margin-left:4px">Prototipo navegable</span>
+    </div>
+    <div style="display:flex;gap:4px;background:#EEF0F6;border-radius:8px;padding:3px">
+      <button onClick="{{ setM }}" style="{{ devM }}">Móvil · 390</button>
+      <button onClick="{{ setT }}" style="{{ devT }}">Tablet · 768</button>
+      <button onClick="{{ setD }}" style="{{ devD }}">Escritorio · 1440</button>
+    </div>
+    <select value="{{ screenSel }}" onChange="{{ jump }}" style="height:32px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:13px;color:#0D1B4B;background:#fff;cursor:pointer">
+      <option value="login">0 · Login</option>
+      <option value="dashboard">1 · Dashboard</option>
+      <option value="nuevo">2 · Nuevo presupuesto</option>
+      <option value="voz">3 · Modo voz</option>
+      <option value="presupuestos">4 · Presupuestos</option>
+      <option value="presupuestoDetalle">5 · Detalle presupuesto</option>
+      <option value="facturas">6 · Facturas</option>
+      <option value="facturaDetalle">7 · Detalle factura</option>
+      <option value="clientes">8 · Clientes</option>
+      <option value="clienteDetalle">8b · Detalle cliente</option>
+      <option value="catalogo">9 · Catálogo de precios</option>
+      <option value="ajustes">10 · Ajustes</option>
+      <option value="publica">11 · Página pública (cliente)</option>
+      <option value="pdf">12 · Plantillas PDF A4</option>
+    </select>
+  </div>
+  <div style="width:{{ wrapW }}px;height:{{ wrapH }}px">
+  <div style="width:{{ frameW }}px;height:{{ frameH }}px;transform:scale({{ frameScale }});transform-origin:top left;background:#F8F9FF;border-radius:20px;border:1px solid #D0D8F0;box-shadow:0 12px 40px rgba(26,43,109,0.15);overflow:hidden;display:flex;position:relative">
+    <sc-if value="{{ showSide }}" hint-placeholder-val="{{ false }}">
+      <div style="width:{{ sideW }}px;flex-shrink:0;background:#1A2B6D;display:flex;flex-direction:column;padding:16px 12px;gap:4px;transition:width .2s">
+        <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 16px">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path><path d="M8.5 10.5v2.5M12 8.5v6M15.5 10v3.5" stroke="#1A2B6D" stroke-width="1.75" stroke-linecap="round"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:#FFFFFF">Prezu</span></sc-if>
+        </div>
+        <button onClick="{{ goNew }}" title="Nuevo presupuesto" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;height:44px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px" style-hover="background:#E09612">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Nuevo presupuesto</span></sc-if>
+        </button>
+        <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,0.45);padding:8px 8px 4px">PRINCIPAL</div></sc-if>
+        <div onClick="{{ goDash }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cInicio }};background:{{ bInicio }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Inicio</span></sc-if>
+        </div>
+        <div onClick="{{ goQuotes }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cPres }};background:{{ bPres }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8M16 17H8"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Presupuestos</span></sc-if>
+        </div>
+        <div onClick="{{ goInvoices }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cFact }};background:{{ bFact }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"></path><path d="M15 9.5a3 3 0 0 0-2.5-1.5c-1.7 0-3 1.3-3 3s1.3 3 3 3c1 0 1.9-.6 2.5-1.5M8 11h4"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Facturas</span></sc-if>
+        </div>
+        <div onClick="{{ goClients }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cCli }};background:{{ bCli }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Clientes</span></sc-if>
+        </div>
+        <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,0.45);padding:14px 8px 4px">NEGOCIO</div></sc-if>
+        <div onClick="{{ goCatalog }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cCat }};background:{{ bCat }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Catálogo</span></sc-if>
+        </div>
+        <div onClick="{{ goSettings }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:{{ cAj }};background:{{ bAj }};font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,0.08)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Ajustes</span></sc-if>
+        </div>
+        <div style="flex:1"></div>
+        <sc-if value="{{ showCollapse }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleSide }}" style="display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.65);font-size:13px" style-hover="background:rgba(255,255,255,0.08)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate({{ chevRot }}deg)"><path d="m9 18 6-6-6-6"></path></svg>
+            <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}"><span>Contraer</span></sc-if>
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-top:1px solid rgba(255,255,255,0.12);margin-top:4px">
+          <div style="width:32px;height:32px;flex-shrink:0;border-radius:999px;background:#F4A623;color:#1A2B6D;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">PG</div>
+          <sc-if value="{{ sideLabels }}" hint-placeholder-val="{{ false }}">
+            <div style="min-width:0"><div style="font-size:13px;font-weight:600;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ negocio }}</div><div style="font-size:11px;color:rgba(255,255,255,0.55)">Plan Autónomo</div></div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+    <div style="flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:{{ mainPadB }}">
+
+      <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Login" style="flex:1;display:flex">
+          <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+            <div style="width:45%;background:#1A2B6D;display:flex;flex-direction:column;justify-content:center;padding:64px;gap:24px">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path><path d="M8.5 10.5v2.5M12 8.5v6M15.5 10v3.5" stroke="#1A2B6D" stroke-width="1.75" stroke-linecap="round"></path></svg>
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:40px;line-height:1.15;color:#FFFFFF;text-wrap:pretty">Del tajo al presupuesto en 30 segundos.</div>
+              <div style="font-size:16px;color:rgba(255,255,255,0.7);line-height:1.5">Dicta las partidas por voz y envía el presupuesto por WhatsApp antes de recoger las herramientas.</div>
+            </div>
+          </sc-if>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px">
+            <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path><path d="M8.5 10.5v2.5M12 8.5v6M15.5 10v3.5" stroke="#1A2B6D" stroke-width="1.75" stroke-linecap="round"></path></svg>
+                <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:28px;color:#1A2B6D">Prezu</span>
+              </div>
+              <div>
+                <label style="display:block;font-size:14px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Email</label>
+                <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="paco@tunegocio.es" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 14px;font-size:15px;color:#0D1B4B;background:#FFFFFF">
+              </div>
+              <div>
+                <label style="display:block;font-size:14px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Contraseña</label>
+                <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 14px;font-size:15px;color:#0D1B4B;background:#FFFFFF">
+              </div>
+              <button onClick="{{ doLogin }}" style="height:48px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#E09612" style-active="transform:scale(0.99)">Entrar</button>
+              <a href="#" onClick="{{ forgot }}" style="font-size:14px;text-align:center">¿Has olvidado la contraseña?</a>
+              <div style="font-size:13px;color:#5A6A9A;text-align:center">¿Aún no tienes cuenta? <a href="#" onClick="{{ forgot }}">Crea una gratis</a></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div data-screen-label="Dashboard" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px">
+            <div>
+              <div style="font-size:14px;color:#5A6A9A">Buenos días,</div>
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D">{{ negocio }}</div>
+            </div>
+            <sc-if value="{{ showSide }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:13px;color:#5A6A9A;padding-top:6px">Miércoles, 22/07/2026</div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ dashLoad }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="height:96px;border-radius:12px;background:linear-gradient(90deg,#EEF0F6 25%,#F6F7FC 50%,#EEF0F6 75%);background-size:600px 100%;animation:shm 1.2s linear infinite"></div>
+              <div style="height:200px;border-radius:12px;background:linear-gradient(90deg,#EEF0F6 25%,#F6F7FC 50%,#EEF0F6 75%);background-size:600px 100%;animation:shm 1.2s linear infinite"></div>
+              <div style="height:140px;border-radius:12px;background:linear-gradient(90deg,#EEF0F6 25%,#F6F7FC 50%,#EEF0F6 75%);background-size:600px 100%;animation:shm 1.2s linear infinite"></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dashReady }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ dashGridS }}">
+              <div style="grid-area:m;min-width:0">
+                <div style="{{ metricsWrap }}">
+                  <div style="{{ mcW }}background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px"><div style="font-size:13px;color:#5A6A9A;margin-bottom:6px">Presupuestos este mes</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#0D1B4B;font-variant-numeric:tabular-nums">14</div></div>
+                  <div style="{{ mcW }}background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px"><div style="font-size:13px;color:#5A6A9A;margin-bottom:6px">Pendiente de cobro</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#D97706;font-variant-numeric:tabular-nums">3.480,00 €</div></div>
+                  <div style="{{ mcW }}background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px"><div style="font-size:13px;color:#5A6A9A;margin-bottom:6px">Facturas emitidas</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#0D1B4B;font-variant-numeric:tabular-nums">21</div></div>
+                  <div style="{{ mcW }}background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px"><div style="font-size:13px;color:#5A6A9A;margin-bottom:6px">Tasa de aceptación</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#16A34A;font-variant-numeric:tabular-nums">68 %</div></div>
+                </div>
+              </div>
+              <div style="grid-area:d;min-width:0">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                  <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;color:#1A2B6D">Últimos presupuestos</div>
+                  <a href="#" onClick="{{ goQuotesA }}" style="font-size:13px;font-weight:500">Ver todos</a>
+                </div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                  <sc-for list="{{ lastQuotes }}" as="q" hint-placeholder-count="5">
+                    <div onClick="{{ q.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:15px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.cliente }}</div>
+                        <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.concepto }}</div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+                        <div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:#0D1B4B">{{ q.totalF }}</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <span style="display:inline-flex;align-items:center;gap:4px;background:{{ q.bBg }};color:{{ q.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">
+                            <sc-if value="{{ q.check1 }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                            <sc-if value="{{ q.check2 }}" hint-placeholder-val="{{ false }}"><svg width="14" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg></sc-if>
+                            {{ q.bLabel }}</span>
+                          <span style="font-size:12px;color:#5A6A9A">{{ q.rel }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="grid-area:c;min-width:0">
+                <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;color:#1A2B6D;margin-bottom:10px">Facturas pendientes de cobro</div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                  <sc-for list="{{ pendInvoices }}" as="f" hint-placeholder-count="3">
+                    <div onClick="{{ f.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:15px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.cliente }}</div>
+                        <div style="font-size:13px;color:#5A6A9A">{{ f.num }} · vence {{ f.vence }}</div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                        <div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:{{ f.impColor }}">{{ f.totalF }}</div>
+                        <span style="background:{{ f.bBg }};color:{{ f.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">{{ f.bLabel }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isNuevo }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Nuevo presupuesto" style="padding:{{ contentPad }};flex:1;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <button onClick="{{ goDash }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Nuevo presupuesto</div>
+          </div>
+          <div style="font-size:14px;color:#5A6A9A;margin:0 0 24px 52px">¿Cómo quieres crearlo?</div>
+          <div style="display:flex;flex-direction:{{ methodDir }};gap:16px;max-width:960px">
+            <div onClick="{{ goVoz }}" style="flex:1;position:relative;background:#FFFFFF;border:2px solid #F4A623;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;cursor:pointer;display:flex;flex-direction:column;gap:12px" style-hover="box-shadow:0 4px 14px rgba(26,43,109,0.14)">
+              <span style="position:absolute;top:-11px;left:20px;background:#F4A623;color:#1A2B6D;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600">Lo más rápido</span>
+              <div style="width:48px;height:48px;border-radius:12px;background:#FDF3DF;color:#B87A0E;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg></div>
+              <div style="font-size:17px;font-weight:600;color:#0D1B4B">Por voz</div>
+              <div style="font-size:13px;color:#5A6A9A;line-height:1.5">Dicta las partidas y la IA las convierte en presupuesto</div>
+            </div>
+            <div onClick="{{ goTexto }}" style="flex:1;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;cursor:pointer;display:flex;flex-direction:column;gap:12px" style-hover="box-shadow:0 4px 14px rgba(26,43,109,0.14)">
+              <div style="width:48px;height:48px;border-radius:12px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"></path></svg></div>
+              <div style="font-size:17px;font-weight:600;color:#0D1B4B">Por texto</div>
+              <div style="font-size:13px;color:#5A6A9A;line-height:1.5">Escribe o pega la descripción del trabajo</div>
+            </div>
+            <div onClick="{{ goForm }}" style="flex:1;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:24px;cursor:pointer;display:flex;flex-direction:column;gap:12px" style-hover="box-shadow:0 4px 14px rgba(26,43,109,0.14)">
+              <div style="width:48px;height:48px;border-radius:12px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4"></path><path d="m3 7 2 2 4-4"></path><path d="M13 6h8M13 12h8M13 18h8"></path></svg></div>
+              <div style="font-size:17px;font-weight:600;color:#0D1B4B">Por formulario</div>
+              <div style="font-size:13px;color:#5A6A9A;line-height:1.5">Añade las partidas una a una</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTexto }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Nuevo por texto" style="padding:{{ contentPad }};max-width:760px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <button onClick="{{ goNew }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Nuevo presupuesto por texto</div>
+          </div>
+          <label style="display:block;font-size:14px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Descripción del trabajo</label>
+          <textarea value="{{ textoVal }}" onChange="{{ onTexto }}" rows="6" style="width:100%;border:1px solid #D0D8F0;border-radius:8px;padding:12px 14px;font-size:15px;line-height:1.5;color:#0D1B4B;background:#FFFFFF;resize:vertical"></textarea>
+          <div style="font-size:13px;color:#5A6A9A;margin:8px 0 20px">La IA separará las partidas y aplicará los precios de tu catálogo.</div>
+          <button onClick="{{ extractText }}" style="height:48px;padding:0 24px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Extraer partidas</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isVoz }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Modo voz" style="flex:1;display:flex;flex-direction:column;padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <button onClick="{{ goNew }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Presupuesto por voz</div>
+          </div>
+
+          <sc-if value="{{ vIdle }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;max-width:560px;margin:0 auto;width:100%">
+              <button onClick="{{ micClick }}" aria-label="Pulsa y dicta" style="width:96px;height:96px;border-radius:999px;background:#F4A623;border:none;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(26,43,109,0.08)" style-hover="background:#E09612" style-active="transform:scale(0.95)">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
+              </button>
+              <div style="font-size:17px;font-weight:500;color:#0D1B4B">Pulsa y dicta el presupuesto</div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px 20px;display:flex;gap:12px;align-items:flex-start">
+                <div style="width:32px;height:32px;flex-shrink:0;border-radius:8px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></div>
+                <div style="font-size:14px;color:#5A6A9A;line-height:1.6;text-wrap:pretty">Di: «Para María Dolores: doce metros de tubería multicapa a catorce cincuenta, ocho horas de mano de obra y un plato de ducha instalado»</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ vRec }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;max-width:560px;margin:0 auto;width:100%">
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:32px;color:#0D1B4B;font-variant-numeric:tabular-nums">{{ recTime }}</div>
+              <div style="display:flex;align-items:center;gap:4px;height:48px">
+                <sc-for list="{{ waveBars }}" as="b" hint-placeholder-count="14">
+                  <div style="width:4px;border-radius:2px;background:#DC2626;height:{{ b.h }}px;animation:wv 1.1s ease-in-out {{ b.d }}s infinite"></div>
+                </sc-for>
+              </div>
+              <button onClick="{{ stopClick }}" aria-label="Parar grabación" style="width:96px;height:96px;border-radius:999px;background:#FCEAEA;border:2px solid #DC2626;color:#DC2626;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:pulse 1.6s ease-out infinite" style-active="transform:scale(0.95)">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+              </button>
+              <div style="font-size:15px;font-weight:500;color:#DC2626">Grabando… pulsa para terminar</div>
+              <div style="min-height:72px;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;padding:14px 18px;width:100%;font-size:15px;line-height:1.6;color:#5A6A9A">{{ transcript }}<span style="display:inline-block;width:2px;height:16px;background:#2F4FB5;margin-left:3px;vertical-align:middle;animation:blink 1s step-end infinite"></span></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ vProc }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;max-width:560px;margin:0 auto;width:100%">
+              <div style="display:flex;align-items:center;gap:4px;height:48px">
+                <sc-for list="{{ waveBars }}" as="b" hint-placeholder-count="14">
+                  <div style="width:4px;border-radius:2px;background:#D0D8F0;height:{{ b.h }}px"></div>
+                </sc-for>
+              </div>
+              <div style="font-size:17px;font-weight:500;color:#0D1B4B">Extrayendo partidas…</div>
+              <div style="width:220px;height:8px;border-radius:999px;background:linear-gradient(90deg,#E8EDFB 25%,#2F4FB5 50%,#E8EDFB 75%);background-size:300px 100%;animation:shm 1.2s linear infinite"></div>
+              <div style="font-size:13px;color:#5A6A9A">Aplicando los precios de tu catálogo</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ vReview }}" hint-placeholder-val="{{ false }}">
+            <div style="max-width:860px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px;flex:1">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:16px;display:flex;gap:12px;flex-wrap:wrap">
+                <div style="flex:2;min-width:200px;position:relative">
+                  <label style="display:block;font-size:13px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Cliente</label>
+                  <button onClick="{{ toggleVClient }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;padding:0 12px;font-size:14px;color:#0D1B4B;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <span>{{ vCliente }}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A6A9A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                  <sc-if value="{{ vClientOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;top:76px;left:0;right:0;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:8px;box-shadow:0 8px 24px rgba(26,43,109,0.18);z-index:20;overflow:hidden">
+                      <div style="padding:8px">
+                        <input value="{{ vcSearch }}" onChange="{{ onVcSearch }}" placeholder="Buscar cliente…" style="width:100%;height:40px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B">
+                      </div>
+                      <sc-for list="{{ vClientList }}" as="c" hint-placeholder-count="4">
+                        <div onClick="{{ c.pick }}" style="padding:11px 14px;font-size:14px;color:#0D1B4B;cursor:pointer;border-top:1px solid #EEF0F6" style-hover="background:#F8F9FF">{{ c.n }}</div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+                <div style="flex:1;min-width:130px">
+                  <label style="display:block;font-size:13px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Fecha</label>
+                  <input defaultValue="22/07/2026" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B;background:#FFFFFF">
+                </div>
+                <div style="flex:1;min-width:130px">
+                  <label style="display:block;font-size:13px;font-weight:500;color:#0D1B4B;margin-bottom:6px">Validez</label>
+                  <select defaultValue="30 días" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;background:#FFFFFF;cursor:pointer"><option>15 días</option><option>30 días</option><option>60 días</option></select>
+                </div>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                <sc-if value="{{ isTable }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 70px 110px 70px 110px;gap:8px;padding:10px 16px;border-bottom:1px solid #D0D8F0;font-size:12px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+                      <div>CONCEPTO</div><div style="text-align:right">CANTIDAD</div><div>UNIDAD</div><div style="text-align:right">PRECIO</div><div style="text-align:right">IVA</div><div style="text-align:right">IMPORTE</div>
+                    </div>
+                    <sc-for list="{{ vRows2 }}" as="r" hint-placeholder-count="3">
+                      <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 70px 110px 70px 110px;gap:8px;padding:8px 16px;border-bottom:1px solid #EEF0F6;align-items:center;min-height:44px">
+                        <input value="{{ r.c }}" onChange="{{ r.onC }}" style="height:36px;border:1px solid transparent;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;background:transparent;width:100%" style-hover="border-color:#D0D8F0">
+                        <input type="number" value="{{ r.qv }}" onChange="{{ r.onQ }}" style="height:36px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;text-align:right;width:100%;font-variant-numeric:tabular-nums">
+                        <div style="font-size:14px;color:#5A6A9A">{{ r.u }}</div>
+                        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+                          <sc-if value="{{ r.cat }}" hint-placeholder-val="{{ false }}"><span title="Precio de tu catálogo" style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0;cursor:help"></span></sc-if>
+                          <input type="number" value="{{ r.pv }}" onChange="{{ r.onP }}" style="height:36px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;text-align:right;width:88px;font-variant-numeric:tabular-nums">
+                        </div>
+                        <div style="font-size:14px;color:#5A6A9A;text-align:right">{{ r.ivaL }}</div>
+                        <div style="font-size:14px;font-weight:600;color:#0D1B4B;text-align:right;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ isCards }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <sc-for list="{{ vRows2 }}" as="r" hint-placeholder-count="3">
+                      <div style="padding:14px 16px;border-bottom:1px solid #EEF0F6;display:flex;flex-direction:column;gap:10px">
+                        <input value="{{ r.c }}" onChange="{{ r.onC }}" style="height:40px;border:1px solid #D0D8F0;border-radius:8px;padding:0 10px;font-size:14px;font-weight:500;color:#0D1B4B;width:100%">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <input type="number" value="{{ r.qv }}" onChange="{{ r.onQ }}" style="height:40px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;text-align:right;width:64px;font-variant-numeric:tabular-nums">
+                          <span style="font-size:13px;color:#5A6A9A;width:24px">{{ r.u }}</span>
+                          <span style="font-size:13px;color:#5A6A9A">×</span>
+                          <div style="display:flex;align-items:center;gap:5px">
+                            <sc-if value="{{ r.cat }}" hint-placeholder-val="{{ false }}"><span title="Precio de tu catálogo" style="width:7px;height:7px;border-radius:999px;background:#F4A623;flex-shrink:0"></span></sc-if>
+                            <input type="number" value="{{ r.pv }}" onChange="{{ r.onP }}" style="height:40px;border:1px solid #D0D8F0;border-radius:8px;padding:0 8px;font-size:14px;color:#0D1B4B;text-align:right;width:78px;font-variant-numeric:tabular-nums">
+                          </div>
+                          <span style="flex:1"></span>
+                          <span style="font-size:15px;font-weight:600;color:#0D1B4B;font-variant-numeric:tabular-nums">{{ r.impF }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <div style="display:flex;justify-content:flex-end;padding:16px">
+                  <div style="width:260px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>Base imponible</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ vBaseF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>IVA (21 %)</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ vIvaF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:8px"><span style="font-size:14px;font-weight:600;color:#0D1B4B">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:28px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ vTotalF }}</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#5A6A9A;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:999px;background:#F4A623"></span>Precio deducido de tu catálogo</div>
+              <div style="{{ reviewBarS }}">
+                <button onClick="{{ saveDraft }}" style="height:48px;padding:0 20px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;flex:1;max-width:220px" style-hover="background:#E8EDFB">Guardar borrador</button>
+                <button onClick="{{ sendQuote }}" style="height:48px;padding:0 24px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;flex:1;max-width:260px" style-hover="background:#E09612">Enviar al cliente</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isQuotes }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Presupuestos" style="padding:{{ contentPad }}">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D;margin-bottom:16px">Presupuestos</div>
+          <div style="position:relative;max-width:420px;margin-bottom:12px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A6A9A" stroke-width="1.75" stroke-linecap="round" style="position:absolute;left:14px;top:15px"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <input value="{{ qSearch }}" onChange="{{ onQSearch }}" placeholder="Buscar por cliente, concepto o número…" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 14px 0 42px;font-size:14px;color:#0D1B4B;background:#FFFFFF">
+          </div>
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px">
+            <sc-for list="{{ qPills }}" as="p" hint-placeholder-count="6">
+              <button onClick="{{ p.pick }}" style="{{ p.s }}">{{ p.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ qTableShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+              <div style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,3fr) 100px 110px 130px 44px;gap:8px;padding:10px 16px;border-bottom:1px solid #D0D8F0;font-size:12px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+                <div>Nº</div><div>CLIENTE</div><div>CONCEPTO</div><div>FECHA</div><div style="text-align:right">IMPORTE</div><div>ESTADO</div><div></div>
+              </div>
+              <sc-for list="{{ quotesF }}" as="q" hint-placeholder-count="6">
+                <div onClick="{{ q.open }}" style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,3fr) 100px 110px 130px 44px;gap:8px;padding:0 16px;height:52px;align-items:center;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                  <div style="font-size:13px;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ q.num }}</div>
+                  <div style="font-size:14px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.cliente }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.concepto }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ q.fecha }}</div>
+                  <div style="font-size:14px;font-weight:600;color:#0D1B4B;text-align:right;font-variant-numeric:tabular-nums">{{ q.totalF }}</div>
+                  <div><span style="display:inline-flex;align-items:center;gap:4px;background:{{ q.bBg }};color:{{ q.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">
+                    <sc-if value="{{ q.check1 }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                    <sc-if value="{{ q.check2 }}" hint-placeholder-val="{{ false }}"><svg width="14" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg></sc-if>
+                    {{ q.bLabel }}</span></div>
+                  <button aria-label="Más acciones" style="width:32px;height:32px;border:none;background:transparent;color:#5A6A9A;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center" style-hover="background:#EEF0F6"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg></button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ qCardsShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+              <sc-for list="{{ quotesF }}" as="q" hint-placeholder-count="6">
+                <div onClick="{{ q.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:15px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.cliente }}</div>
+                    <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.concepto }}</div>
+                    <div style="font-size:12px;color:#8A8FA3;margin-top:2px">{{ q.num }} · {{ q.rel }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+                    <div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:#0D1B4B">{{ q.totalF }}</div>
+                    <span style="display:inline-flex;align-items:center;gap:4px;background:{{ q.bBg }};color:{{ q.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">
+                      <sc-if value="{{ q.check1 }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                      <sc-if value="{{ q.check2 }}" hint-placeholder-val="{{ false }}"><svg width="14" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg></sc-if>
+                      {{ q.bLabel }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ quotesEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
+              <svg width="120" height="92" viewBox="0 0 120 92" fill="none"><rect x="32" y="6" width="56" height="72" rx="6" stroke="#2F4FB5" stroke-width="2"></rect><path d="M44 22h32M44 32h32M44 42h18" stroke="#D0D8F0" stroke-width="2" stroke-linecap="round"></path><circle cx="88" cy="64" r="18" fill="#FDF3DF" stroke="#F4A623" stroke-width="2"></circle><path d="M88 57a3 3 0 0 0-3 3v4a3 3 0 0 0 6 0v-4a3 3 0 0 0-3-3z" stroke="#B87A0E" stroke-width="1.75"></path><path d="M82 64v1a6 6 0 0 0 12 0v-1M88 71v3" stroke="#B87A0E" stroke-width="1.75" stroke-linecap="round"></path></svg>
+              <div style="font-size:15px;color:#5A6A9A;max-width:320px;text-wrap:pretty">No hay presupuestos con este filtro. Crea el primero en 30 segundos.</div>
+              <button onClick="{{ goNew }}" style="height:48px;padding:0 24px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Nuevo presupuesto</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isQuoteDetail }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Detalle de presupuesto" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <button onClick="{{ backQuotes }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="min-width:0">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">{{ sqNum }}</span>
+                <span style="background:{{ sqBBg }};color:{{ sqBFg }};border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500">{{ sqBLabel }}</span>
+              </div>
+              <div style="font-size:14px;color:#5A6A9A;margin-top:2px">{{ sqCliente }} · Emitido {{ sqFecha }} · Válido hasta {{ sqValidez }}</div>
+            </div>
+          </div>
+          <div style="{{ detailGridS }}">
+            <div style="min-width:0">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 100px 70px 110px;gap:8px;padding:10px 16px;border-bottom:1px solid #D0D8F0;font-size:12px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+                  <div>CONCEPTO</div><div style="text-align:right">CANT.</div><div style="text-align:right">PRECIO</div><div style="text-align:right">IVA</div><div style="text-align:right">IMPORTE</div>
+                </div>
+                <sc-for list="{{ sqRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 100px 70px 110px;gap:8px;padding:0 16px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+                    <div style="font-size:14px;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.c }}</div>
+                    <div style="font-size:14px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">{{ r.qty }} {{ r.u }}</div>
+                    <div style="font-size:14px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">{{ r.pF }}</div>
+                    <div style="font-size:14px;color:#5A6A9A;text-align:right">{{ r.ivaL }}</div>
+                    <div style="font-size:14px;font-weight:600;color:#0D1B4B;text-align:right;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:flex;justify-content:flex-end;padding:16px;background:#F8F9FF">
+                  <div style="width:260px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>Base imponible</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ sqBaseF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>IVA (21 %)</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ sqIvaF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:8px"><span style="font-size:14px;font-weight:600;color:#0D1B4B">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ sqTotalF }}</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="{{ actionBarS }}">
+                <button onClick="{{ dlPdf }}" style="height:48px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0" style-hover="background:#E8EDFB">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>
+                  Descargar PDF</button>
+                <button onClick="{{ waSend }}" style="height:48px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0" style-hover="background:#E8EDFB">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"></path></svg>
+                  Enviar por WhatsApp</button>
+                <span style="flex:1"></span>
+                <button onClick="{{ convClick }}" title="{{ convTitle }}" style="height:48px;padding:0 20px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;opacity:{{ convOpacity }};flex-shrink:0" style-hover="background:#E09612">Convertir en factura</button>
+              </div>
+              <sc-if value="{{ notCanInvoice }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#8A8FA3;text-align:right;margin-top:8px">«Convertir en factura» estará disponible cuando el cliente acepte.</div>
+              </sc-if>
+            </div>
+            <div style="min-width:0;display:flex;flex-direction:column;gap:20px">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px">
+                <div style="font-size:15px;font-weight:600;color:#0D1B4B;margin-bottom:14px">Actividad</div>
+                <sc-for list="{{ sqEvents }}" as="e" hint-placeholder-count="4">
+                  <div style="display:flex;gap:12px">
+                    <div style="display:flex;flex-direction:column;align-items:center">
+                      <div style="width:16px;height:16px;border-radius:999px;background:{{ e.dot }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <sc-if value="{{ e.done }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                      </div>
+                      <sc-if value="{{ e.notLast }}" hint-placeholder-val="{{ false }}"><div style="width:2px;flex:1;min-height:20px;background:#EEF0F6"></div></sc-if>
+                    </div>
+                    <div style="padding-bottom:14px">
+                      <div style="font-size:14px;font-weight:500;color:{{ e.txt }}">{{ e.l }}</div>
+                      <div style="font-size:12px;color:#8A8FA3;font-variant-numeric:tabular-nums">{{ e.f }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;gap:16px;align-items:center">
+                <div onClick="{{ openPdf }}" style="width:88px;height:124px;background:#FFFFFF;border:1px solid #D0D8F0;border-radius:6px;cursor:pointer;padding:10px;display:flex;flex-direction:column;gap:5px;flex-shrink:0" style-hover="box-shadow:0 4px 14px rgba(26,43,109,0.18)">
+                  <div style="width:16px;height:16px;border-radius:4px;background:#F4A623"></div>
+                  <div style="height:4px;width:80%;background:#D0D8F0;border-radius:2px"></div>
+                  <div style="height:4px;width:60%;background:#EEF0F6;border-radius:2px"></div>
+                  <div style="height:4px;width:70%;background:#EEF0F6;border-radius:2px"></div>
+                  <div style="flex:1"></div>
+                  <div style="height:12px;width:50%;background:#EEF0F6;border-radius:2px;align-self:flex-end"></div>
+                </div>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:#0D1B4B">{{ sqNum }}.pdf</div>
+                  <div style="font-size:12px;color:#8A8FA3;margin:2px 0 8px">Documento de 1 página</div>
+                  <a href="#" onClick="{{ openPdfA }}" style="font-size:13px;font-weight:500">Ver PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isInvoices }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Facturas" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D">Facturas</div>
+            <select defaultValue="Julio 2026" style="height:40px;border:1px solid #D0D8F0;border-radius:8px;padding:0 10px;font-size:13px;color:#0D1B4B;background:#FFFFFF;cursor:pointer"><option>Julio 2026</option><option>Junio 2026</option><option>Mayo 2026</option><option>Todo 2026</option></select>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:14px 16px"><div style="font-size:12px;color:#5A6A9A;margin-bottom:4px">Facturado</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#0D1B4B;font-variant-numeric:tabular-nums">{{ totFactF }}</div></div>
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:14px 16px"><div style="font-size:12px;color:#5A6A9A;margin-bottom:4px">Cobrado</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#16A34A;font-variant-numeric:tabular-nums">{{ totCobF }}</div></div>
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:14px 16px"><div style="font-size:12px;color:#5A6A9A;margin-bottom:4px">Pendiente</div><div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#D97706;font-variant-numeric:tabular-nums">{{ totPendF }}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px">
+            <sc-for list="{{ iPills }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.pick }}" style="{{ p.s }}">{{ p.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ invTableShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+              <div style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,3fr) 100px 100px 110px 120px;gap:8px;padding:10px 16px;border-bottom:1px solid #D0D8F0;font-size:12px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+                <div>Nº</div><div>CLIENTE</div><div>CONCEPTO</div><div>EMITIDA</div><div>VENCE</div><div style="text-align:right">IMPORTE</div><div>COBRO</div>
+              </div>
+              <sc-for list="{{ invF }}" as="f" hint-placeholder-count="5">
+                <div onClick="{{ f.open }}" style="display:grid;grid-template-columns:110px minmax(0,2fr) minmax(0,3fr) 100px 100px 110px 120px;gap:8px;padding:0 16px;height:52px;align-items:center;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                  <div style="font-size:13px;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ f.num }}</div>
+                  <div style="font-size:14px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.cliente }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.concepto }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ f.emitida }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ f.vence }}</div>
+                  <div style="font-size:14px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:{{ f.impColor }}">{{ f.totalF }}</div>
+                  <div><span style="background:{{ f.bBg }};color:{{ f.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">{{ f.bLabel }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ invCardsShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+              <sc-for list="{{ invF }}" as="f" hint-placeholder-count="5">
+                <div onClick="{{ f.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:15px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.cliente }}</div>
+                    <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.concepto }}</div>
+                    <div style="font-size:12px;color:#8A8FA3;margin-top:2px">{{ f.num }} · vence {{ f.vence }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+                    <div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:{{ f.impColor }}">{{ f.totalF }}</div>
+                    <span style="background:{{ f.bBg }};color:{{ f.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">{{ f.bLabel }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ invEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <div style="font-size:15px;color:#5A6A9A">No hay facturas con este filtro.</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isInvoiceDetail }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Detalle de factura" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <button onClick="{{ backInvoices }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="min-width:0">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">{{ siNum }}</span>
+                <span title="Las facturas emitidas no se pueden modificar" style="color:#8A8FA3;cursor:help;display:inline-flex"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                <span style="background:{{ siBBg }};color:{{ siBFg }};border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500">{{ siBLabel }}</span>
+                <span style="background:#EEF0F6;color:#5A6A9A;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3zM20 14h1M14 20h1M20 20h1"></path></svg>
+                  VeriFactu · QR pendiente</span>
+              </div>
+              <div style="font-size:14px;color:#5A6A9A;margin-top:2px">{{ siCliente }} · Emitida {{ siEmitida }} · Vence {{ siVence }}</div>
+            </div>
+          </div>
+          <div style="{{ detailGridS }}">
+            <div style="min-width:0">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 100px 110px;gap:8px;padding:10px 16px;border-bottom:1px solid #D0D8F0;font-size:12px;font-weight:600;letter-spacing:.06em;color:#5A6A9A">
+                  <div>CONCEPTO</div><div style="text-align:right">CANT.</div><div style="text-align:right">PRECIO</div><div style="text-align:right">IMPORTE</div>
+                </div>
+                <sc-for list="{{ siRows }}" as="r" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:minmax(0,3fr) 90px 100px 110px;gap:8px;padding:0 16px;height:44px;align-items:center;border-bottom:1px solid #EEF0F6">
+                    <div style="font-size:14px;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.c }}</div>
+                    <div style="font-size:14px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">{{ r.qty }} {{ r.u }}</div>
+                    <div style="font-size:14px;color:#5A6A9A;text-align:right;font-variant-numeric:tabular-nums">{{ r.pF }}</div>
+                    <div style="font-size:14px;font-weight:600;color:#0D1B4B;text-align:right;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:flex;justify-content:flex-end;padding:16px;background:#F8F9FF">
+                  <div style="width:260px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>Base imponible</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ siBaseF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#5A6A9A"><span>IVA (21 %)</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ siIvaF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:8px"><span style="font-size:14px;font-weight:600;color:#0D1B4B">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ siTotalF }}</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="{{ actionBarS }}">
+                <sc-if value="{{ siPend }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ markPaid }}" style="height:48px;padding:0 18px;background:#16A34A;color:#FFFFFF;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0" style-hover="background:#128A3E">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                    Marcar como cobrada</button>
+                </sc-if>
+                <button onClick="{{ dlPdf }}" style="height:48px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0" style-hover="background:#E8EDFB">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>
+                  Descargar PDF</button>
+                <button onClick="{{ waSend }}" style="height:48px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;flex-shrink:0" style-hover="background:#E8EDFB">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"></path></svg>
+                  Enviar por WhatsApp</button>
+                <span style="flex:1"></span>
+                <button onClick="{{ openRect }}" style="height:48px;padding:0 16px;background:transparent;color:#DC2626;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;flex-shrink:0" style-hover="background:#FCEAEA">Emitir rectificativa</button>
+              </div>
+            </div>
+            <div style="min-width:0">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div style="font-size:15px;font-weight:600;color:#0D1B4B">Datos de la factura</div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#5A6A9A">Cliente</span><span style="color:#0D1B4B;font-weight:500;text-align:right">{{ siCliente }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#5A6A9A">Fecha de emisión</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siEmitida }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#5A6A9A">Vencimiento</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siVence }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#5A6A9A">Forma de pago</span><span style="color:#0D1B4B">Transferencia</span></div>
+                <div style="border-top:1px solid #EEF0F6;padding-top:12px;font-size:12px;color:#8A8FA3;line-height:1.5;display:flex;gap:8px;align-items:flex-start">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  Las facturas emitidas no se pueden modificar. Si hay un error, emite una rectificativa.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isClients }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Clientes" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px">
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D">Clientes</div>
+            <button onClick="{{ openClientModal }}" style="height:44px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Nuevo cliente</button>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+            <sc-for list="{{ clients }}" as="c" hint-placeholder-count="4">
+              <div onClick="{{ c.open }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                <div style="width:44px;height:44px;flex-shrink:0;border-radius:999px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">{{ c.ini }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:15px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.n }}</div>
+                  <div style="font-size:13px;color:#5A6A9A">{{ c.nif }} · {{ c.tel }}</div>
+                </div>
+                <div style="font-size:13px;color:#5A6A9A;flex-shrink:0;text-align:right">{{ c.counts }}</div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8FA3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isClientDetail }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Detalle de cliente" style="padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <button onClick="{{ backClients }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Cliente</div>
+          </div>
+          <div style="{{ detailGridS }}">
+            <div style="min-width:0;display:flex;flex-direction:column;gap:20px">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+                <div style="width:56px;height:56px;flex-shrink:0;border-radius:999px;background:#E8EDFB;color:#2F4FB5;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600">{{ scIni }}</div>
+                <div style="flex:1;min-width:200px">
+                  <div style="font-size:17px;font-weight:600;color:#0D1B4B">{{ scN }}</div>
+                  <div style="font-size:13px;color:#5A6A9A;margin-top:4px;line-height:1.7">NIF {{ scNif }}<br>{{ scTel }}<br>{{ scLoc }}</div>
+                </div>
+                <button onClick="{{ openClientModal }}" style="height:40px;padding:0 14px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Editar</button>
+              </div>
+              <div>
+                <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;color:#1A2B6D;margin-bottom:10px">Historial de documentos</div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                  <sc-for list="{{ scDocs }}" as="dd" hint-placeholder-count="3">
+                    <div onClick="{{ dd.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #EEF0F6;cursor:pointer" style-hover="background:#F8F9FF">
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;font-weight:600;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dd.tipo }} {{ dd.num }}</div>
+                        <div style="font-size:13px;color:#5A6A9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dd.concepto }} · {{ dd.fecha }}</div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+                        <div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:#0D1B4B">{{ dd.totalF }}</div>
+                        <span style="background:{{ dd.bBg }};color:{{ dd.bFg }};border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500">{{ dd.bLabel }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="min-width:0">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px">
+                <div style="font-size:13px;color:#5A6A9A;margin-bottom:6px">Total facturado</div>
+                <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:28px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ scTotalF }}</div>
+                <div style="font-size:13px;color:#5A6A9A;margin-top:8px">{{ scCounts }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Catálogo de precios" style="padding:{{ contentPad }};max-width:860px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+            <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D">Catálogo de precios</div>
+            <button onClick="{{ toggleCatAdd }}" style="height:44px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;flex-shrink:0" style-hover="background:#E8EDFB">Añadir partida</button>
+          </div>
+          <div style="background:#E8EDFB;border-radius:8px;padding:12px 16px;font-size:13px;color:#2F4FB5;display:flex;gap:10px;align-items:center;margin-bottom:16px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" style="flex-shrink:0"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
+            La IA usa estos precios cuando dictas un presupuesto.</div>
+          <sc-if value="{{ catAddOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #2F4FB5;border-radius:12px;padding:16px;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end">
+              <div style="flex:2;min-width:180px"><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Concepto</label><input value="{{ newC }}" onChange="{{ onNewC }}" placeholder="Ej.: Cambio de sifón" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+              <div style="width:120px"><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Precio (€)</label><input type="number" value="{{ newP }}" onChange="{{ onNewP }}" placeholder="0,00" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B;text-align:right"></div>
+              <button onClick="{{ addItem }}" style="height:44px;padding:0 18px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Guardar</button>
+            </div>
+          </sc-if>
+          <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+            <sc-for list="{{ catRows }}" as="it" hint-placeholder-count="7">
+              <div style="border-bottom:1px solid #EEF0F6">
+                <sc-if value="{{ it.isEdit }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:10px;padding:12px 16px;align-items:center;flex-wrap:wrap;background:#F8F9FF">
+                    <input value="{{ editC }}" onChange="{{ onEditC }}" style="flex:2;min-width:160px;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B">
+                    <input type="number" value="{{ editP }}" onChange="{{ onEditP }}" style="width:110px;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B;text-align:right">
+                    <button onClick="{{ it.save }}" style="height:44px;padding:0 16px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Guardar</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ it.isView }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:44px">
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:14px;font-weight:500;color:#0D1B4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.c }}</div>
+                      <div style="font-size:12px;color:#8A8FA3;margin-top:2px">Usado {{ it.uses }} veces</div>
+                    </div>
+                    <div style="font-size:14px;font-weight:600;color:#0D1B4B;font-variant-numeric:tabular-nums;flex-shrink:0">{{ it.pF }} / {{ it.u }}</div>
+                    <div style="font-size:13px;color:#5A6A9A;width:44px;text-align:right;flex-shrink:0">{{ it.ivaL }}</div>
+                    <button onClick="{{ it.edit }}" aria-label="Editar" style="width:36px;height:36px;border:none;background:transparent;color:#5A6A9A;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0" style-hover="background:#EEF0F6"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Ajustes" style="padding:{{ contentPad }}">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D;margin-bottom:16px">Ajustes</div>
+          <div style="{{ settingsCols }}">
+            <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div style="font-size:15px;font-weight:600;color:#0D1B4B">Datos del negocio</div>
+                <div style="display:flex;gap:14px;align-items:center">
+                  <div style="width:64px;height:64px;border-radius:12px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;flex-shrink:0">PG</div>
+                  <div>
+                    <button style="height:40px;padding:0 14px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Subir logo</button>
+                    <div style="font-size:12px;color:#8A8FA3;margin-top:6px">PNG o JPG. Aparecerá en tus PDF.</div>
+                  </div>
+                </div>
+                <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Nombre del negocio</label><input value="{{ sNombre }}" onChange="{{ onSNombre }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">NIF</label><input value="{{ sNif }}" onChange="{{ onSNif }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+                  <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Teléfono</label><input value="{{ sTel }}" onChange="{{ onSTel }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+                </div>
+                <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Dirección</label><input value="{{ sDir }}" onChange="{{ onSDir }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+                <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Email</label><input value="{{ sEmail }}" onChange="{{ onSEmail }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div style="font-size:15px;font-weight:600;color:#0D1B4B">Facturación</div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">IVA por defecto</label>
+                  <div style="display:flex;gap:10px">
+                    <button onClick="{{ pick21 }}" style="{{ iva21S }}">21 %</button>
+                    <button onClick="{{ pick10 }}" style="{{ iva10S }}">10 %</button>
+                    <button onClick="{{ pick0 }}" style="{{ iva0S }}">0 %</button>
+                  </div>
+                  <div style="font-size:12px;color:#8A8FA3;margin-top:6px">El 10 % aplica a obras en vivienda cuando corresponde.</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Serie de presupuestos</label><input value="{{ sSerieP }}" onChange="{{ onSSerieP }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B;font-variant-numeric:tabular-nums"></div>
+                  <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Serie de facturas</label><input value="{{ sSerieF }}" onChange="{{ onSSerieF }}" style="width:100%;height:44px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B;font-variant-numeric:tabular-nums"></div>
+                </div>
+                <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Condiciones por defecto</label><textarea value="{{ sCond }}" onChange="{{ onSCond }}" rows="3" style="width:100%;border:1px solid #D0D8F0;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.5;color:#0D1B4B;resize:vertical"></textarea></div>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:20px;display:flex;flex-direction:column;gap:12px">
+                <div style="font-size:15px;font-weight:600;color:#0D1B4B">Cuenta</div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#5A6A9A">Email de acceso</span><span style="color:#0D1B4B">{{ sEmail }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;align-items:center"><span style="color:#5A6A9A">Plan</span><span style="background:#FDF3DF;color:#B87A0E;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:500">Autónomo</span></div>
+                <div><button onClick="{{ logout }}" style="height:44px;padding:0 4px;background:transparent;color:#DC2626;border:none;font-size:14px;font-weight:500;cursor:pointer;border-radius:8px" style-hover="background:#FCEAEA">Cerrar sesión</button></div>
+              </div>
+              <div style="display:flex;justify-content:flex-end"><button onClick="{{ saveSettings }}" style="height:48px;padding:0 24px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Guardar cambios</button></div>
+            </div>
+            <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+              <div style="position:sticky;top:24px">
+                <div style="font-size:13px;color:#5A6A9A;margin-bottom:10px">Así se verá tu PDF</div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:8px;box-shadow:0 2px 8px rgba(26,43,109,0.08);padding:28px;aspect-ratio:210/297;max-width:420px;display:flex;flex-direction:column;font-size:10px;color:#5A6A9A">
+                  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <div style="width:26px;height:26px;border-radius:6px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:11px">PG</div>
+                      <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;color:#1A2B6D">{{ sNombre }}</div>
+                    </div>
+                    <div style="text-align:right;line-height:1.6">NIF {{ sNif }}<br>{{ sDir }}<br>{{ sTel }}</div>
+                  </div>
+                  <div style="height:1px;background:#D0D8F0;margin:14px 0"></div>
+                  <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;color:#1A2B6D;margin-bottom:8px">PRESUPUESTO {{ sSerieP }}-014</div>
+                  <div style="height:6px;width:55%;background:#EEF0F6;border-radius:3px;margin-bottom:5px"></div>
+                  <div style="height:6px;width:70%;background:#EEF0F6;border-radius:3px;margin-bottom:5px"></div>
+                  <div style="height:6px;width:62%;background:#EEF0F6;border-radius:3px;margin-bottom:5px"></div>
+                  <div style="height:6px;width:66%;background:#EEF0F6;border-radius:3px"></div>
+                  <div style="flex:1"></div>
+                  <div style="align-self:flex-end;background:#F8F9FF;border:1px solid #D0D8F0;border-radius:6px;padding:8px 12px;width:130px">
+                    <div style="display:flex;justify-content:space-between"><span>Total</span><span style="font-weight:700;color:#1A2B6D">960,74 €</span></div>
+                  </div>
+                  <div style="height:1px;background:#EEF0F6;margin:12px 0 8px"></div>
+                  <div style="font-size:8px;line-height:1.5">{{ sCond }}</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Página pública del cliente" style="flex:1;display:flex;flex-direction:column;background:#F8F9FF">
+          <sc-if value="{{ pubPending }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;display:flex;flex-direction:column;max-width:560px;width:100%;margin:0 auto">
+              <div style="background:#FFFFFF;border-bottom:1px solid #D0D8F0;padding:16px;display:flex;gap:12px;align-items:center">
+                <div style="width:44px;height:44px;border-radius:10px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;flex-shrink:0">PG</div>
+                <div>
+                  <div style="font-size:16px;font-weight:600;color:#0D1B4B">{{ negocio }}</div>
+                  <div style="font-size:12px;color:#5A6A9A">Villafranca de Córdoba · 657 XX XX XX</div>
+                </div>
+              </div>
+              <div style="padding:16px;display:flex;flex-direction:column;gap:14px;flex:1">
+                <div>
+                  <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:21px;color:#1A2B6D">Presupuesto P-2026-014</div>
+                  <div style="font-size:13px;color:#5A6A9A;margin-top:2px">Reforma de baño · Emitido el 20/07/2026 · Válido hasta el 19/08/2026</div>
+                </div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;box-shadow:0 2px 8px rgba(26,43,109,0.08);overflow:hidden">
+                  <sc-for list="{{ pubRows }}" as="r" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #EEF0F6">
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;font-weight:500;color:#0D1B4B">{{ r.c }}</div>
+                        <div style="font-size:12px;color:#8A8FA3;font-variant-numeric:tabular-nums">{{ r.qty }} {{ r.u }} × {{ r.pF }}</div>
+                      </div>
+                      <div style="font-size:14px;font-weight:600;color:#0D1B4B;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                    </div>
+                  </sc-for>
+                  <div style="padding:14px 16px;background:#F8F9FF;display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;justify-content:space-between;font-size:13px;color:#5A6A9A"><span>Base imponible</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ pubBaseF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;color:#5A6A9A"><span>IVA (21 %)</span><span style="font-variant-numeric:tabular-nums;color:#0D1B4B">{{ pubIvaF }}</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:8px"><span style="font-size:14px;font-weight:600;color:#0D1B4B">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:26px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ pubTotalF }}</span></div>
+                  </div>
+                </div>
+                <div style="background:#FFFFFF;border:1px solid #D0D8F0;border-radius:12px;padding:14px 16px;font-size:12px;color:#5A6A9A;line-height:1.6">
+                  <div style="font-weight:600;color:#0D1B4B;font-size:13px;margin-bottom:4px">Condiciones</div>
+                  {{ sCond }}
+                </div>
+                <div style="flex:1"></div>
+                <div style="text-align:center;font-size:12px;color:#8A8FA3;display:flex;align-items:center;justify-content:center;gap:6px;padding-bottom:4px">
+                  Hecho con
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path></svg>
+                  <span style="font-weight:600;color:#5A6A9A">Prezu</span>
+                </div>
+              </div>
+              <div style="position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D0D8F0;padding:12px 16px;display:flex;flex-direction:column;gap:8px;z-index:5">
+                <button onClick="{{ pubAccept }}" style="height:52px;background:#16A34A;color:#FFFFFF;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#128A3E" style-active="transform:scale(0.99)">Aceptar presupuesto</button>
+                <button onClick="{{ pubChanges }}" style="height:48px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#E8EDFB">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"></path></svg>
+                  Proponer cambios</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ pubDone }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px;text-align:center">
+              <div style="animation:pop .5s ease-out">
+                <svg width="96" height="96" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="#E7F6EC"></circle><circle cx="26" cy="26" r="24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-dasharray="151" stroke-dashoffset="151" style="animation:dash .7s ease-out forwards"></circle><path fill="none" stroke="#16A34A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M15 27l8 8 15-16" stroke-dasharray="34" stroke-dashoffset="34" style="animation:dash .45s ease-out .5s forwards"></path></svg>
+              </div>
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:24px;color:#1A2B6D">¡Presupuesto aceptado!</div>
+              <div style="font-size:15px;color:#5A6A9A;max-width:300px;line-height:1.5;text-wrap:pretty">Paco recibirá la confirmación al momento y se pondrá en contacto contigo.</div>
+              <a href="#" onClick="{{ pubBack }}" style="font-size:14px;font-weight:500">Volver al presupuesto</a>
+              <div style="font-size:12px;color:#8A8FA3;display:flex;align-items:center;gap:6px;margin-top:16px">
+                Hecho con
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#F4A623"></path></svg>
+                <span style="font-weight:600;color:#5A6A9A">Prezu</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPdf }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Plantillas PDF A4" style="flex:1;background:#E9ECF8;padding:{{ contentPad }}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <button onClick="{{ backFromPdf }}" aria-label="Volver" style="width:40px;height:40px;border:1px solid #D0D8F0;border-radius:8px;background:#FFFFFF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#EEF0F6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg></button>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;color:#1A2B6D">Plantillas PDF · A4</div>
+              <div style="font-size:13px;color:#5A6A9A">Presupuesto y factura con los datos del negocio</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;overflow-x:auto;padding-bottom:16px">
+            <div style="width:595px;min-height:842px;flex-shrink:0;background:#FFFFFF;box-shadow:0 8px 28px rgba(26,43,109,0.18);padding:44px;display:flex;flex-direction:column;font-size:10.5px;color:#0D1B4B">
+              <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <div style="width:34px;height:34px;border-radius:8px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px">PG</div>
+                  <div>
+                    <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D">{{ sNombre }}</div>
+                    <div style="font-size:9px;color:#5A6A9A">Fontanería y reformas</div>
+                  </div>
+                </div>
+                <div style="text-align:right;font-size:9px;color:#5A6A9A;line-height:1.7">NIF {{ sNif }}<br>{{ sDir }}<br>{{ sTel }} · {{ sEmail }}</div>
+              </div>
+              <div style="height:2px;background:#1A2B6D;margin:18px 0"></div>
+              <div style="display:flex;justify-content:space-between;gap:16px">
+                <div>
+                  <div style="font-size:8px;font-weight:600;letter-spacing:.08em;color:#5A6A9A;margin-bottom:4px">PRESUPUESTO PARA</div>
+                  <div style="font-size:12px;font-weight:600">{{ sqCliente }}</div>
+                  <div style="font-size:9px;color:#5A6A9A;margin-top:2px">Villafranca de Córdoba (Córdoba)</div>
+                </div>
+                <div style="background:#F8F9FF;border:1px solid #D0D8F0;border-radius:8px;padding:10px 14px;font-size:9px;line-height:1.9;color:#5A6A9A">
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Nº</span><span style="color:#0D1B4B;font-weight:600;font-variant-numeric:tabular-nums">{{ sqNum }}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Fecha</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ sqFecha }}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Válido hasta</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ sqValidez }}</span></div>
+                </div>
+              </div>
+              <div style="margin-top:22px">
+                <div style="display:grid;grid-template-columns:minmax(0,3fr) 60px 70px 80px;gap:8px;padding:7px 10px;background:#1A2B6D;color:#FFFFFF;font-size:8px;font-weight:600;letter-spacing:.06em;border-radius:4px 4px 0 0">
+                  <div>CONCEPTO</div><div style="text-align:right">CANT.</div><div style="text-align:right">PRECIO</div><div style="text-align:right">IMPORTE</div>
+                </div>
+                <sc-for list="{{ pdfQRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:minmax(0,3fr) 60px 70px 80px;gap:8px;padding:8px 10px;border-bottom:1px solid #EEF0F6;font-size:10px">
+                    <div>{{ r.c }}</div>
+                    <div style="text-align:right;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ r.qty }} {{ r.u }}</div>
+                    <div style="text-align:right;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ r.pF }}</div>
+                    <div style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <div style="width:190px;background:#F8F9FF;border:1px solid #D0D8F0;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:10px">
+                  <div style="display:flex;justify-content:space-between;color:#5A6A9A"><span>Base imponible</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ sqBaseF }}</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#5A6A9A"><span>IVA 21 %</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ sqIvaF }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:6px"><span style="font-weight:600">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ sqTotalF }}</span></div>
+                </div>
+              </div>
+              <div style="flex:1"></div>
+              <div style="border-top:1px solid #D0D8F0;padding-top:12px;font-size:8.5px;color:#5A6A9A;line-height:1.7">
+                <div style="font-weight:600;color:#0D1B4B;margin-bottom:2px">Condiciones</div>
+                {{ sCond }}
+                <div style="margin-top:6px">Pago por transferencia · IBAN ES12 XXXX XXXX XXXX XXXX · Bizum al {{ sTel }}</div>
+              </div>
+            </div>
+            <div style="width:595px;min-height:842px;flex-shrink:0;background:#FFFFFF;box-shadow:0 8px 28px rgba(26,43,109,0.18);padding:44px;display:flex;flex-direction:column;font-size:10.5px;color:#0D1B4B">
+              <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <div style="width:34px;height:34px;border-radius:8px;background:#1A2B6D;color:#F4A623;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px">PG</div>
+                  <div>
+                    <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D">{{ sNombre }}</div>
+                    <div style="font-size:9px;color:#5A6A9A">NIF {{ sNif }} · {{ sDir }}</div>
+                  </div>
+                </div>
+                <div style="text-align:center;flex-shrink:0">
+                  <div style="width:85px;height:85px;background:#EEF0F6;border:1px dashed #8A8FA3;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8A8FA3">QR VeriFactu</div>
+                  <div style="font-size:6.5px;color:#8A8FA3;max-width:95px;margin-top:4px;line-height:1.4">Factura verificable en la sede electrónica de la AEAT</div>
+                </div>
+              </div>
+              <div style="height:2px;background:#1A2B6D;margin:14px 0 18px"></div>
+              <div style="display:flex;justify-content:space-between;gap:16px">
+                <div>
+                  <div style="font-size:8px;font-weight:600;letter-spacing:.08em;color:#5A6A9A;margin-bottom:4px">FACTURAR A</div>
+                  <div style="font-size:12px;font-weight:600">{{ siCliente }}</div>
+                  <div style="font-size:9px;color:#5A6A9A;margin-top:2px">Córdoba</div>
+                </div>
+                <div style="background:#F8F9FF;border:1px solid #D0D8F0;border-radius:8px;padding:10px 14px;font-size:9px;line-height:1.9;color:#5A6A9A">
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Nº factura</span><span style="color:#0D1B4B;font-weight:600;font-variant-numeric:tabular-nums">{{ siNum }}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Emitida</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siEmitida }}</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:20px"><span>Vencimiento</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siVence }}</span></div>
+                </div>
+              </div>
+              <div style="margin-top:22px">
+                <div style="display:grid;grid-template-columns:minmax(0,3fr) 60px 70px 80px;gap:8px;padding:7px 10px;background:#1A2B6D;color:#FFFFFF;font-size:8px;font-weight:600;letter-spacing:.06em;border-radius:4px 4px 0 0">
+                  <div>CONCEPTO</div><div style="text-align:right">CANT.</div><div style="text-align:right">PRECIO</div><div style="text-align:right">IMPORTE</div>
+                </div>
+                <sc-for list="{{ pdfFRows }}" as="r" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:minmax(0,3fr) 60px 70px 80px;gap:8px;padding:8px 10px;border-bottom:1px solid #EEF0F6;font-size:10px">
+                    <div>{{ r.c }}</div>
+                    <div style="text-align:right;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ r.qty }} {{ r.u }}</div>
+                    <div style="text-align:right;color:#5A6A9A;font-variant-numeric:tabular-nums">{{ r.pF }}</div>
+                    <div style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ r.impF }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <div style="width:190px;background:#F8F9FF;border:1px solid #D0D8F0;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:10px">
+                  <div style="display:flex;justify-content:space-between;color:#5A6A9A"><span>Base imponible</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siBaseF }}</span></div>
+                  <div style="display:flex;justify-content:space-between;color:#5A6A9A"><span>IVA 21 %</span><span style="color:#0D1B4B;font-variant-numeric:tabular-nums">{{ siIvaF }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #D0D8F0;padding-top:6px"><span style="font-weight:600">Total</span><span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;color:#1A2B6D;font-variant-numeric:tabular-nums">{{ siTotalF }}</span></div>
+                </div>
+              </div>
+              <div style="flex:1"></div>
+              <div style="border-top:1px solid #D0D8F0;padding-top:12px;font-size:8.5px;color:#5A6A9A;line-height:1.7">
+                <div style="font-weight:600;color:#0D1B4B;margin-bottom:2px">Condiciones y pago</div>
+                Pago a 30 días por transferencia · IBAN ES12 XXXX XXXX XXXX XXXX
+                <div style="margin-top:4px">Factura emitida conforme al reglamento VeriFactu. Documento inmutable.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ isMobileApp }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;bottom:0;left:0;right:0;height:68px;background:#FFFFFF;border-top:1px solid #D0D8F0;display:flex;align-items:stretch;z-index:10">
+        <div onClick="{{ goDash }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ tInicio }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
+          <span style="font-size:11px;font-weight:500">Inicio</span>
+        </div>
+        <div onClick="{{ goQuotes }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ tPres }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+          <span style="font-size:11px;font-weight:500">Presup.</span>
+        </div>
+        <div style="width:72px"></div>
+        <div onClick="{{ goInvoices }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ tFact }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"></path><path d="M8 11h6"></path></svg>
+          <span style="font-size:11px;font-weight:500">Facturas</span>
+        </div>
+        <div onClick="{{ goClients }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ tCli }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span style="font-size:11px;font-weight:500">Clientes</span>
+        </div>
+        <div onClick="{{ goSettings }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:{{ tAj }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path></svg>
+          <span style="font-size:11px;font-weight:500">Ajustes</span>
+        </div>
+      </div>
+      <button onClick="{{ goNew }}" aria-label="Nuevo presupuesto" style="position:absolute;bottom:34px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:999px;background:#F4A623;border:4px solid #F8F9FF;color:#1A2B6D;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(26,43,109,0.25);z-index:11" style-hover="background:#E09612" style-active="transform:translateX(-50%) scale(0.95)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      </button>
+    </sc-if>
+
+    <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#1A2B6D;color:#FFFFFF;border-radius:8px;padding:12px 18px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(26,43,109,0.3);z-index:40;white-space:nowrap;max-width:90%">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F4A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span style="overflow:hidden;text-overflow:ellipsis">{{ toastMsg }}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ clientModal }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(13,27,75,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px">
+        <div style="background:#FFFFFF;border-radius:12px;box-shadow:0 12px 40px rgba(26,43,109,0.3);padding:24px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow-y:auto">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D">Datos del cliente</div>
+          <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Nombre o razón social</label><input defaultValue="" placeholder="Ej.: María Dolores Jiménez" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">NIF</label><input defaultValue="" placeholder="30XXXXXXX" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+            <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Teléfono</label><input defaultValue="" placeholder="6XX XX XX XX" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+          </div>
+          <div><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Dirección</label><input defaultValue="" placeholder="Calle, número, localidad" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:14px;color:#0D1B4B"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+            <button onClick="{{ closeClientModal }}" style="height:44px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Cancelar</button>
+            <button onClick="{{ saveClient }}" style="height:44px;padding:0 18px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Guardar cliente</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ pubModal }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(13,27,75,0.45);display:flex;align-items:flex-end;justify-content:center;z-index:50">
+        <div style="background:#FFFFFF;border-radius:12px 12px 0 0;box-shadow:0 -8px 40px rgba(26,43,109,0.3);padding:24px;max-width:560px;width:100%;display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D">Aceptar presupuesto</div>
+          <div style="font-size:13px;color:#5A6A9A">Total a aceptar: <span style="font-weight:600;color:#0D1B4B;font-variant-numeric:tabular-nums">960,74 €</span> · P-2026-014</div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Tu nombre</label>
+            <input value="{{ pubName }}" onChange="{{ onPubName }}" placeholder="Nombre y apellidos" style="width:100%;height:48px;border:1px solid #D0D8F0;border-radius:8px;padding:0 12px;font-size:15px;color:#0D1B4B">
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <label style="font-size:13px;font-weight:500">Firma con el dedo <span style="color:#8A8FA3;font-weight:400">(opcional)</span></label>
+              <sc-if value="{{ hasSig }}" hint-placeholder-val="{{ false }}"><a href="#" onClick="{{ clearSigA }}" style="font-size:12px">Borrar</a></sc-if>
+            </div>
+            <div onPointerDown="{{ sigDown }}" onPointerMove="{{ sigMove }}" onPointerUp="{{ sigUp }}" onPointerLeave="{{ sigUp }}" style="height:130px;border:1px dashed #D0D8F0;border-radius:8px;background:#F8F9FF;position:relative;touch-action:none;cursor:crosshair;overflow:hidden">
+              <sc-if value="{{ noSig }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#8A8FA3;pointer-events:none">Dibuja aquí tu firma</div>
+              </sc-if>
+              <svg width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none">
+                <sc-for list="{{ sigStrokes }}" as="s" hint-placeholder-count="0">
+                  <polyline points="{{ s.pts }}" fill="none" stroke="#1A2B6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                </sc-for>
+              </svg>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button onClick="{{ pubClose }}" style="height:48px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Cancelar</button>
+            <button onClick="{{ pubConfirm }}" style="height:48px;padding:0 20px;background:#16A34A;color:#FFFFFF;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#128A3E">Confirmar aceptación</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ modalFactura }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(13,27,75,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px">
+        <div style="background:#FFFFFF;border-radius:12px;box-shadow:0 12px 40px rgba(26,43,109,0.3);padding:24px;max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D">¿Emitir factura?</div>
+          <div style="font-size:14px;color:#5A6A9A;line-height:1.5">Se creará la factura con el siguiente número correlativo. Las facturas emitidas no se pueden modificar.</div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+            <button onClick="{{ closeFactura }}" style="height:44px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Cancelar</button>
+            <button onClick="{{ confirmFactura }}" style="height:44px;padding:0 18px;background:#F4A623;color:#1A2B6D;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#E09612">Emitir factura</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ modalRect }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(13,27,75,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px">
+        <div style="background:#FFFFFF;border-radius:12px;box-shadow:0 12px 40px rgba(26,43,109,0.3);padding:24px;max-width:400px;width:100%;display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:#1A2B6D">¿Emitir rectificativa?</div>
+          <div style="font-size:14px;color:#5A6A9A;line-height:1.5">Se creará una factura rectificativa que anula F-2026-021. Esta acción no se puede deshacer.</div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+            <button onClick="{{ closeRect }}" style="height:44px;padding:0 16px;background:transparent;color:#2F4FB5;border:1.5px solid #2F4FB5;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#E8EDFB">Cancelar</button>
+            <button onClick="{{ confirmRect }}" style="height:44px;padding:0 18px;background:transparent;color:#DC2626;border:1.5px solid #DC2626;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#FCEAEA">Emitir rectificativa</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;negocio&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Fontanería Paco García&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenido&quot;},&quot;dispositivoInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;movil&quot;,&quot;tablet&quot;,&quot;desktop&quot;],&quot;default&quot;:&quot;movil&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototipo&quot;},&quot;pantallaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;login&quot;,&quot;nuevo&quot;,&quot;voz&quot;,&quot;presupuestos&quot;,&quot;facturas&quot;,&quot;clientes&quot;,&quot;catalogo&quot;,&quot;ajustes&quot;,&quot;publica&quot;,&quot;pdf&quot;],&quot;default&quot;:&quot;dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototipo&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.WORDS='Para María Dolores: doce metros de tubería multicapa a catorce cincuenta, ocho horas de mano de obra y un plato de ducha instalado.'.split(' ');
+    const quotes=[
+      {num:'P-2026-015',cliente:'Hostal Los Omeyas',concepto:'Cambio de grifería en 3 habitaciones',fecha:'22/07/2026',rel:'hace 3 horas',validez:'21/08/2026',estado:'Borrador',
+       partidas:[{c:'Grifería monomando instalada',q:3,u:'ud',p:60,iva:21,cat:true},{c:'Mano de obra',q:2,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'22/07/2026 · 08:03',done:true},{l:'Enviado',f:'',done:false},{l:'Visto',f:'',done:false},{l:'Aceptado',f:'',done:false}]},
+      {num:'P-2026-014',cliente:'María Dolores Jiménez',concepto:'Reforma de baño',fecha:'20/07/2026',rel:'hace 2 días',validez:'19/08/2026',estado:'Visto',
+       partidas:[{c:'Tubería multicapa 20 mm instalada',q:12,u:'m',p:14.5,iva:21,cat:true},{c:'Plato de ducha instalado',q:1,u:'ud',p:280,iva:21,cat:true},{c:'Grifería monomando instalada',q:1,u:'ud',p:60,iva:21,cat:true},{c:'Mano de obra',q:8,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'20/07/2026 · 09:12',done:true},{l:'Enviado',f:'20/07/2026 · 09:15',done:true},{l:'Visto',f:'20/07/2026 · 11:42',done:true},{l:'Aceptado',f:'',done:false}]},
+      {num:'P-2026-013',cliente:'Comunidad de Propietarios Los Naranjos',concepto:'Sustitución de termo eléctrico 80 L',fecha:'18/07/2026',rel:'hace 4 días',validez:'17/08/2026',estado:'Aceptado',
+       partidas:[{c:'Sustitución termo eléctrico 80 L',q:1,u:'ud',p:340,iva:21,cat:true},{c:'Mano de obra',q:2,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'18/07/2026 · 17:40',done:true},{l:'Enviado',f:'18/07/2026 · 17:52',done:true},{l:'Visto',f:'18/07/2026 · 19:03',done:true},{l:'Aceptado',f:'19/07/2026 · 10:05',done:true}]},
+      {num:'P-2026-012',cliente:'Hostal Los Omeyas',concepto:'Desatasco y revisión de baños',fecha:'17/07/2026',rel:'hace 5 días',validez:'16/08/2026',estado:'Enviado',
+       partidas:[{c:'Desatasco con máquina',q:1,u:'ud',p:120,iva:21,cat:true},{c:'Mano de obra',q:3,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'17/07/2026 · 12:10',done:true},{l:'Enviado',f:'17/07/2026 · 12:14',done:true},{l:'Visto',f:'',done:false},{l:'Aceptado',f:'',done:false}]},
+      {num:'P-2026-011',cliente:'Restaurante La Montería',concepto:'Desatasco con máquina en cocina',fecha:'14/07/2026',rel:'hace 8 días',validez:'13/08/2026',estado:'Facturado',
+       partidas:[{c:'Desatasco con máquina',q:1,u:'ud',p:120,iva:21,cat:true},{c:'Mano de obra',q:2,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'14/07/2026 · 08:22',done:true},{l:'Enviado',f:'14/07/2026 · 08:30',done:true},{l:'Visto',f:'14/07/2026 · 09:01',done:true},{l:'Aceptado',f:'14/07/2026 · 13:45',done:true}]},
+      {num:'P-2026-010',cliente:'María Dolores Jiménez',concepto:'Punto de agua para lavadora',fecha:'10/07/2026',rel:'hace 12 días',validez:'09/08/2026',estado:'Rechazado',
+       partidas:[{c:'Punto de agua',q:1,u:'ud',p:95,iva:21,cat:true},{c:'Mano de obra',q:1,u:'h',p:35,iva:21,cat:true}],
+       events:[{l:'Creado',f:'10/07/2026 · 10:15',done:true},{l:'Enviado',f:'10/07/2026 · 10:20',done:true},{l:'Visto',f:'10/07/2026 · 14:02',done:true},{l:'Rechazado',f:'11/07/2026 · 09:30',done:true}]}
+    ];
+    const invoices=[
+      {num:'F-2026-021',cliente:'Restaurante La Montería',concepto:'Desatasco con máquina + 2 h de mano de obra',base:190,estado:'Pendiente',emitida:'06/07/2026',vence:'05/08/2026',
+       partidas:[{c:'Desatasco con máquina',q:1,u:'ud',p:120},{c:'Mano de obra',q:2,u:'h',p:35}]},
+      {num:'F-2026-020',cliente:'Comunidad de Propietarios Los Naranjos',concepto:'Sustitución de termo eléctrico 80 L',base:410,estado:'Cobrada',emitida:'03/07/2026',vence:'02/08/2026',
+       partidas:[{c:'Sustitución termo eléctrico 80 L',q:1,u:'ud',p:340},{c:'Mano de obra',q:2,u:'h',p:35}]},
+      {num:'F-2026-017',cliente:'Comunidad de Propietarios Los Naranjos',concepto:'Reparación de bajante comunitaria',base:380,estado:'Pendiente',emitida:'24/06/2026',vence:'28/07/2026',
+       partidas:[{c:'Mano de obra',q:6,u:'h',p:35},{c:'Material de fontanería (bajante PVC)',q:1,u:'ud',p:170}]},
+      {num:'F-2026-019',cliente:'Hostal Los Omeyas',concepto:'Reparación de fuga en cuarto de calderas',base:265,estado:'Vencida',emitida:'15/06/2026',vence:'30/06/2026',
+       partidas:[{c:'Mano de obra',q:4,u:'h',p:35},{c:'Material de fontanería',q:1,u:'ud',p:125}]},
+      {num:'F-2026-018',cliente:'María Dolores Jiménez',concepto:'Instalación de grifería de cocina',base:95,estado:'Cobrada',emitida:'20/06/2026',vence:'20/07/2026',
+       partidas:[{c:'Grifería monomando instalada',q:1,u:'ud',p:60},{c:'Mano de obra',q:1,u:'h',p:35}]}
+    ];
+    const clients=[
+      {n:'Comunidad de Propietarios Los Naranjos',ini:'LN',nif:'H14XXXXXX',tel:'957 XX XX XX',loc:'Córdoba',pres:6,fact:4,total:2340.5},
+      {n:'Restaurante La Montería',ini:'LM',nif:'B14XXXXXX',tel:'957 XX XX XX',loc:'Córdoba',pres:5,fact:3,total:1876.2},
+      {n:'María Dolores Jiménez',ini:'MD',nif:'30XXXXXXX',tel:'657 XX XX XX',loc:'Villafranca de Córdoba',pres:4,fact:2,total:612.3},
+      {n:'Hostal Los Omeyas',ini:'LO',nif:'B14XXXXXX',tel:'957 XX XX XX',loc:'Córdoba',pres:3,fact:2,total:989.45}
+    ];
+    const catalog=[
+      {c:'Mano de obra',p:35,u:'h',iva:21,uses:48},
+      {c:'Tubería multicapa 20 mm instalada',p:14.5,u:'m',iva:21,uses:23},
+      {c:'Desatasco con máquina',p:120,u:'ud',iva:21,uses:19},
+      {c:'Grifería monomando instalada',p:60,u:'ud',iva:21,uses:14},
+      {c:'Plato de ducha instalado',p:280,u:'ud',iva:21,uses:9},
+      {c:'Punto de agua',p:95,u:'ud',iva:21,uses:8},
+      {c:'Sustitución termo eléctrico 80 L',p:340,u:'ud',iva:21,uses:6}
+    ];
+    this.state={
+      device:this.props.dispositivoInicial??'movil',
+      screen:this.props.pantallaInicial??'dashboard',
+      quotes,invoices,clients,catalog,
+      quoteId:'P-2026-014',invoiceId:'F-2026-021',clientId:'María Dolores Jiménez',
+      qFilter:'Todos',qSearch:'',iFilter:'Todas',
+      sideOpen:false,dashLoad:true,toast:null,
+      voice:'idle',recSec:0,words:0,
+      vRows:[{c:'Tubería multicapa 20 mm instalada',q:12,u:'m',p:14.5,iva:21,cat:true},{c:'Mano de obra',q:8,u:'h',p:35,iva:21,cat:true},{c:'Plato de ducha instalado',q:1,u:'ud',p:280,iva:21,cat:true}],
+      vCliente:'María Dolores Jiménez',vClientOpen:false,vcSearch:'',
+      textoVal:'Para María Dolores: doce metros de tubería multicapa a catorce cincuenta, ocho horas de mano de obra y un plato de ducha instalado.',
+      loginEmail:'',loginPass:'',
+      modalFactura:false,modalRect:false,clientModal:false,
+      editIdx:-1,editC:'',editP:'',catAddOpen:false,newC:'',newP:'',newU:'ud',
+      sNombre:this.props.negocio??'Fontanería Paco García',sNif:'30XXXXXXX',sDir:'C/ Real 24, Villafranca de Córdoba (Córdoba)',sTel:'657 XX XX XX',sEmail:'paco@fontaneriapaco.es',
+      sIva:'21',sSerieP:'P-2026',sSerieF:'F-2026',
+      sCond:'Presupuesto válido durante 30 días. Pago por transferencia o Bizum al finalizar el trabajo. Garantía de 2 años en mano de obra.',
+      pubModal:false,pubName:'',pubDone:false,strokes:[],drawing:false,
+      deskW:typeof window!=='undefined'?window.innerWidth:1280
+    };
+    this._binds={};
+  }
+  componentDidMount(){ this._dl=setTimeout(()=>this.setState({dashLoad:false}),900); this._rs=()=>this.setState({deskW:window.innerWidth}); window.addEventListener('resize',this._rs); }
+  componentWillUnmount(){ clearTimeout(this._dl);clearInterval(this._rt);clearInterval(this._wt);clearTimeout(this._pt);clearTimeout(this._tt); window.removeEventListener('resize',this._rs); }
+  go(s,extra){ this.setState(Object.assign({screen:s},extra||{})); }
+  fmt(n){ return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+  totals(rows){ let b=0,i=0; rows.forEach(r=>{b+=r.q*r.p;i+=r.q*r.p*(r.iva!=null?r.iva:21)/100;}); return {b,i,t:b+i}; }
+  toastMsg(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt=setTimeout(()=>this.setState({toast:null}),3000); }
+  bindField(k){ if(!this._binds[k]) this._binds[k]=(e)=>this.setState({[k]:e.target.value}); return this._binds[k]; }
+  startRec(){
+    this.setState({voice:'rec',recSec:0,words:0});
+    this._rt=setInterval(()=>this.setState(s=>({recSec:s.recSec+1})),1000);
+    this._wt=setInterval(()=>this.setState(s=>s.words>=this.WORDS.length?null:{words:s.words+1}),300);
+  }
+  stopRec(){
+    clearInterval(this._rt);clearInterval(this._wt);
+    this.setState({voice:'proc'});
+    this._pt=setTimeout(()=>this.setState({voice:'review'}),2200);
+  }
+  badge(e){
+    const B={Borrador:['#EEF0F6','#5A6A9A'],Enviado:['#E8EDFB','#2F4FB5'],Visto:['#E8EDFB','#2F4FB5'],Aceptado:['#E7F6EC','#16A34A'],Rechazado:['#FCEAEA','#DC2626'],Caducado:['#F4F4F4','#8A8FA3'],Facturado:['#FDF3DF','#B87A0E'],Pendiente:['#FDF3DF','#D97706'],Cobrada:['#E7F6EC','#16A34A'],Vencida:['#FCEAEA','#DC2626']};
+    const b=B[e]||B.Borrador;
+    return {bBg:b[0],bFg:b[1],bLabel:e,check1:e==='Enviado',check2:e==='Visto'};
+  }
+  renderVals(){
+    const st=this.state,m=st.device==='movil',t=st.device==='tablet',d=st.device==='desktop';
+    const negocio=st.sNombre;
+    const app=['dashboard','nuevo','texto','voz','presupuestos','presupuestoDetalle','facturas','facturaDetalle','clientes','clienteDetalle','catalogo','ajustes'];
+    const isApp=app.indexOf(st.screen)>=0;
+    const seg=(on)=>'height:28px;padding:0 12px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;'+(on?'background:#1A2B6D;color:#FFFFFF':'background:transparent;color:#5A6A9A');
+    const decQ=(q)=>{const tot=this.totals(q.partidas);return Object.assign({},q,this.badge(q.estado),{open:()=>this.go('presupuestoDetalle',{quoteId:q.num}),totalF:this.fmt(tot.t),baseF:this.fmt(tot.b),ivaF:this.fmt(tot.i)});};
+    const decI=(f)=>{const iva=f.base*0.21;return Object.assign({},f,this.badge(f.estado),{open:()=>this.go('facturaDetalle',{invoiceId:f.num}),totalF:this.fmt(f.base+iva),baseF:this.fmt(f.base),ivaF:this.fmt(iva),impColor:f.estado==='Vencida'?'#DC2626':'#0D1B4B'});};
+    const quotes=st.quotes.map(decQ);
+    const invs=st.invoices.map(decI);
+    const qf=quotes.filter(q=>(st.qFilter==='Todos'||q.estado===st.qFilter)&&(q.cliente+' '+q.concepto+' '+q.num).toLowerCase().indexOf(st.qSearch.toLowerCase())>=0);
+    const inf=invs.filter(f=>st.iFilter==='Todas'||f.estado===st.iFilter);
+    const pillS=(on)=>'flex-shrink:0;height:36px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid '+(on?'#1A2B6D;background:#1A2B6D;color:#FFFFFF':'#D0D8F0;background:#FFFFFF;color:#5A6A9A');
+    const qPills=['Todos','Borrador','Enviado','Aceptado','Rechazado','Facturado'].map(p=>({label:p,s:pillS(st.qFilter===p),pick:()=>this.setState({qFilter:p})}));
+    const iPills=['Todas','Pendiente','Cobrada','Vencida'].map(p=>({label:p,s:pillS(st.iFilter===p),pick:()=>this.setState({iFilter:p})}));
+    const sq=quotes.find(q=>q.num===st.quoteId)||quotes[1];
+    const sqRows=sq.partidas.map(r=>({c:r.c,qty:r.q,u:r.u,pF:this.fmt(r.p),ivaL:r.iva+' %',impF:this.fmt(r.q*r.p),cat:!!r.cat}));
+    const sqEvents=sq.events.map((e,i)=>({l:e.l,f:e.f||'—',done:e.done,dot:e.done?(e.l==='Rechazado'?'#DC2626':'#16A34A'):'#D0D8F0',txt:e.done?'#0D1B4B':'#8A8FA3',last:i===sq.events.length-1,notLast:i<sq.events.length-1}));
+    const canInv=sq.estado==='Aceptado';
+    const si=invs.find(f=>f.num===st.invoiceId)||invs[0];
+    const siRows=si.partidas.map(r=>({c:r.c,qty:r.q,u:r.u,pF:this.fmt(r.p),impF:this.fmt(r.q*r.p)}));
+    const cliDec=st.clients.map(c=>Object.assign({},c,{counts:c.pres+' presupuestos · '+c.fact+' facturas',totalF:this.fmt(c.total),open:()=>this.go('clienteDetalle',{clientId:c.n})}));
+    const sc=cliDec.find(c=>c.n===st.clientId)||cliDec[2];
+    const scDocs=quotes.filter(q=>q.cliente===sc.n).map(q=>({num:q.num,tipo:'Presupuesto',concepto:q.concepto,totalF:q.totalF,bBg:q.bBg,bFg:q.bFg,bLabel:q.bLabel,fecha:q.fecha,open:q.open}))
+      .concat(invs.filter(f=>f.cliente===sc.n).map(f=>({num:f.num,tipo:'Factura',concepto:f.concepto,totalF:f.totalF,bBg:f.bBg,bFg:f.bFg,bLabel:f.bLabel,fecha:f.emitida,open:f.open})));
+    const catRows=st.catalog.slice().sort((a,b)=>b.uses-a.uses).map((it,idx)=>({
+      c:it.c,pF:this.fmt(it.p),u:it.u,ivaL:it.iva+' %',uses:it.uses,isEdit:st.editIdx===idx,
+      edit:()=>this.setState({editIdx:idx,editC:it.c,editP:String(it.p)}),
+      save:()=>{const cat=st.catalog.map(x=>x.c===it.c?Object.assign({},x,{c:st.editC,p:parseFloat(st.editP)||x.p}):x);this.setState({catalog:cat,editIdx:-1});this.toastMsg('Partida actualizada');}
+    }));
+    const vt=this.totals(st.vRows);
+    const vRows2=st.vRows.map((r,i)=>({
+      c:r.c,qv:r.q,pv:r.p,u:r.u,ivaL:r.iva+' %',cat:r.cat,impF:this.fmt(r.q*r.p),
+      onC:(e)=>{const rows=st.vRows.slice();rows[i]=Object.assign({},rows[i],{c:e.target.value,cat:false});this.setState({vRows:rows});},
+      onQ:(e)=>{const rows=st.vRows.slice();rows[i]=Object.assign({},rows[i],{q:parseFloat(e.target.value)||0});this.setState({vRows:rows});},
+      onP:(e)=>{const rows=st.vRows.slice();rows[i]=Object.assign({},rows[i],{p:parseFloat(e.target.value)||0,cat:false});this.setState({vRows:rows});}
+    }));
+    const vClientList=st.clients.filter(c=>c.n.toLowerCase().indexOf(st.vcSearch.toLowerCase())>=0).map(c=>({n:c.n,pick:()=>this.setState({vCliente:c.n,vClientOpen:false,vcSearch:''})}));
+    const waveBars=[18,30,42,26,38,46,22,40,32,44,24,36,28,20].map((h,i)=>({h,d:(i%7)*0.09}));
+    const mm=Math.floor(st.recSec/60),ss=String(st.recSec%60).padStart(2,'0');
+    const pubQ=quotes.find(q=>q.num==='P-2026-014');
+    const sigStrokes=st.strokes.map(s=>({pts:s.join(' ')}));
+    const relPos=(e)=>{const r=e.currentTarget.getBoundingClientRect();return Math.round(e.clientX-r.left)+','+Math.round(e.clientY-r.top);};
+    const navC=(keys)=>keys.indexOf(st.screen)>=0?'#FFFFFF':'rgba(255,255,255,0.65)';
+    const navB=(keys)=>keys.indexOf(st.screen)>=0?'rgba(255,255,255,0.14)':'transparent';
+    const tabC=(keys)=>keys.indexOf(st.screen)>=0?'#2F4FB5':'#5A6A9A';
+    const goV=()=>{this.go('voz',{voice:'idle',recSec:0,words:0});clearInterval(this._rt);clearInterval(this._wt);};
+    return {
+      negocio,
+      devM:seg(m),devT:seg(t),devD:seg(d),
+      setM:()=>this.setState({device:'movil'}),setT:()=>this.setState({device:'tablet'}),setD:()=>this.setState({device:'desktop'}),
+      screenSel:st.screen,
+      jump:(e)=>{const v=e.target.value;if(v==='voz')goV();else this.go(v,{quoteId:'P-2026-014',invoiceId:'F-2026-021',clientId:'María Dolores Jiménez',pubDone:false,pubModal:false});},
+      frameW:m?390:t?768:1440,frameH:m?844:t?1024:900,
+      frameScale:Math.min(1,(st.deskW-48)/(m?390:t?768:1440)),
+      wrapW:Math.round((m?390:t?768:1440)*Math.min(1,(st.deskW-48)/(m?390:t?768:1440))),
+      wrapH:Math.round((m?844:t?1024:900)*Math.min(1,(st.deskW-48)/(m?390:t?768:1440))),
+      showSide:isApp&&!m,sideW:d?240:(st.sideOpen?240:72),sideLabels:d||st.sideOpen,showCollapse:t,chevRot:st.sideOpen?180:0,
+      toggleSide:()=>this.setState(s=>({sideOpen:!s.sideOpen})),
+      isMobileApp:isApp&&m,mainPadB:isApp&&m?'84px':'0px',contentPad:m?'16px':t?'24px':'32px',
+      cInicio:navC(['dashboard']),bInicio:navB(['dashboard']),
+      cPres:navC(['presupuestos','presupuestoDetalle','nuevo','texto','voz']),bPres:navB(['presupuestos','presupuestoDetalle','nuevo','texto','voz']),
+      cFact:navC(['facturas','facturaDetalle']),bFact:navB(['facturas','facturaDetalle']),
+      cCli:navC(['clientes','clienteDetalle']),bCli:navB(['clientes','clienteDetalle']),
+      cCat:navC(['catalogo']),bCat:navB(['catalogo']),
+      cAj:navC(['ajustes']),bAj:navB(['ajustes']),
+      tInicio:tabC(['dashboard']),tPres:tabC(['presupuestos','presupuestoDetalle','nuevo','texto','voz']),tFact:tabC(['facturas','facturaDetalle']),tCli:tabC(['clientes','clienteDetalle']),tAj:tabC(['ajustes','catalogo']),
+      goDash:()=>this.go('dashboard'),goQuotes:()=>this.go('presupuestos'),goInvoices:()=>this.go('facturas'),goClients:()=>this.go('clientes'),goCatalog:()=>this.go('catalogo'),goSettings:()=>this.go('ajustes'),goNew:()=>this.go('nuevo'),
+      goQuotesA:(e)=>{e.preventDefault();this.go('presupuestos');},
+      isLogin:st.screen==='login',isDash:st.screen==='dashboard',isNuevo:st.screen==='nuevo',isTexto:st.screen==='texto',isVoz:st.screen==='voz',
+      isQuotes:st.screen==='presupuestos',isQuoteDetail:st.screen==='presupuestoDetalle',isInvoices:st.screen==='facturas',isInvoiceDetail:st.screen==='facturaDetalle',
+      isClients:st.screen==='clientes',isClientDetail:st.screen==='clienteDetalle',isCatalog:st.screen==='catalogo',isSettings:st.screen==='ajustes',
+      isPublic:st.screen==='publica',isPdf:st.screen==='pdf',
+      isDesktop:d,isMobile:m,isTable:!m,isCards:m,
+      loginEmail:st.loginEmail,onLoginEmail:this.bindField('loginEmail'),loginPass:st.loginPass,onLoginPass:this.bindField('loginPass'),
+      doLogin:()=>{this.go('dashboard',{dashLoad:true});clearTimeout(this._dl);this._dl=setTimeout(()=>this.setState({dashLoad:false}),900);},
+      forgot:(e)=>{e.preventDefault();this.toastMsg('Te hemos enviado un correo de recuperación');},
+      dashLoad:st.dashLoad,dashReady:!st.dashLoad,
+      dashGridS:d?'display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-template-areas:"d m" "d c";gap:24px;align-items:start':'display:grid;grid-template-columns:1fr;grid-template-areas:"m" "d" "c";gap:20px',
+      metricsWrap:m?'display:flex;overflow-x:auto;gap:12px;margin:0 -16px;padding:2px 16px 6px':d?'display:grid;grid-template-columns:1fr 1fr;gap:12px':'display:grid;grid-template-columns:repeat(4,1fr);gap:12px',
+      mcW:m?'min-width:180px;':'',
+      lastQuotes:quotes.slice(0,5),
+      pendInvoices:invs.filter(f=>f.estado!=='Cobrada').slice(0,3),
+      methodDir:m?'column':'row',
+      goVoz:goV,goTexto:()=>this.go('texto'),
+      goForm:()=>{this.go('voz',{voice:'review'});},
+      textoVal:st.textoVal,onTexto:this.bindField('textoVal'),
+      extractText:()=>{this.go('voz',{voice:'proc'});this._pt=setTimeout(()=>this.setState({voice:'review'}),2200);},
+      vIdle:st.voice==='idle',vRec:st.voice==='rec',vProc:st.voice==='proc',vReview:st.voice==='review',
+      micClick:()=>this.startRec(),stopClick:()=>this.stopRec(),
+      recTime:mm+':'+ss,transcript:this.WORDS.slice(0,st.words).join(' '),waveBars,
+      vCliente:st.vCliente,vClientOpen:st.vClientOpen,toggleVClient:()=>this.setState(s=>({vClientOpen:!s.vClientOpen})),
+      vcSearch:st.vcSearch,onVcSearch:this.bindField('vcSearch'),vClientList,
+      vRows2,vBaseF:this.fmt(vt.b),vIvaF:this.fmt(vt.i),vTotalF:this.fmt(vt.t),
+      reviewBarS:m?'position:sticky;bottom:0;background:#F8F9FF;border-top:1px solid #D0D8F0;margin:0 -16px;padding:12px 16px;display:flex;gap:10px;justify-content:center;z-index:5':'display:flex;gap:12px;justify-content:flex-end;padding-bottom:8px',
+      saveDraft:()=>{this.toastMsg('Borrador guardado');this.go('presupuestos');},
+      sendQuote:()=>{this.toastMsg('Presupuesto enviado a '+st.vCliente+' por WhatsApp');this.go('presupuestoDetalle',{quoteId:'P-2026-014'});},
+      qPills,qSearch:st.qSearch,onQSearch:this.bindField('qSearch'),quotesF:qf,quotesEmpty:qf.length===0,
+      sqNum:sq.num,sqCliente:sq.cliente,sqConcepto:sq.concepto,sqFecha:sq.fecha,sqValidez:sq.validez,
+      sqBBg:sq.bBg,sqBFg:sq.bFg,sqBLabel:sq.bLabel,sqRows,sqBaseF:sq.baseF,sqIvaF:sq.ivaF,sqTotalF:sq.totalF,sqEvents,
+      canInvoice:canInv,convOpacity:canInv?1:0.4,convTitle:canInv?'Convertir en factura':'Disponible cuando el cliente acepte',
+      convClick:()=>{if(canInv)this.setState({modalFactura:true});},
+      backQuotes:()=>this.go('presupuestos'),backInvoices:()=>this.go('facturas'),backClients:()=>this.go('clientes'),backNew:()=>this.go('nuevo'),
+      waSend:()=>this.toastMsg('Abriendo WhatsApp…'),dlPdf:()=>this.toastMsg('Descargando PDF…'),openPdf:()=>this.go('pdf'),
+      iPills,invF:inf,totFactF:'726,00 €',totCobF:'496,10 €',totPendF:'229,90 €',
+      siNum:si.num,siCliente:si.cliente,siConcepto:si.concepto,siBaseF:si.baseF,siIvaF:si.ivaF,siTotalF:si.totalF,
+      siBBg:si.bBg,siBFg:si.bFg,siBLabel:si.bLabel,siEmitida:si.emitida,siVence:si.vence,siRows,
+      siPend:si.estado!=='Cobrada',
+      markPaid:()=>{const inv2=st.invoices.map(f=>f.num===si.num?Object.assign({},f,{estado:'Cobrada'}):f);this.setState({invoices:inv2});this.toastMsg('Factura marcada como cobrada');},
+      openRect:()=>this.setState({modalRect:true}),closeRect:()=>this.setState({modalRect:false}),
+      confirmRect:()=>{this.setState({modalRect:false});this.toastMsg('Rectificativa R-2026-001 creada como borrador');},
+      modalFactura:st.modalFactura,closeFactura:()=>this.setState({modalFactura:false}),
+      confirmFactura:()=>{this.setState({modalFactura:false});this.toastMsg('Factura F-2026-020 emitida');this.go('facturaDetalle',{invoiceId:'F-2026-020'});},
+      modalRect:st.modalRect,
+      clients:cliDec,
+      clientModal:st.clientModal,openClientModal:()=>this.setState({clientModal:true}),closeClientModal:()=>this.setState({clientModal:false}),
+      saveClient:()=>{this.setState({clientModal:false});this.toastMsg('Cliente guardado');},
+      scN:sc.n,scIni:sc.ini,scNif:sc.nif,scTel:sc.tel,scLoc:sc.loc,scCounts:sc.counts,scTotalF:sc.totalF,scDocs,
+      catRows,editC:st.editC,onEditC:this.bindField('editC'),editP:st.editP,onEditP:this.bindField('editP'),
+      catAddOpen:st.catAddOpen,toggleCatAdd:()=>this.setState(s=>({catAddOpen:!s.catAddOpen})),
+      newC:st.newC,onNewC:this.bindField('newC'),newP:st.newP,onNewP:this.bindField('newP'),
+      addItem:()=>{if(!st.newC)return;const cat=st.catalog.concat([{c:st.newC,p:parseFloat(st.newP)||0,u:st.newU,iva:21,uses:0}]);this.setState({catalog:cat,catAddOpen:false,newC:'',newP:''});this.toastMsg('Partida añadida al catálogo');},
+      sNombre:st.sNombre,onSNombre:this.bindField('sNombre'),sNif:st.sNif,onSNif:this.bindField('sNif'),sDir:st.sDir,onSDir:this.bindField('sDir'),
+      sTel:st.sTel,onSTel:this.bindField('sTel'),sEmail:st.sEmail,onSEmail:this.bindField('sEmail'),
+      iva21S:'flex:1;height:44px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid '+(st.sIva==='21'?'#2F4FB5;background:#E8EDFB;color:#2F4FB5':'#D0D8F0;background:#FFFFFF;color:#5A6A9A'),
+      iva10S:'flex:1;height:44px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid '+(st.sIva==='10'?'#2F4FB5;background:#E8EDFB;color:#2F4FB5':'#D0D8F0;background:#FFFFFF;color:#5A6A9A'),
+      iva0S:'flex:1;height:44px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid '+(st.sIva==='0'?'#2F4FB5;background:#E8EDFB;color:#2F4FB5':'#D0D8F0;background:#FFFFFF;color:#5A6A9A'),
+      pick21:()=>this.setState({sIva:'21'}),pick10:()=>this.setState({sIva:'10'}),pick0:()=>this.setState({sIva:'0'}),
+      sSerieP:st.sSerieP,onSSerieP:this.bindField('sSerieP'),sSerieF:st.sSerieF,onSSerieF:this.bindField('sSerieF'),
+      sCond:st.sCond,onSCond:this.bindField('sCond'),
+      saveSettings:()=>this.toastMsg('Ajustes guardados'),
+      logout:()=>{this.go('login');},
+      settingsCols:d?'display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:24px;align-items:start':'display:block',
+      pubRows:pubQ.partidas.map(r=>({c:r.c,qty:r.q,u:r.u,pF:this.fmt(r.p),impF:this.fmt(r.q*r.p)})),
+      pubBaseF:pubQ.baseF,pubIvaF:pubQ.ivaF,pubTotalF:pubQ.totalF,
+      pubModal:st.pubModal,pubAccept:()=>this.setState({pubModal:true}),pubClose:()=>this.setState({pubModal:false}),
+      pubName:st.pubName,onPubName:this.bindField('pubName'),
+      pubConfirm:()=>this.setState({pubModal:false,pubDone:true}),
+      pubDone:st.pubDone,pubPending:!st.pubDone,
+      pubBack:(e)=>{e.preventDefault();this.setState({pubDone:false,strokes:[],pubName:''});},
+      pubChanges:()=>this.toastMsg('Abriendo WhatsApp…'),
+      sigStrokes,
+      sigDown:(e)=>{this.setState(s=>({drawing:true,strokes:s.strokes.concat([[relPos(e)]])}));},
+      sigMove:(e)=>{if(!st.drawing)return;const p=relPos(e);this.setState(s=>{const str=s.strokes.slice();str[str.length-1]=str[str.length-1].concat([p]);return {strokes:str};});},
+      sigUp:()=>this.setState({drawing:false}),
+      clearSig:()=>this.setState({strokes:[]}),
+      clearSigA:(e)=>{e.preventDefault();this.setState({strokes:[]});},
+      hasSig:st.strokes.length>0,
+      pdfQRows:sqRows,pdfFRows:siRows,
+      pQBaseF:'794,00 €',pQIvaF:'166,74 €',pQTotalF:'960,74 €',
+      pFBaseF:'190,00 €',pFIvaF:'39,90 €',pFTotalF:'229,90 €',
+      backFromPdf:()=>this.go('presupuestoDetalle'),
+      detailGridS:d?'display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:24px;align-items:start':'display:flex;flex-direction:column;gap:20px',
+      actionBarS:m?'position:sticky;bottom:0;background:#F8F9FF;border-top:1px solid #D0D8F0;margin:20px -16px 0;padding:12px 16px;display:flex;gap:8px;overflow-x:auto;z-index:5':'display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;align-items:center',
+      noSig:st.strokes.length===0,
+      invEmpty:inf.length===0,
+      qTableShow:!m&&qf.length>0,qCardsShow:m&&qf.length>0,
+      invTableShow:!m&&inf.length>0,invCardsShow:m&&inf.length>0,
+      notCanInvoice:!canInv,
+      openPdfA:(e)=>{e.preventDefault();this.go('pdf');},
+      hasToast:!!st.toast,toastMsg:st.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

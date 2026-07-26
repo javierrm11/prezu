@@ -15,7 +15,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Prezu",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  title: {
+    default: "Prezu — Presupuestos y facturas por voz para autónomos de oficios",
+    template: "%s · Prezu",
+  },
   description: "Presupuestos y facturas por voz para autónomos de oficios",
 };
 

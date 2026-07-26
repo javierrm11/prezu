@@ -33,3 +33,12 @@ export function estadoCobroEfectivo(estadoCobro: string, vencimiento: string | n
   }
   return estadoCobro;
 }
+
+const ESTADOS_SUSCRIPCION_CON_ACCESO = ["trialing", "active"];
+
+// La suscripción ya no bloquea la app entera (ver AppLayout): solo
+// se comprueba en el momento de descargar un PDF de presupuesto o
+// factura, en la página y en el route handler.
+export function tieneAccesoSuscripcion(estadoSuscripcion: string | null | undefined): boolean {
+  return Boolean(estadoSuscripcion && ESTADOS_SUSCRIPCION_CON_ACCESO.includes(estadoSuscripcion));
+}

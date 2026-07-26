@@ -1,42 +1,13 @@
 import { Document, Page, View, Text, Image } from "@react-pdf/renderer";
 import { formatearEuros, formatearFecha } from "@/lib/formato";
 import { obtenerIniciales } from "@/lib/texto";
-import {
-  COLOR_TEXTO_SECUNDARIO,
-  estilosDocumento as estilos,
-  type EmpresaPDF,
-  type LineaPDF,
-} from "./estilos";
+import { COLOR_TEXTO_SECUNDARIO, estilosDocumento as estilos } from "../estilos";
+import { etiquetasDocumento, type DatosDocumentoPDF } from "./tipos";
 
-export type { LineaPDF };
-
-export type PresupuestoPDFProps = {
-  empresa: EmpresaPDF;
-  cliente: { nombre: string; nif: string | null; ciudad: string | null };
-  numeroDocumento: string;
-  fecha: string | null;
-  validoHasta: string | null;
-  lineas: LineaPDF[];
-  baseImponible: number;
-  totalIva: number;
-  total: number;
-  etiquetaIva: string;
-  condiciones: string | null;
-};
-
-export function PresupuestoPDF({
-  empresa,
-  cliente,
-  numeroDocumento,
-  fecha,
-  validoHasta,
-  lineas,
-  baseImponible,
-  totalIva,
-  total,
-  etiquetaIva,
-  condiciones,
-}: PresupuestoPDFProps) {
+export function DocumentoClasico(datos: DatosDocumentoPDF) {
+  const { empresa, cliente, numeroDocumento, fecha, fechaSecundaria, lineas } = datos;
+  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago } = datos;
+  const etiquetas = etiquetasDocumento(datos.tipo);
   const contactoNegocio = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
 
   return (
@@ -70,24 +41,25 @@ export function PresupuestoPDF({
 
         <View style={estilos.filaDatos}>
           <View>
-            <Text style={estilos.etiquetaChica}>PRESUPUESTO PARA</Text>
+            <Text style={estilos.etiquetaChica}>{etiquetas.cliente}</Text>
             <Text style={estilos.clienteNombre}>{cliente.nombre}</Text>
             {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
             {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
+            {cliente.direccion && <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>}
           </View>
           <View style={estilos.cajaMeta}>
             <View style={estilos.filaMeta}>
-              <Text>Nº</Text>
+              <Text>{etiquetas.numero}</Text>
               <Text style={estilos.metaValor}>{numeroDocumento}</Text>
             </View>
             <View style={estilos.filaMeta}>
-              <Text>Fecha</Text>
+              <Text>{etiquetas.fecha}</Text>
               <Text style={estilos.metaValor}>{fecha ? formatearFecha(fecha) : "—"}</Text>
             </View>
             <View style={estilos.filaMetaSinMargen}>
-              <Text>Válido hasta</Text>
+              <Text>{etiquetas.fechaSecundaria}</Text>
               <Text style={estilos.metaValor}>
-                {validoHasta ? formatearFecha(validoHasta) : "—"}
+                {fechaSecundaria ? formatearFecha(fechaSecundaria) : "—"}
               </Text>
             </View>
           </View>
@@ -129,10 +101,15 @@ export function PresupuestoPDF({
 
         <View style={{ flex: 1 }} />
 
-        {condiciones && (
+        {(condiciones || formaPago) && (
           <View style={estilos.pie}>
-            <Text style={estilos.pieTitulo}>Condiciones</Text>
-            <Text>{condiciones}</Text>
+            {condiciones && (
+              <>
+                <Text style={estilos.pieTitulo}>Condiciones</Text>
+                <Text>{condiciones}</Text>
+              </>
+            )}
+            {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
           </View>
         )}
       </Page>

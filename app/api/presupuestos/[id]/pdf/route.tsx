@@ -3,7 +3,9 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearNumeroDocumento } from "@/lib/formato";
-import { PresupuestoPDF, type LineaPDF } from "@/lib/pdf/PresupuestoPDF";
+import { tieneAccesoSuscripcion } from "@/lib/estados";
+import { renderizarDocumentoPDF, type IdPlantillaPDF } from "@/lib/pdf/plantillas";
+import type { LineaPDF } from "@/lib/pdf/estilos";
 
 type FilaPresupuestoDB = {
   id: string;
@@ -26,11 +28,13 @@ type FilaPresupuestoDB = {
     condiciones_defecto: string | null;
     logo_url: string | null;
     serie_presupuesto: string;
+    pdf_plantilla: IdPlantillaPDF | null;
+    estado_suscripcion: string | null;
   } | null;
 };
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -44,7 +48,7 @@ export async function GET(
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto)",
+      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto, pdf_plantilla, estado_suscripcion)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -54,6 +58,14 @@ export async function GET(
 
   if (!presupuesto) {
     return new Response("No encontrado", { status: 404 });
+  }
+
+  // Defensa en profundidad: la página ya evita enseñar este enlace
+  // sin suscripción activa, pero la URL es adivinable/reutilizable
+  // directamente, así que también se comprueba aquí.
+  if (!tieneAccesoSuscripcion(presupuesto.empresas?.estado_suscripcion)) {
+    const volver = encodeURIComponent(`/presupuestos/${id}`);
+    return Response.redirect(new URL(`/suscripcion?volver=${volver}`, request.url), 302);
   }
 
   const { data: lineasDB } = await supabase
@@ -82,8 +94,9 @@ export async function GET(
   const urlLogo = await crearUrlFirmadaLogo(supabase, presupuesto.empresas?.logo_url ?? null);
 
   const buffer = await renderToBuffer(
-    <PresupuestoPDF
-      empresa={{
+    renderizarDocumentoPDF(presupuesto.empresas?.pdf_plantilla, {
+      tipo: "presupuesto",
+      empresa: {
         nombre: presupuesto.empresas?.nombre ?? "",
         nif: presupuesto.empresas?.nif ?? null,
         direccion: presupuesto.empresas?.direccion ?? null,
@@ -91,22 +104,22 @@ export async function GET(
         telefono: presupuesto.empresas?.telefono ?? null,
         email: presupuesto.empresas?.email ?? null,
         logoUrl: urlLogo,
-      }}
-      cliente={{
+      },
+      cliente: {
         nombre: presupuesto.clientes?.nombre ?? "Sin cliente",
         nif: presupuesto.clientes?.nif ?? null,
         ciudad: presupuesto.clientes?.ciudad ?? null,
-      }}
-      numeroDocumento={numeroDocumento}
-      fecha={presupuesto.fecha_emision}
-      validoHasta={presupuesto.valido_hasta}
-      lineas={lineas}
-      baseImponible={Number(presupuesto.base_imponible)}
-      totalIva={Number(presupuesto.total_iva)}
-      total={Number(presupuesto.total)}
-      etiquetaIva={etiquetaIva}
-      condiciones={presupuesto.condiciones ?? presupuesto.empresas?.condiciones_defecto ?? null}
-    />,
+      },
+      numeroDocumento,
+      fecha: presupuesto.fecha_emision,
+      fechaSecundaria: presupuesto.valido_hasta,
+      lineas,
+      baseImponible: Number(presupuesto.base_imponible),
+      totalIva: Number(presupuesto.total_iva),
+      total: Number(presupuesto.total),
+      etiquetaIva,
+      condiciones: presupuesto.condiciones ?? presupuesto.empresas?.condiciones_defecto ?? null,
+    }),
   );
 
   return new Response(new Uint8Array(buffer), {

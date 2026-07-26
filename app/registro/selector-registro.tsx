@@ -60,6 +60,15 @@ export function SelectorRegistro({ estaAutenticado, empresaId }: SelectorRegistr
             </Link>
           </p>
         ))}
+
+      {!estaAutenticado && (
+        <p className="text-center text-[13px] text-texto-secundario">
+          ¿Ya tienes cuenta?{" "}
+          <Link href="/login" className="font-medium text-secundario">
+            Inicia sesión
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { registrarEmpresa } from "./acciones";
-import { crearSesionCheckout } from "../suscripcion/acciones";
 
 export function FormularioRegistroEmpresa() {
   const router = useRouter();
@@ -54,18 +53,9 @@ export function FormularioRegistroEmpresa() {
     }
 
     router.refresh();
-
-    const checkout = await crearSesionCheckout();
-
-    if (checkout.error || !checkout.url) {
-      // La cuenta y la sesión ya existen: si el checkout falla aquí,
-      // /suscripcion (donde manda el layout autenticado sin
-      // suscripción activa) deja reintentarlo.
-      router.push("/suscripcion");
-      return;
-    }
-
-    window.location.href = checkout.url;
+    // Sin pasarela de pago aquí: se pide tarjeta más adelante, la
+    // primera vez que el negocio intente descargar un PDF.
+    router.push("/dashboard");
   }
 
   return (

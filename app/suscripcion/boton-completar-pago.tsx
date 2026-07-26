@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { crearSesionCheckout } from "./acciones";
 
-export function BotonCompletarPago() {
+export function BotonCompletarPago({ volver }: { volver?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
@@ -12,7 +12,7 @@ export function BotonCompletarPago() {
     setError(null);
     setCargando(true);
 
-    const resultado = await crearSesionCheckout();
+    const resultado = await crearSesionCheckout(volver);
 
     if (resultado.error || !resultado.url) {
       setError(resultado.error ?? "No se ha podido iniciar el pago.");
