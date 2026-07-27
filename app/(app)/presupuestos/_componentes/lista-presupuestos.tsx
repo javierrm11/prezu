@@ -131,11 +131,10 @@ export function ListaPresupuestos({
             <div>ESTADO</div>
           </div>
           {filtrados.map((presupuesto) => {
-            const etiquetaNumero = formatearNumeroDocumento(
-              seriePresupuesto,
-              presupuesto.numero,
-              presupuesto.anio,
-            );
+            const etiquetaNumero =
+              presupuesto.numero != null
+                ? formatearNumeroDocumento(seriePresupuesto, presupuesto.numero, presupuesto.anio)
+                : "Presupuesto";
             const badge = <Badge tono={tonoPresupuesto(presupuesto.estado)}>{presupuesto.estado}</Badge>;
 
             return (

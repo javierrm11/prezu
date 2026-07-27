@@ -17,6 +17,7 @@ import { Boton } from "@/components/ui/Boton";
 import { BotonConvertirFactura } from "../_componentes/boton-convertir-factura";
 import { AccionesEstadoPresupuesto } from "../_componentes/acciones-estado-presupuesto";
 import { AccionesEnviarPresupuesto } from "../_componentes/acciones-enviar-presupuesto";
+import { TituloPresupuestoEditable } from "../_componentes/titulo-presupuesto-editable";
 
 const ESTADOS_TERMINALES = ["aceptado", "rechazado", "facturado", "caducado"];
 
@@ -40,7 +41,7 @@ export default async function PresupuestoDetallePage({
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, serie, estado, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre, telefono)",
+      "id, numero, anio, serie, estado, nombre, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -53,6 +54,7 @@ export default async function PresupuestoDetallePage({
         anio: number | null;
         serie: string | null;
         estado: string;
+        nombre: string | null;
         cliente_id: string | null;
         factura_id: string | null;
         token_publico: string;
@@ -61,7 +63,7 @@ export default async function PresupuestoDetallePage({
         base_imponible: number;
         total_iva: number;
         total: number;
-        clientes: { nombre: string; telefono: string | null } | null;
+        clientes: { nombre: string } | null;
       }
     | null;
 
@@ -73,7 +75,7 @@ export default async function PresupuestoDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("nombre, serie_presupuesto, serie_factura, pdf_plantilla, estado_suscripcion")
+    .select("serie_presupuesto, serie_factura, pdf_plantilla, estado_suscripcion")
     .eq("id", empresaId)
     .single();
 
@@ -100,11 +102,14 @@ export default async function PresupuestoDetallePage({
     .eq("entidad_id", id)
     .order("created_at", { ascending: true });
 
-  const etiquetaNumero = formatearNumeroDocumento(
-    empresa?.serie_presupuesto ?? "P",
-    presupuesto.numero,
-    presupuesto.anio,
-  );
+  const etiquetaNumero =
+    presupuesto.numero != null
+      ? formatearNumeroDocumento(
+          empresa?.serie_presupuesto ?? "P",
+          presupuesto.numero,
+          presupuesto.anio,
+        )
+      : "Presupuesto";
 
   const enlacePublico = `${process.env.NEXT_PUBLIC_APP_URL}/p/${presupuesto.token_publico}`;
 
@@ -120,15 +125,19 @@ export default async function PresupuestoDetallePage({
         </Link>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="font-heading text-[22px] font-bold text-primario">
-              {etiquetaNumero}
-            </span>
+            <TituloPresupuestoEditable
+              presupuestoId={presupuesto.id}
+              nombreInicial={
+                presupuesto.nombre ??
+                `Presupuesto ${presupuesto.clientes?.nombre ?? ""}`.trim()
+              }
+            />
             <Badge tono={tonoPresupuesto(presupuesto.estado)}>
               {presupuesto.estado}
             </Badge>
           </div>
           <div className="mt-0.5 text-sm text-texto-secundario">
-            {presupuesto.clientes?.nombre ?? "Sin cliente"}
+            {etiquetaNumero} · {presupuesto.clientes?.nombre ?? "Sin cliente"}
             {presupuesto.fecha_emision &&
               ` · Emitido ${formatearFecha(presupuesto.fecha_emision)}`}
             {presupuesto.valido_hasta &&
@@ -191,8 +200,8 @@ export default async function PresupuestoDetallePage({
             </div>
           </div>
 
-          {!ESTADOS_TERMINALES.includes(presupuesto.estado) && (
-            <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex flex-col items-end gap-3">
+            {!ESTADOS_TERMINALES.includes(presupuesto.estado) && (
               <AccionesEstadoPresupuesto
                 empresaId={empresaId}
                 presupuesto={{
@@ -205,38 +214,35 @@ export default async function PresupuestoDetallePage({
                 }}
                 seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
               />
-            </div>
-          )}
-
-          <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
-            <AccionesEnviarPresupuesto
-              empresaId={empresaId}
-              presupuesto={{
-                id: presupuesto.id,
-                estado: presupuesto.estado,
-                fechaEmision,
-                numero: presupuesto.numero,
-                anio: presupuesto.anio,
-                serie: presupuesto.serie,
-              }}
-              seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
-              enlacePublico={enlacePublico}
-              telefonoCliente={presupuesto.clientes?.telefono ?? null}
-              clienteNombre={presupuesto.clientes?.nombre ?? "cliente"}
-              negocioNombre={empresa?.nombre ?? "mi negocio"}
-              total={Number(presupuesto.total)}
-            />
-            <a href={enlacePdf}>
-              <Boton variante="secundario" className="inline-flex items-center gap-2">
-                <Download size={16} />
-                Descargar PDF
-              </Boton>
-            </a>
-            {presupuesto.estado === "borrador" && (
-              <Link href={`/presupuestos/${presupuesto.id}/editar`}>
-                <Boton variante="secundario">Editar</Boton>
-              </Link>
             )}
+
+            <div className="flex flex-wrap items-start justify-end gap-2.5">
+              <AccionesEnviarPresupuesto
+                empresaId={empresaId}
+                presupuesto={{
+                  id: presupuesto.id,
+                  estado: presupuesto.estado,
+                  fechaEmision,
+                  numero: presupuesto.numero,
+                  anio: presupuesto.anio,
+                  serie: presupuesto.serie,
+                }}
+                seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
+                enlacePublico={enlacePublico}
+              />
+              <a href={enlacePdf}>
+                <Boton variante="secundario" className="inline-flex items-center gap-2">
+                  <Download size={16} />
+                  Descargar PDF
+                </Boton>
+              </a>
+              {presupuesto.estado === "borrador" && (
+                <Link href={`/presupuestos/${presupuesto.id}/editar`}>
+                  <Boton variante="secundario">Editar</Boton>
+                </Link>
+              )}
+            </div>
+
             {presupuesto.estado === "facturado" && presupuesto.factura_id ? (
               <Link href={`/facturas/${presupuesto.factura_id}`}>
                 <Boton variante="secundario">Ver factura</Boton>

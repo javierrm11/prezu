@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Download, Eye, FileWarning, Lock, MessageCircle } from "lucide-react";
+import { ArrowLeft, Check, Download, Eye, FileWarning, Lock } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import {
@@ -11,7 +11,6 @@ import {
 } from "@/lib/formato";
 import { estadoCobroEfectivo, tonoFactura } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
-import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
 import { calcularEnlacePdf } from "@/lib/pdf/enlace";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
@@ -37,7 +36,7 @@ export default async function FacturaDetallePage({
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total, clientes(telefono)",
+      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -60,7 +59,6 @@ export default async function FacturaDetallePage({
         base_imponible: number;
         total_iva: number;
         total: number;
-        clientes: { telefono: string | null } | null;
       }
     | null;
 
@@ -86,7 +84,7 @@ export default async function FacturaDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("nombre, estado_suscripcion")
+    .select("estado_suscripcion")
     .eq("id", empresaId)
     .single();
 
@@ -123,14 +121,6 @@ export default async function FacturaDetallePage({
 
   const etiquetaNumero = formatearNumeroDocumento(factura.serie, factura.numero, factura.anio);
   const estadoEfectivo = estadoCobroEfectivo(factura.estado_cobro, factura.vencimiento);
-
-  const telefonoCliente = factura.clientes?.telefono;
-  const enlaceWhatsApp = telefonoCliente
-    ? construirEnlaceWhatsApp(
-        telefonoCliente,
-        `Hola ${factura.cliente_nombre}, te paso la factura ${etiquetaNumero} de ${empresa?.nombre ?? "mi negocio"} por un importe de ${formatearEuros(Number(factura.total))}. Cualquier duda, aquí me tienes.`,
-      )
-    : null;
 
   return (
     <div>
@@ -235,36 +225,31 @@ export default async function FacturaDetallePage({
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
-            <a href={enlaceVerPdf} target="_blank" rel="noopener noreferrer">
-              <Boton variante="secundario" className="inline-flex items-center gap-2">
-                <Eye size={16} />
-                Ver PDF
-              </Boton>
-            </a>
-            <a href={enlaceDescargarPdf}>
-              <Boton variante="secundario" className="inline-flex items-center gap-2">
-                <Download size={16} />
-                Descargar PDF
-              </Boton>
-            </a>
-            {enlaceWhatsApp && (
-              <a href={enlaceWhatsApp} target="_blank" rel="noopener noreferrer">
+          <div className="mt-4 flex flex-col items-end gap-3">
+            <div className="flex flex-wrap items-start justify-end gap-2.5">
+              <a href={enlaceVerPdf} target="_blank" rel="noopener noreferrer">
                 <Boton variante="secundario" className="inline-flex items-center gap-2">
-                  <MessageCircle size={16} />
-                  Enviar por WhatsApp
+                  <Eye size={16} />
+                  Ver PDF
                 </Boton>
               </a>
-            )}
+              <a href={enlaceDescargarPdf}>
+                <Boton variante="secundario" className="inline-flex items-center gap-2">
+                  <Download size={16} />
+                  Descargar PDF
+                </Boton>
+              </a>
+              <Link href={`/facturas/${factura.id}/rectificar`}>
+                <Boton variante="secundario" className="inline-flex items-center gap-2">
+                  <FileWarning size={16} />
+                  Rectificar
+                </Boton>
+              </Link>
+            </div>
+
             {factura.estado_cobro !== "cobrada" && (
               <BotonMarcarCobrada empresaId={empresaId} facturaId={factura.id} />
             )}
-            <Link href={`/facturas/${factura.id}/rectificar`}>
-              <Boton variante="secundario" className="inline-flex items-center gap-2">
-                <FileWarning size={16} />
-                Rectificar
-              </Boton>
-            </Link>
           </div>
 
           {(factura.cliente_nif || factura.cliente_direccion) && (

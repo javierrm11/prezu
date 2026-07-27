@@ -151,9 +151,14 @@ export function FormularioPresupuesto({
 
       await supabase.from("presupuesto_lineas").delete().eq("presupuesto_id", presupuestoId);
     } else {
+      const nombreCliente = clientes.find((cliente) => cliente.id === clienteId)?.nombre ?? "";
       const { data: nuevoPresupuesto, error: errorInsert } = await supabase
         .from("presupuestos")
-        .insert({ ...datosPresupuesto, estado: "borrador" })
+        .insert({
+          ...datosPresupuesto,
+          estado: "borrador",
+          nombre: `Presupuesto ${nombreCliente}`.trim(),
+        })
         .select("id")
         .single();
 
