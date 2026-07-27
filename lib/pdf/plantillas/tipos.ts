@@ -9,11 +9,11 @@ export const PLANTILLAS_PDF: { id: IdPlantillaPDF; nombre: string; descripcion: 
   { id: "acento", nombre: "Con acento", descripcion: "Franja de color lateral y detalles en ámbar." },
 ];
 
-// Datos comunes a presupuesto y factura: un mismo documento con
-// pequeñas diferencias de etiqueta según `tipo`, para no duplicar
-// cada plantilla en dos componentes casi idénticos.
+// Datos comunes a presupuesto, factura y rectificativa: un mismo
+// documento con pequeñas diferencias de etiqueta según `tipo`, para
+// no duplicar cada plantilla en tres componentes casi idénticos.
 export type DatosDocumentoPDF = {
-  tipo: "presupuesto" | "factura";
+  tipo: "presupuesto" | "factura" | "rectificativa";
   empresa: EmpresaPDF;
   cliente: { nombre: string; nif: string | null; ciudad?: string | null; direccion?: string | null };
   numeroDocumento: string;
@@ -26,20 +26,35 @@ export type DatosDocumentoPDF = {
   etiquetaIva: string;
   condiciones: string | null;
   formaPago?: string | null;
+  // Solo si tipo="rectificativa": número de la factura que corrige,
+  // para dejarlo impreso en el documento (lo exige Hacienda).
+  rectificaA?: string | null;
 };
 
 export function etiquetasDocumento(tipo: DatosDocumentoPDF["tipo"]) {
-  return tipo === "presupuesto"
-    ? {
-        cliente: "PRESUPUESTO PARA",
-        numero: "Nº",
-        fecha: "Fecha",
-        fechaSecundaria: "Válido hasta",
-      }
-    : {
-        cliente: "FACTURAR A",
-        numero: "Nº factura",
-        fecha: "Emitida",
-        fechaSecundaria: "Vencimiento",
-      };
+  if (tipo === "presupuesto") {
+    return {
+      titulo: "PRESUPUESTO",
+      cliente: "PRESUPUESTO PARA",
+      numero: "Nº",
+      fecha: "Fecha",
+      fechaSecundaria: "Válido hasta",
+    };
+  }
+  if (tipo === "rectificativa") {
+    return {
+      titulo: "FACTURA RECTIFICATIVA",
+      cliente: "FACTURAR A",
+      numero: "Nº rectificativa",
+      fecha: "Emitida",
+      fechaSecundaria: "Vencimiento",
+    };
+  }
+  return {
+    titulo: "FACTURA",
+    cliente: "FACTURAR A",
+    numero: "Nº factura",
+    fecha: "Emitida",
+    fechaSecundaria: "Vencimiento",
+  };
 }

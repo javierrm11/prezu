@@ -25,7 +25,7 @@ export default async function AjustesPage() {
   const { data: empresa } = await supabase
     .from("empresas")
     .select(
-      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
+      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, serie_rectificativa, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
     )
     .eq("id", empresaId)
     .single();

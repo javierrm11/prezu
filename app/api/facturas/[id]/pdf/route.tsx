@@ -12,6 +12,8 @@ type FilaFacturaDB = {
   numero: number;
   anio: number;
   serie: string;
+  tipo: string;
+  rectifica_a: string | null;
   fecha_emision: string;
   vencimiento: string | null;
   forma_pago: string | null;
@@ -50,7 +52,7 @@ export async function GET(
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, serie, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla, estado_suscripcion)",
+      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla, estado_suscripcion)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -91,9 +93,22 @@ export async function GET(
   const numeroDocumento = formatearNumeroDocumento(factura.serie, factura.numero, factura.anio);
   const urlLogo = await crearUrlFirmadaLogo(supabase, factura.empresas?.logo_url ?? null);
 
+  let rectificaA: string | null = null;
+  if (factura.tipo === "rectificativa" && factura.rectifica_a) {
+    const { data: original } = await supabase
+      .from("facturas")
+      .select("serie, numero, anio")
+      .eq("id", factura.rectifica_a)
+      .single();
+    if (original) {
+      rectificaA = formatearNumeroDocumento(original.serie, original.numero, original.anio);
+    }
+  }
+
   const buffer = await renderToBuffer(
     renderizarDocumentoPDF(factura.empresas?.pdf_plantilla, {
-      tipo: "factura",
+      tipo: factura.tipo === "rectificativa" ? "rectificativa" : "factura",
+      rectificaA,
       empresa: {
         nombre: factura.empresas?.nombre ?? "",
         nif: factura.empresas?.nif ?? null,

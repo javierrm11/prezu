@@ -23,6 +23,7 @@ export type EmpresaAjustes = {
   condiciones_defecto: string | null;
   serie_presupuesto: string;
   serie_factura: string;
+  serie_rectificativa: string;
 };
 
 type FormularioAjustesProps = {
@@ -47,6 +48,7 @@ export function FormularioAjustes({
   const [condiciones, setCondiciones] = useState(empresa.condiciones_defecto ?? "");
   const [seriePresupuesto, setSeriePresupuesto] = useState(empresa.serie_presupuesto);
   const [serieFactura, setSerieFactura] = useState(empresa.serie_factura);
+  const [serieRectificativa, setSerieRectificativa] = useState(empresa.serie_rectificativa);
   const [proximoNumeroFactura, setProximoNumeroFactura] = useState(proximoNumeroFacturaInicial);
   const [error, setError] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -110,9 +112,10 @@ export function FormularioAjustes({
 
     const seriePresupuestoLimpia = seriePresupuesto.trim().toUpperCase();
     const serieFacturaLimpia = serieFactura.trim().toUpperCase();
+    const serieRectificativaLimpia = serieRectificativa.trim().toUpperCase();
 
-    if (!seriePresupuestoLimpia || !serieFacturaLimpia) {
-      setError("La serie de presupuestos y de facturas no pueden estar vacías");
+    if (!seriePresupuestoLimpia || !serieFacturaLimpia || !serieRectificativaLimpia) {
+      setError("Las series de presupuestos, facturas y rectificativas no pueden estar vacías");
       setGuardando(false);
       return;
     }
@@ -161,6 +164,7 @@ export function FormularioAjustes({
         condiciones_defecto: condiciones || null,
         serie_presupuesto: seriePresupuestoLimpia,
         serie_factura: serieFacturaLimpia,
+        serie_rectificativa: serieRectificativaLimpia,
       })
       .eq("id", empresa.id);
 
@@ -190,6 +194,7 @@ export function FormularioAjustes({
 
     setSeriePresupuesto(seriePresupuestoLimpia);
     setSerieFactura(serieFacturaLimpia);
+    setSerieRectificativa(serieRectificativaLimpia);
     setMensaje("Cambios guardados");
     router.refresh();
   }
@@ -307,6 +312,18 @@ export function FormularioAjustes({
         </div>
         <p className="-mt-2.5 text-xs text-texto-secundario">
           Ejemplo con &quot;{serieFactura.trim().toUpperCase() || "F"}&quot;: {serieFactura.trim().toUpperCase() || "F"}-{new Date().getFullYear()}-001
+        </p>
+
+        <Campo
+          id="serie-rectificativa"
+          label="Serie de rectificativas"
+          value={serieRectificativa}
+          onChange={(evento) => setSerieRectificativa(evento.target.value)}
+          maxLength={4}
+          required
+        />
+        <p className="-mt-2.5 text-xs text-texto-secundario">
+          Para corregir una factura ya emitida. Ejemplo: {serieRectificativa.trim().toUpperCase() || "R"}-{new Date().getFullYear()}-001
         </p>
 
         <Campo

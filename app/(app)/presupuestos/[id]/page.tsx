@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Download, MessageCircle } from "lucide-react";
+import { ArrowLeft, Check, Download } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import {
@@ -11,13 +11,12 @@ import {
 } from "@/lib/formato";
 import { tonoPresupuesto } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
-import { construirEnlaceWhatsApp } from "@/lib/whatsapp";
 import { calcularEnlacePdf } from "@/lib/pdf/enlace";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
-import { BotonCopiarEnlace } from "@/components/ui/BotonCopiarEnlace";
 import { BotonConvertirFactura } from "../_componentes/boton-convertir-factura";
 import { AccionesEstadoPresupuesto } from "../_componentes/acciones-estado-presupuesto";
+import { AccionesEnviarPresupuesto } from "../_componentes/acciones-enviar-presupuesto";
 
 const ESTADOS_TERMINALES = ["aceptado", "rechazado", "facturado", "caducado"];
 
@@ -41,7 +40,7 @@ export default async function PresupuestoDetallePage({
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, estado, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre, telefono)",
+      "id, numero, anio, serie, estado, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre, telefono)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -52,6 +51,7 @@ export default async function PresupuestoDetallePage({
         id: string;
         numero: number | null;
         anio: number | null;
+        serie: string | null;
         estado: string;
         cliente_id: string | null;
         factura_id: string | null;
@@ -68,6 +68,8 @@ export default async function PresupuestoDetallePage({
   if (!presupuesto) {
     notFound();
   }
+
+  const fechaEmision = presupuesto.fecha_emision ?? new Date().toISOString().slice(0, 10);
 
   const { data: empresa } = await supabase
     .from("empresas")
@@ -105,14 +107,6 @@ export default async function PresupuestoDetallePage({
   );
 
   const enlacePublico = `${process.env.NEXT_PUBLIC_APP_URL}/p/${presupuesto.token_publico}`;
-
-  const telefonoCliente = presupuesto.clientes?.telefono;
-  const enlaceWhatsApp = telefonoCliente
-    ? construirEnlaceWhatsApp(
-        telefonoCliente,
-        `Hola ${presupuesto.clientes?.nombre}, te paso el presupuesto ${etiquetaNumero} de ${empresa?.nombre ?? "mi negocio"} por un importe de ${formatearEuros(Number(presupuesto.total))}. Puedes verlo y aceptarlo aquí: ${enlacePublico}`,
-      )
-    : null;
 
   return (
     <div>
@@ -199,26 +193,45 @@ export default async function PresupuestoDetallePage({
 
           {!ESTADOS_TERMINALES.includes(presupuesto.estado) && (
             <div className="mt-4 flex justify-end">
-              <AccionesEstadoPresupuesto empresaId={empresaId} presupuestoId={presupuesto.id} />
+              <AccionesEstadoPresupuesto
+                empresaId={empresaId}
+                presupuesto={{
+                  id: presupuesto.id,
+                  estado: presupuesto.estado,
+                  fechaEmision,
+                  numero: presupuesto.numero,
+                  anio: presupuesto.anio,
+                  serie: presupuesto.serie,
+                }}
+                seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
+              />
             </div>
           )}
 
           <div className="mt-4 flex flex-wrap items-start justify-end gap-2.5">
-            <BotonCopiarEnlace url={enlacePublico} />
+            <AccionesEnviarPresupuesto
+              empresaId={empresaId}
+              presupuesto={{
+                id: presupuesto.id,
+                estado: presupuesto.estado,
+                fechaEmision,
+                numero: presupuesto.numero,
+                anio: presupuesto.anio,
+                serie: presupuesto.serie,
+              }}
+              seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
+              enlacePublico={enlacePublico}
+              telefonoCliente={presupuesto.clientes?.telefono ?? null}
+              clienteNombre={presupuesto.clientes?.nombre ?? "cliente"}
+              negocioNombre={empresa?.nombre ?? "mi negocio"}
+              total={Number(presupuesto.total)}
+            />
             <a href={enlacePdf}>
               <Boton variante="secundario" className="inline-flex items-center gap-2">
                 <Download size={16} />
                 Descargar PDF
               </Boton>
             </a>
-            {enlaceWhatsApp && (
-              <a href={enlaceWhatsApp} target="_blank" rel="noopener noreferrer">
-                <Boton variante="secundario" className="inline-flex items-center gap-2">
-                  <MessageCircle size={16} />
-                  Enviar por WhatsApp
-                </Boton>
-              </a>
-            )}
             {presupuesto.estado === "borrador" && (
               <Link href={`/presupuestos/${presupuesto.id}/editar`}>
                 <Boton variante="secundario">Editar</Boton>
@@ -231,7 +244,15 @@ export default async function PresupuestoDetallePage({
             ) : (
               <BotonConvertirFactura
                 empresaId={empresaId}
-                presupuestoId={presupuesto.id}
+                presupuesto={{
+                  id: presupuesto.id,
+                  estado: presupuesto.estado,
+                  fechaEmision,
+                  numero: presupuesto.numero,
+                  anio: presupuesto.anio,
+                  serie: presupuesto.serie,
+                }}
+                seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
                 clienteId={presupuesto.cliente_id}
                 lineas={(lineas ?? []).map((linea) => ({
                   concepto: linea.concepto,

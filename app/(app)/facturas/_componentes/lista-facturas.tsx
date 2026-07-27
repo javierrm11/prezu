@@ -118,7 +118,7 @@ export function ListaFacturas({ facturas }: { facturas: FacturaFila[] }) {
         </div>
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-3">
+      <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-xl border border-borde bg-superficie p-3.5 shadow-tarjeta">
           <div className="mb-1 text-xs text-texto-secundario">Facturado</div>
           <div className="font-heading tabular-nums text-[19px] font-bold text-texto">
@@ -139,7 +139,7 @@ export function ListaFacturas({ facturas }: { facturas: FacturaFila[] }) {
         </div>
       </div>
 
-      <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
+      <div className="mb-3 flex flex-wrap gap-2">
         {FILTROS.map((filtro) => (
           <button
             key={filtro.id}

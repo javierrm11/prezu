@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
 
 export type LineaParaFactura = {
   concepto: string;
@@ -15,9 +16,19 @@ export type LineaParaFactura = {
   importe: number;
 };
 
+type PresupuestoActual = {
+  id: string;
+  estado: string;
+  fechaEmision: string;
+  numero: number | null;
+  anio: number | null;
+  serie: string | null;
+};
+
 type BotonConvertirFacturaProps = {
   empresaId: string;
-  presupuestoId: string;
+  presupuesto: PresupuestoActual;
+  seriePresupuesto: string;
   clienteId: string | null;
   lineas: LineaParaFactura[];
   baseImponible: number;
@@ -28,7 +39,8 @@ type BotonConvertirFacturaProps = {
 
 export function BotonConvertirFactura({
   empresaId,
-  presupuestoId,
+  presupuesto,
+  seriePresupuesto,
   clienteId,
   lineas,
   baseImponible,
@@ -41,6 +53,8 @@ export function BotonConvertirFactura({
   const [convirtiendo, setConvirtiendo] = useState(false);
 
   async function convertir() {
+    const presupuestoId = presupuesto.id;
+
     if (!clienteId) {
       setError("El presupuesto no tiene cliente asignado");
       return;
@@ -53,6 +67,20 @@ export function BotonConvertirFactura({
     setError(null);
     setConvirtiendo(true);
     const supabase = crearClienteNavegador();
+
+    // Convertir en factura también entrega el presupuesto: si
+    // seguía en borrador, se numera antes de facturarlo (nunca debe
+    // quedar un presupuesto facturado sin su P-2026-XXX).
+    const resultadoEnvio = await asegurarPresupuestoEnviado(
+      supabase,
+      { ...presupuesto, empresaId },
+      seriePresupuesto,
+    );
+    if ("error" in resultadoEnvio) {
+      setError(resultadoEnvio.error);
+      setConvirtiendo(false);
+      return;
+    }
 
     // Snapshot de los datos fiscales del cliente en el momento de
     // convertir, no una referencia compartida (regla de negocio 9).

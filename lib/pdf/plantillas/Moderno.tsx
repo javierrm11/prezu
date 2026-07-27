@@ -35,6 +35,14 @@ const estilos = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     fontSize: 20,
     letterSpacing: 1,
+    maxWidth: 260,
+  },
+  // "FACTURA RECTIFICATIVA" no cabe en una línea al tamaño normal
+  // sin partir la palabra por la mitad: se achica solo para ese caso.
+  tipoDocumentoLargo: {
+    fontSize: 13,
+    letterSpacing: 0.5,
+    maxWidth: 200,
   },
   numeroDocumento: { textAlign: "right", color: "#FFFFFF", fontSize: 10, marginTop: 4 },
   contenido: { paddingHorizontal: 44, paddingTop: 26, paddingBottom: 44, flex: 1 },
@@ -108,7 +116,7 @@ const estilos = StyleSheet.create({
 
 export function DocumentoModerno(datos: DatosDocumentoPDF) {
   const { empresa, cliente, numeroDocumento, fecha, fechaSecundaria, lineas } = datos;
-  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago } = datos;
+  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago, rectificaA } = datos;
   const etiquetas = etiquetasDocumento(datos.tipo);
   const contactoNegocio = [empresa.telefono, empresa.email, empresa.nif && `NIF ${empresa.nif}`]
     .filter(Boolean)
@@ -133,8 +141,14 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
             </View>
           </View>
           <View>
-            <Text style={estilos.tipoDocumento}>
-              {datos.tipo === "presupuesto" ? "PRESUPUESTO" : "FACTURA"}
+            <Text
+              style={
+                datos.tipo === "rectificativa"
+                  ? [estilos.tipoDocumento, estilos.tipoDocumentoLargo]
+                  : estilos.tipoDocumento
+              }
+            >
+              {etiquetas.titulo}
             </Text>
             <Text style={estilos.numeroDocumento}>{numeroDocumento}</Text>
           </View>
@@ -148,6 +162,11 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
               {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
               {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
               {cliente.direccion && <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>}
+              {rectificaA && (
+                <Text style={[estilos.textoSecundario, { marginTop: 4 }]}>
+                  Rectifica a la factura {rectificaA}
+                </Text>
+              )}
             </View>
             <View style={estilos.cajaMeta}>
               <View style={estilos.filaMeta}>

@@ -60,7 +60,7 @@ export function FormularioLogin() {
       <Boton type="submit" disabled={cargando}>
         {cargando ? "Entrando…" : "Entrar"}
       </Boton>
-      <a href="#" className="text-center text-sm">
+      <a href="/recuperar" className="text-center text-sm">
         ¿Has olvidado la contraseña?
       </a>
       <p className="text-center text-[13px] text-texto-secundario">

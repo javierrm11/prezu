@@ -74,7 +74,7 @@ const estilos = StyleSheet.create({
 
 export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
   const { empresa, cliente, numeroDocumento, fecha, fechaSecundaria, lineas } = datos;
-  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago } = datos;
+  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago, rectificaA } = datos;
   const etiquetas = etiquetasDocumento(datos.tipo);
   const contactoNegocio = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
 
@@ -97,9 +97,7 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
           </View>
         </View>
 
-        <Text style={estilos.tipoDocumento}>
-          {(datos.tipo === "presupuesto" ? "PRESUPUESTO" : "FACTURA") + " ·"}
-        </Text>
+        <Text style={estilos.tipoDocumento}>{etiquetas.titulo} ·</Text>
         <Text style={estilos.numeroDocumento}>{numeroDocumento}</Text>
 
         <View style={estilos.divisor} />
@@ -111,6 +109,11 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
             {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
             {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
             {cliente.direccion && <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>}
+            {rectificaA && (
+              <Text style={[estilos.textoSecundario, { marginTop: 4 }]}>
+                Rectifica a la factura {rectificaA}
+              </Text>
+            )}
           </View>
           <View>
             <View style={estilos.filaMeta}>

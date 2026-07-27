@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Download, Eye, Lock, MessageCircle } from "lucide-react";
+import { ArrowLeft, Check, Download, Eye, FileWarning, Lock, MessageCircle } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import {
@@ -37,7 +37,7 @@ export default async function FacturaDetallePage({
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, serie, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total, clientes(telefono)",
+      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total, clientes(telefono)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -49,6 +49,8 @@ export default async function FacturaDetallePage({
         numero: number;
         anio: number;
         serie: string;
+        tipo: string;
+        rectifica_a: string | null;
         fecha_emision: string;
         vencimiento: string | null;
         estado_cobro: string;
@@ -65,6 +67,22 @@ export default async function FacturaDetallePage({
   if (!factura) {
     notFound();
   }
+
+  const [{ data: original }, { data: rectificadaPor }] = await Promise.all([
+    factura.rectifica_a
+      ? supabase
+          .from("facturas")
+          .select("id, serie, numero, anio")
+          .eq("id", factura.rectifica_a)
+          .single()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("facturas")
+      .select("id, serie, numero, anio")
+      .eq("rectifica_a", id)
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   const { data: empresa } = await supabase
     .from("empresas")
@@ -142,6 +160,28 @@ export default async function FacturaDetallePage({
             {factura.fecha_emision && ` · Emitida ${formatearFecha(factura.fecha_emision)}`}
             {factura.vencimiento && ` · Vence ${formatearFecha(factura.vencimiento)}`}
           </div>
+          {original && (
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-aviso">
+              <FileWarning size={13} />
+              Rectifica a{" "}
+              <Link href={`/facturas/${original.id}`} className="font-medium underline">
+                {formatearNumeroDocumento(original.serie, original.numero, original.anio)}
+              </Link>
+            </div>
+          )}
+          {rectificadaPor && (
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-aviso">
+              <FileWarning size={13} />
+              Rectificada por{" "}
+              <Link href={`/facturas/${rectificadaPor.id}`} className="font-medium underline">
+                {formatearNumeroDocumento(
+                  rectificadaPor.serie,
+                  rectificadaPor.numero,
+                  rectificadaPor.anio,
+                )}
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -219,6 +259,12 @@ export default async function FacturaDetallePage({
             {factura.estado_cobro !== "cobrada" && (
               <BotonMarcarCobrada empresaId={empresaId} facturaId={factura.id} />
             )}
+            <Link href={`/facturas/${factura.id}/rectificar`}>
+              <Boton variante="secundario" className="inline-flex items-center gap-2">
+                <FileWarning size={16} />
+                Rectificar
+              </Boton>
+            </Link>
           </div>
 
           {(factura.cliente_nif || factura.cliente_direccion) && (

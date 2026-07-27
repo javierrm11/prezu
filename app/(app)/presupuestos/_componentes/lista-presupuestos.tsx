@@ -95,7 +95,7 @@ export function ListaPresupuestos({
         />
       </div>
 
-      <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
+      <div className="mb-3 flex flex-wrap gap-2">
         {FILTROS.map((filtro) => (
           <button
             key={filtro.id}

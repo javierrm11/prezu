@@ -4,17 +4,29 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
 
 type Estado = "aceptado" | "rechazado";
 
+type PresupuestoActual = {
+  id: string;
+  estado: string;
+  fechaEmision: string;
+  numero: number | null;
+  anio: number | null;
+  serie: string | null;
+};
+
 type AccionesEstadoPresupuestoProps = {
   empresaId: string;
-  presupuestoId: string;
+  presupuesto: PresupuestoActual;
+  seriePresupuesto: string;
 };
 
 export function AccionesEstadoPresupuesto({
   empresaId,
-  presupuestoId,
+  presupuesto,
+  seriePresupuesto,
 }: AccionesEstadoPresupuestoProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +37,25 @@ export function AccionesEstadoPresupuesto({
     setProcesando(estado);
     const supabase = crearClienteNavegador();
 
+    // Marcar aceptado/rechazado a mano también cuenta como haber
+    // entregado el presupuesto: si seguía en borrador, se numera
+    // antes de resolverlo (nunca debe quedar un presupuesto
+    // resuelto sin su P-2026-XXX).
+    const resultadoEnvio = await asegurarPresupuestoEnviado(
+      supabase,
+      { ...presupuesto, empresaId },
+      seriePresupuesto,
+    );
+    if ("error" in resultadoEnvio) {
+      setError(resultadoEnvio.error);
+      setProcesando(null);
+      return;
+    }
+
     const { error: errorUpdate } = await supabase
       .from("presupuestos")
       .update({ estado })
-      .eq("id", presupuestoId);
+      .eq("id", presupuesto.id);
 
     if (errorUpdate) {
       setError("No se ha podido actualizar el presupuesto");
@@ -39,7 +66,7 @@ export function AccionesEstadoPresupuesto({
     await supabase.from("eventos").insert({
       empresa_id: empresaId,
       entidad: "presupuesto",
-      entidad_id: presupuestoId,
+      entidad_id: presupuesto.id,
       tipo: estado,
     });
 

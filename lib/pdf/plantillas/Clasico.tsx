@@ -6,7 +6,7 @@ import { etiquetasDocumento, type DatosDocumentoPDF } from "./tipos";
 
 export function DocumentoClasico(datos: DatosDocumentoPDF) {
   const { empresa, cliente, numeroDocumento, fecha, fechaSecundaria, lineas } = datos;
-  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago } = datos;
+  const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago, rectificaA } = datos;
   const etiquetas = etiquetasDocumento(datos.tipo);
   const contactoNegocio = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
 
@@ -46,6 +46,11 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
             {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
             {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
             {cliente.direccion && <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>}
+            {rectificaA && (
+              <Text style={[estilos.textoSecundario, { marginTop: 4 }]}>
+                Rectifica a la factura {rectificaA}
+              </Text>
+            )}
           </View>
           <View style={estilos.cajaMeta}>
             <View style={estilos.filaMeta}>
