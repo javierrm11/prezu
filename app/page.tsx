@@ -656,15 +656,15 @@ function PieDePagina() {
         </div>
         <div className="flex flex-col gap-2.5">
           <div className="text-xs font-semibold tracking-wider text-white/45">LEGAL</div>
-          <a href="#top" className="text-sm text-white/75 hover:text-acento">
+          <Link href="/aviso-legal" className="text-sm text-white/75 hover:text-acento">
             Aviso legal
-          </a>
-          <a href="#top" className="text-sm text-white/75 hover:text-acento">
+          </Link>
+          <Link href="/privacidad" className="text-sm text-white/75 hover:text-acento">
             Privacidad
-          </a>
-          <a href="#top" className="text-sm text-white/75 hover:text-acento">
+          </Link>
+          <Link href="/cookies" className="text-sm text-white/75 hover:text-acento">
             Cookies
-          </a>
+          </Link>
         </div>
         <div className="flex flex-col gap-2.5">
           <div className="text-xs font-semibold tracking-wider text-white/45">CONTACTO</div>
