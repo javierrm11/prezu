@@ -1,5 +1,6 @@
 "use server";
 
+import type { Stripe } from "stripe";
 import { crearClienteStripe } from "@/lib/stripe";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
@@ -45,15 +46,21 @@ export async function crearSesionCheckout(returnTo?: string) {
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer: clienteId,
-    line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
-    discounts: [{ coupon: process.env.STRIPE_COUPON_ID! }],
-    subscription_data: { trial_period_days: 1 },
-    success_url: `${baseUrl}${destino}`,
-    cancel_url: `${baseUrl}/suscripcion`,
-  });
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: clienteId,
+      line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
+      discounts: [{ coupon: process.env.STRIPE_COUPON_ID! }],
+      subscription_data: { trial_period_days: 1 },
+      success_url: `${baseUrl}${destino}`,
+      cancel_url: `${baseUrl}/suscripcion`,
+    });
+  } catch (error) {
+    const mensaje = error instanceof Error ? error.message : "Error desconocido de Stripe";
+    return { error: `No se ha podido iniciar el pago con Stripe: ${mensaje}` };
+  }
 
   if (!session.url) {
     return { error: "No se ha podido iniciar el pago." };
