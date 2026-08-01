@@ -1,6 +1,7 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
+import { contarDocumentosDelMes } from "@/lib/limitesPlan";
 import type { IdPlantillaPDF } from "@/lib/pdf/plantillas";
 import { FormularioAjustes, type EmpresaAjustes } from "./_componentes/formulario-ajustes";
 import { SeccionSuscripcion } from "./_componentes/seccion-suscripcion";
@@ -25,7 +26,7 @@ export default async function AjustesPage() {
   const { data: empresa } = await supabase
     .from("empresas")
     .select(
-      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, serie_rectificativa, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
+      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, serie_rectificativa, plan, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
     )
     .eq("id", empresaId)
     .single();
@@ -53,6 +54,8 @@ export default async function AjustesPage() {
 
   const proximoNumeroFacturaInicial = (serieActual?.ultimo_numero ?? 0) + 1;
 
+  const documentosUsadosEsteMes = await contarDocumentosDelMes(supabase, empresaId);
+
   return (
     <div className="max-w-2xl">
       <h1 className="mb-4 font-heading text-2xl font-bold text-primario">Ajustes</h1>
@@ -65,6 +68,8 @@ export default async function AjustesPage() {
         />
 
         <SeccionSuscripcion
+          plan={empresa.plan}
+          documentosUsadosEsteMes={documentosUsadosEsteMes}
           estado={empresa.estado_suscripcion}
           periodoFin={empresa.suscripcion_periodo_fin}
           cancelaAlFinal={empresa.suscripcion_cancela_al_final}
@@ -80,12 +85,6 @@ export default async function AjustesPage() {
           <div className="flex items-center justify-between gap-3 text-sm">
             <span className="text-texto-secundario">Email de acceso</span>
             <span className="text-texto">{user.email}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="text-texto-secundario">Plan</span>
-            <span className="rounded-full bg-[#FDF3DF] px-3 py-[3px] text-xs font-medium text-[#B87A0E]">
-              Autónomo
-            </span>
           </div>
           <div>
             <BotonCerrarSesion />

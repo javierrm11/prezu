@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { FormularioFactura } from "../_componentes/formulario-factura";
+import type { Plan } from "@/lib/limitesPlan";
 
 export default async function NuevaFacturaPage() {
   const supabase = await crearClienteServidor();
@@ -24,7 +25,7 @@ export default async function NuevaFacturaPage() {
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("iva_defecto, serie_factura")
+    .select("iva_defecto, serie_factura, plan")
     .eq("id", empresaId)
     .single();
 
@@ -68,6 +69,7 @@ export default async function NuevaFacturaPage() {
       ) : (
         <FormularioFactura
           empresaId={empresaId}
+          plan={(empresa?.plan as Plan) ?? "gratis"}
           clientes={clientes}
           ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
           serieFactura={empresa?.serie_factura ?? "F"}

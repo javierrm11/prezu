@@ -11,7 +11,6 @@ import {
 } from "@/lib/formato";
 import { estadoCobroEfectivo, tonoFactura } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
-import { calcularEnlacePdf } from "@/lib/pdf/enlace";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
 import { BotonMarcarCobrada } from "../_componentes/boton-marcar-cobrada";
@@ -82,29 +81,12 @@ export default async function FacturaDetallePage({
       .maybeSingle(),
   ]);
 
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("estado_suscripcion")
-    .eq("id", empresaId)
-    .single();
-
   // Las facturas no tienen paso de "elegir plantilla" (usan la que
   // ya se eligió en un presupuesto o en Ajustes, "clásico" si aún
-  // no se ha elegido ninguna), así que pdfPlantilla aquí es
-  // irrelevante: solo importa si hay suscripción activa.
-  const rutaDetalle = `/facturas/${factura.id}`;
-  const enlaceVerPdf = calcularEnlacePdf({
-    estadoSuscripcion: empresa?.estado_suscripcion,
-    pdfPlantilla: null,
-    rutaDetalle,
-    rutaApiPdf: `/api/facturas/${factura.id}/pdf`,
-  });
-  const enlaceDescargarPdf = calcularEnlacePdf({
-    estadoSuscripcion: empresa?.estado_suscripcion,
-    pdfPlantilla: null,
-    rutaDetalle,
-    rutaApiPdf: `/api/facturas/${factura.id}/pdf?descarga=1`,
-  });
+  // no se ha elegido ninguna), así que el PDF es siempre accesible
+  // directamente.
+  const enlaceVerPdf = `/api/facturas/${factura.id}/pdf`;
+  const enlaceDescargarPdf = `/api/facturas/${factura.id}/pdf?descarga=1`;
 
   const { data: lineas } = await supabase
     .from("factura_lineas")

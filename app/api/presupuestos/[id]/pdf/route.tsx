@@ -3,7 +3,6 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearNumeroDocumento } from "@/lib/formato";
-import { tieneAccesoSuscripcion } from "@/lib/estados";
 import { renderizarDocumentoPDF, type IdPlantillaPDF } from "@/lib/pdf/plantillas";
 import type { LineaPDF } from "@/lib/pdf/estilos";
 
@@ -29,7 +28,6 @@ type FilaPresupuestoDB = {
     logo_url: string | null;
     serie_presupuesto: string;
     pdf_plantilla: IdPlantillaPDF | null;
-    estado_suscripcion: string | null;
   } | null;
 };
 
@@ -48,7 +46,7 @@ export async function GET(
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto, pdf_plantilla, estado_suscripcion)",
+      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto, pdf_plantilla)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -58,14 +56,6 @@ export async function GET(
 
   if (!presupuesto) {
     return new Response("No encontrado", { status: 404 });
-  }
-
-  // Defensa en profundidad: la página ya evita enseñar este enlace
-  // sin suscripción activa, pero la URL es adivinable/reutilizable
-  // directamente, así que también se comprueba aquí.
-  if (!tieneAccesoSuscripcion(presupuesto.empresas?.estado_suscripcion)) {
-    const volver = encodeURIComponent(`/presupuestos/${id}`);
-    return Response.redirect(new URL(`/suscripcion?volver=${volver}`, request.url), 302);
   }
 
   const { data: lineasDB } = await supabase

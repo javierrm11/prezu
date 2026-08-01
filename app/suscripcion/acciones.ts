@@ -6,10 +6,20 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 
+const PRICE_ID_POR_PLAN = {
+  basico: process.env.STRIPE_PRICE_ID_BASICO,
+  pro: process.env.STRIPE_PRICE_ID_PRO,
+} as const;
+
 // empresaId se saca de la sesión, nunca de un parámetro del
 // cliente: así nadie puede generar un pago para el negocio de otro
 // pasando un id ajeno.
-export async function crearSesionCheckout(returnTo?: string) {
+export async function crearSesionCheckout(plan: "basico" | "pro", returnTo?: string) {
+  const priceId = PRICE_ID_POR_PLAN[plan];
+  if (!priceId) {
+    return { error: `Falta configurar el precio de Stripe del plan ${plan}.` };
+  }
+
   // Solo rutas relativas propias: returnTo viaja como query param
   // desde el navegador, así que no puede usarse para redirigir a
   // otro dominio tras el pago.
@@ -51,9 +61,7 @@ export async function crearSesionCheckout(returnTo?: string) {
     session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: clienteId,
-      line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
-      discounts: [{ coupon: process.env.STRIPE_COUPON_ID! }],
-      subscription_data: { trial_period_days: 1 },
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}${destino}`,
       cancel_url: `${baseUrl}/suscripcion`,
     });

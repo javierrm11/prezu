@@ -12,6 +12,7 @@ import {
 import { tonoPresupuesto } from "@/lib/estados";
 import { etiquetaEvento } from "@/lib/eventos";
 import { calcularEnlacePdf } from "@/lib/pdf/enlace";
+import type { Plan } from "@/lib/limitesPlan";
 import { Badge } from "@/components/ui/Badge";
 import { Boton } from "@/components/ui/Boton";
 import { BotonConvertirFactura } from "../_componentes/boton-convertir-factura";
@@ -75,14 +76,12 @@ export default async function PresupuestoDetallePage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("serie_presupuesto, serie_factura, pdf_plantilla, estado_suscripcion")
+    .select("serie_presupuesto, serie_factura, pdf_plantilla, plan")
     .eq("id", empresaId)
     .single();
 
   const enlacePdf = calcularEnlacePdf({
-    estadoSuscripcion: empresa?.estado_suscripcion,
     pdfPlantilla: empresa?.pdf_plantilla,
-    rutaDetalle: `/presupuestos/${presupuesto.id}`,
     rutaApiPdf: `/api/presupuestos/${presupuesto.id}/pdf`,
     rutaElegirPlantilla: `/presupuestos/${presupuesto.id}/elegir-plantilla`,
   });
@@ -250,6 +249,7 @@ export default async function PresupuestoDetallePage({
             ) : (
               <BotonConvertirFactura
                 empresaId={empresaId}
+                plan={(empresa?.plan as Plan) ?? "gratis"}
                 presupuesto={{
                   id: presupuesto.id,
                   estado: presupuesto.estado,

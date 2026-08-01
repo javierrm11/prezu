@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
-import { tieneAccesoSuscripcion } from "@/lib/estados";
 import type { IdPlantillaPDF } from "@/lib/pdf/plantillas";
 import { SelectorPlantillaPresupuesto } from "./selector";
 
@@ -37,13 +36,9 @@ export default async function ElegirPlantillaPage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("pdf_plantilla, estado_suscripcion")
+    .select("pdf_plantilla")
     .eq("id", empresaId)
     .single();
-
-  if (!tieneAccesoSuscripcion(empresa?.estado_suscripcion)) {
-    redirect(`/suscripcion?volver=${encodeURIComponent(`/presupuestos/${id}`)}`);
-  }
 
   return (
     <div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
+import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
 
 export type LineaParaFactura = {
   concepto: string;
@@ -27,6 +28,7 @@ type PresupuestoActual = {
 
 type BotonConvertirFacturaProps = {
   empresaId: string;
+  plan: Plan;
   presupuesto: PresupuestoActual;
   seriePresupuesto: string;
   clienteId: string | null;
@@ -39,6 +41,7 @@ type BotonConvertirFacturaProps = {
 
 export function BotonConvertirFactura({
   empresaId,
+  plan,
   presupuesto,
   seriePresupuesto,
   clienteId,
@@ -67,6 +70,15 @@ export function BotonConvertirFactura({
     setError(null);
     setConvirtiendo(true);
     const supabase = crearClienteNavegador();
+
+    const limite = await puedeCrearDocumento(supabase, empresaId, plan);
+    if (!limite.ok) {
+      setError(
+        "Has usado tus 5 presupuestos o facturas gratis de este mes. Mejora tu plan para seguir creando.",
+      );
+      setConvirtiendo(false);
+      return;
+    }
 
     // Convertir en factura también entrega el presupuesto: si
     // seguía en borrador, se numera antes de facturarlo (nunca debe

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
+import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
 import {
   lineaVacia,
   TablaPartidas,
@@ -29,6 +30,7 @@ export type PresupuestoExistente = {
 
 type FormularioPresupuestoProps = {
   empresaId: string;
+  plan: Plan;
   clientes: ClienteOpcion[];
   ivaDefecto: number;
   catalogo?: ItemCatalogoSelector[];
@@ -49,6 +51,7 @@ function lineasIniciales(
 
 export function FormularioPresupuesto({
   empresaId,
+  plan,
   clientes,
   ivaDefecto,
   catalogo,
@@ -120,6 +123,18 @@ export function FormularioPresupuesto({
 
     setGuardando(true);
     const supabase = crearClienteNavegador();
+
+    if (!presupuestoExistente) {
+      const limite = await puedeCrearDocumento(supabase, empresaId, plan);
+      if (!limite.ok) {
+        setError(
+          "Has usado tus 5 presupuestos o facturas gratis de este mes. Mejora tu plan para seguir creando.",
+        );
+        setGuardando(false);
+        return;
+      }
+    }
+
     const totalesFinales = calcularTotales(lineasValidas);
     const validoHasta = new Date(fecha);
     validoHasta.setDate(validoHasta.getDate() + validezDias);

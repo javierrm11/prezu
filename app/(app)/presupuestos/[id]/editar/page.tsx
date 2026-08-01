@@ -7,6 +7,7 @@ import {
   FormularioPresupuesto,
   type PresupuestoExistente,
 } from "../../_componentes/formulario-presupuesto";
+import type { Plan } from "@/lib/limitesPlan";
 
 const VALIDEZ_DIAS_VALIDAS = [15, 30, 60];
 
@@ -67,7 +68,7 @@ export default async function EditarPresupuestoPage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("iva_defecto")
+    .select("iva_defecto, plan")
     .eq("id", empresaId)
     .single();
 
@@ -118,6 +119,7 @@ export default async function EditarPresupuestoPage({
 
       <FormularioPresupuesto
         empresaId={empresaId}
+        plan={(empresa?.plan as Plan) ?? "gratis"}
         clientes={clientes ?? []}
         ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
         catalogo={catalogo}

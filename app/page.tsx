@@ -532,50 +532,85 @@ function SeccionVerifactu() {
   );
 }
 
-const VENTAJAS = [
-  "Presupuestos y facturas ilimitados",
-  "Dictado por voz",
-  "Envío por WhatsApp",
-  "Aviso de visto y aceptado",
-  "Tu catálogo de precios",
-  "PDF con tu logo",
+const PLANES = [
+  {
+    nombre: "Gratis",
+    precio: "0 €",
+    descripcion: "Captación / autónomo que factura muy poco",
+    ventajas: ["Hasta 5 presupuestos o facturas al mes", "1 usuario"],
+    destacado: false,
+  },
+  {
+    nombre: "Básico",
+    precio: "9 €",
+    descripcion: "Autónomo con actividad habitual",
+    ventajas: ["Presupuestos y facturas ilimitadas", "1 usuario", "Seguimiento de cobros"],
+    destacado: true,
+  },
+  {
+    nombre: "Pro",
+    precio: "19 €",
+    descripcion: "Pequeña empresa / varios usuarios",
+    ventajas: [
+      "Todo lo del plan Básico",
+      "Multiusuario (Próximamente)",
+      "Recordatorios de cobro automáticos (Próximamente)",
+    ],
+    destacado: false,
+  },
 ];
 
 function Precios() {
   return (
     <RevelarAlEntrar>
       <section id="precios" className="bg-fondo px-5 pt-10 pb-12 sm:pt-[72px] sm:pb-[88px]">
-        <div className="mx-auto flex max-w-[520px] flex-col items-center gap-6 text-center">
-          <h2 className="font-heading text-[30px] leading-tight font-bold text-primario sm:text-[46px]">
-            Un precio, sin sorpresas.
+        <div className="mx-auto flex max-w-[1000px] flex-col items-center gap-8">
+          <h2 className="text-center font-heading text-[30px] leading-tight font-bold text-primario sm:text-[46px]">
+            Un plan para cada momento del negocio.
           </h2>
-          <div className="flex w-full flex-col gap-5 rounded-xl border-2 border-acento bg-superficie p-6 text-left shadow-tarjeta sm:p-8">
-            <div className="text-center">
-              <div className="font-heading text-[19px] font-bold text-primario">Prezu</div>
-              <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
-                <span className="font-heading text-[44px] font-bold tabular-nums text-texto sm:text-[54px]">
-                  2 €
-                </span>
-                <span className="text-[17px] text-texto-secundario">el primer mes</span>
-              </div>
-              <div className="mt-0.5 text-[13px] text-texto-secundario">
-                Después, 5 €/mes
-              </div>
-            </div>
-            <div className="flex flex-col gap-2.5 border-t border-[#EEF0F6] pt-5">
-              {VENTAJAS.map((ventaja) => (
-                <div key={ventaja} className="flex items-start gap-2.5">
-                  <Check size={18} className="mt-0.5 flex-shrink-0 text-exito" strokeWidth={2.4} />
-                  <span className="text-[15px]">{ventaja}</span>
+
+          <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-3">
+            {PLANES.map((plan) => (
+              <div
+                key={plan.nombre}
+                className={`flex flex-col gap-5 rounded-xl border-2 bg-superficie p-6 text-left shadow-tarjeta ${
+                  plan.destacado ? "border-acento" : "border-borde"
+                }`}
+              >
+                <div>
+                  <div className="font-heading text-[19px] font-bold text-primario">
+                    {plan.nombre}
+                  </div>
+                  <div className="mt-0.5 text-[13px] text-texto-secundario">{plan.descripcion}</div>
+                  <div className="mt-2.5 flex items-baseline gap-1.5">
+                    <span className="font-heading text-[38px] font-bold tabular-nums text-texto">
+                      {plan.precio}
+                    </span>
+                    <span className="text-[15px] text-texto-secundario">/mes</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <Link href="/registro">
-              <Boton className="w-full">Empezar gratis</Boton>
-            </Link>
-            <div className="text-center text-[13px] text-texto-secundario">
-              1 día de prueba gratis. Necesitas tarjeta para empezar. Cancela cuando quieras.
-            </div>
+                <div className="flex flex-1 flex-col gap-2.5 border-t border-[#EEF0F6] pt-5">
+                  {plan.ventajas.map((ventaja) => (
+                    <div key={ventaja} className="flex items-start gap-2.5">
+                      <Check size={18} className="mt-0.5 flex-shrink-0 text-exito" strokeWidth={2.4} />
+                      <span className="text-[15px]">{ventaja}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/registro">
+                  <Boton
+                    variante={plan.destacado ? "primario" : "secundario"}
+                    className="w-full"
+                  >
+                    Empezar gratis
+                  </Boton>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center text-[13px] text-texto-secundario">
+            Todos los planes empiezan por el plan Gratis, sin tarjeta. Mejora cuando lo necesites.
           </div>
         </div>
       </section>

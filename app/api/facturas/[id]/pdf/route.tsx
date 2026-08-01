@@ -3,7 +3,6 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
 import { formatearNumeroDocumento } from "@/lib/formato";
-import { tieneAccesoSuscripcion } from "@/lib/estados";
 import { renderizarDocumentoPDF, type IdPlantillaPDF } from "@/lib/pdf/plantillas";
 import type { LineaPDF } from "@/lib/pdf/estilos";
 
@@ -33,7 +32,6 @@ type FilaFacturaDB = {
     condiciones_defecto: string | null;
     logo_url: string | null;
     pdf_plantilla: IdPlantillaPDF | null;
-    estado_suscripcion: string | null;
   } | null;
 };
 
@@ -52,7 +50,7 @@ export async function GET(
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla, estado_suscripcion)",
+      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -62,14 +60,6 @@ export async function GET(
 
   if (!factura) {
     return new Response("No encontrado", { status: 404 });
-  }
-
-  // Defensa en profundidad: la página ya evita enseñar este enlace
-  // sin suscripción activa, pero la URL es adivinable/reutilizable
-  // directamente, así que también se comprueba aquí.
-  if (!tieneAccesoSuscripcion(factura.empresas?.estado_suscripcion)) {
-    const volver = encodeURIComponent(`/facturas/${id}`);
-    return Response.redirect(new URL(`/suscripcion?volver=${volver}`, request.url), 302);
   }
 
   const { data: lineasDB } = await supabase

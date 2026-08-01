@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { FormularioPresupuesto } from "../_componentes/formulario-presupuesto";
+import type { Plan } from "@/lib/limitesPlan";
 
 export default async function NuevoPresupuestoPage() {
   const supabase = await crearClienteServidor();
@@ -24,7 +25,7 @@ export default async function NuevoPresupuestoPage() {
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("iva_defecto")
+    .select("iva_defecto, plan")
     .eq("id", empresaId)
     .single();
 
@@ -68,6 +69,7 @@ export default async function NuevoPresupuestoPage() {
       ) : (
         <FormularioPresupuesto
           empresaId={empresaId}
+          plan={(empresa?.plan as Plan) ?? "gratis"}
           clientes={clientes}
           ivaDefecto={Number(empresa?.iva_defecto ?? 21)}
           catalogo={catalogo}

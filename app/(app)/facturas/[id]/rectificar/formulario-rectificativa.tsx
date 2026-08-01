@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
 import { formatearEuros } from "@/lib/formato";
+import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
 import {
   lineaVacia,
   TablaPartidas,
@@ -24,6 +25,7 @@ type ClienteSnapshot = {
 
 type FormularioRectificativaProps = {
   empresaId: string;
+  plan: Plan;
   facturaOriginalId: string;
   etiquetaOriginal: string;
   cliente: ClienteSnapshot;
@@ -41,6 +43,7 @@ function hoyISO() {
 
 export function FormularioRectificativa({
   empresaId,
+  plan,
   facturaOriginalId,
   etiquetaOriginal,
   cliente,
@@ -93,6 +96,14 @@ export function FormularioRectificativa({
     }
     if (lineasValidas.length === 0) {
       setError("Añade al menos una partida");
+      return;
+    }
+
+    const limite = await puedeCrearDocumento(crearClienteNavegador(), empresaId, plan);
+    if (!limite.ok) {
+      setError(
+        "Has usado tus 5 presupuestos o facturas gratis de este mes. Mejora tu plan para seguir creando.",
+      );
       return;
     }
 

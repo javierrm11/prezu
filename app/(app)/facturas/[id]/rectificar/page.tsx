@@ -5,6 +5,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { formatearNumeroDocumento } from "@/lib/formato";
 import { FormularioRectificativa } from "./formulario-rectificativa";
+import type { Plan } from "@/lib/limitesPlan";
 
 export default async function RectificarFacturaPage({
   params,
@@ -44,7 +45,7 @@ export default async function RectificarFacturaPage({
 
   const { data: empresa } = await supabase
     .from("empresas")
-    .select("iva_defecto, serie_rectificativa")
+    .select("iva_defecto, serie_rectificativa, plan")
     .eq("id", empresaId)
     .single();
 
@@ -106,6 +107,7 @@ export default async function RectificarFacturaPage({
 
       <FormularioRectificativa
         empresaId={empresaId}
+        plan={(empresa?.plan as Plan) ?? "gratis"}
         facturaOriginalId={original.id}
         etiquetaOriginal={etiquetaOriginal}
         cliente={{

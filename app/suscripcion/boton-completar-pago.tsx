@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { crearSesionCheckout } from "./acciones";
 
-export function BotonCompletarPago({ volver }: { volver?: string }) {
+type BotonCompletarPagoProps = {
+  plan: "basico" | "pro";
+  etiqueta: string;
+  volver?: string;
+};
+
+export function BotonCompletarPago({ plan, etiqueta, volver }: BotonCompletarPagoProps) {
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
@@ -12,7 +18,7 @@ export function BotonCompletarPago({ volver }: { volver?: string }) {
     setError(null);
     setCargando(true);
 
-    const resultado = await crearSesionCheckout(volver);
+    const resultado = await crearSesionCheckout(plan, volver);
 
     if (resultado.error || !resultado.url) {
       setError(resultado.error ?? "No se ha podido iniciar el pago.");
@@ -26,9 +32,9 @@ export function BotonCompletarPago({ volver }: { volver?: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <Boton onClick={iniciarPago} disabled={cargando} className="w-full">
-        {cargando ? "Redirigiendo…" : "Completar pago"}
+        {cargando ? "Redirigiendo…" : etiqueta}
       </Boton>
-      {error && <p className="text-sm text-peligro">{error}</p>}
+      {error && <p className="text-center text-sm text-peligro">{error}</p>}
     </div>
   );
 }

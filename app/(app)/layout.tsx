@@ -4,10 +4,9 @@ import { obtenerIniciales } from "@/lib/texto";
 import { BarraLateral } from "./_componentes/barra-lateral";
 import { NavMovil } from "./_componentes/nav-movil";
 
-// La suscripción ya no bloquea la app entera: solo la descarga de
-// PDF de presupuestos/facturas la comprueba (ver esos route
-// handlers y sus páginas). Así se puede usar el resto de la app
-// antes de pedir tarjeta.
+// El acceso a la app no depende del plan: el límite del plan
+// Gratis se comprueba solo al crear un presupuesto o factura (ver
+// lib/limitesPlan.ts y el trigger de BD en 0015_planes.sql).
 export default async function AppLayout({
   children,
 }: {
