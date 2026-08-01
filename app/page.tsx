@@ -547,29 +547,18 @@ const PLANES = [
     ventajas: ["Presupuestos y facturas ilimitadas", "1 usuario", "Seguimiento de cobros"],
     destacado: true,
   },
-  {
-    nombre: "Pro",
-    precio: "19 €",
-    descripcion: "Pequeña empresa / varios usuarios",
-    ventajas: [
-      "Todo lo del plan Básico",
-      "Multiusuario (Próximamente)",
-      "Recordatorios de cobro automáticos (Próximamente)",
-    ],
-    destacado: false,
-  },
 ];
 
 function Precios() {
   return (
     <RevelarAlEntrar>
       <section id="precios" className="bg-fondo px-5 pt-10 pb-12 sm:pt-[72px] sm:pb-[88px]">
-        <div className="mx-auto flex max-w-[1000px] flex-col items-center gap-8">
+        <div className="mx-auto flex max-w-[680px] flex-col items-center gap-8">
           <h2 className="text-center font-heading text-[30px] leading-tight font-bold text-primario sm:text-[46px]">
             Un plan para cada momento del negocio.
           </h2>
 
-          <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-3">
+          <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2">
             {PLANES.map((plan) => (
               <div
                 key={plan.nombre}

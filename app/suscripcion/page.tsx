@@ -41,17 +41,6 @@ const PLANES: {
     descripcion: "Autónomo con actividad habitual",
     ventajas: ["Presupuestos y facturas ilimitadas", "1 usuario", "Seguimiento de cobros"],
   },
-  {
-    id: "pro",
-    nombre: "Pro",
-    precio: "19 €",
-    descripcion: "Pequeña empresa / varios usuarios",
-    ventajas: [
-      "Todo lo del plan Básico",
-      "Multiusuario (Próximamente)",
-      "Recordatorios de cobro automáticos (Próximamente)",
-    ],
-  },
 ];
 
 export default async function SuscripcionPage({
@@ -101,7 +90,7 @@ export default async function SuscripcionPage({
         )}
       </div>
 
-      <div className="grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid w-full max-w-2xl grid-cols-1 gap-5 sm:grid-cols-2">
         {PLANES.map((item) => {
           const esActual = item.id === plan;
 
