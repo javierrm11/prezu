@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 
 type BotonMarcarCobradaProps = {
   empresaId: string;
@@ -12,11 +13,15 @@ type BotonMarcarCobradaProps = {
 
 export function BotonMarcarCobrada({ empresaId, facturaId }: BotonMarcarCobradaProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
   async function marcarCobrada() {
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setGuardando(true);
     const supabase = crearClienteNavegador();
 

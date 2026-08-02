@@ -1,20 +1,34 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { Logo } from "@/components/ui/Logo";
 import { FormularioLogin } from "./formulario-login";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ volver?: string; error?: string }>;
+}) {
+  const { volver, error } = await searchParams;
   const supabase = await crearClienteServidor();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect("/dashboard");
+    redirect(volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard");
   }
 
   return (
-    <div className="flex flex-1">
+    <div className="relative flex flex-1">
+      <Link
+        href="/"
+        aria-label="Volver"
+        className="absolute top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-borde bg-superficie text-primario hover:bg-fondo"
+      >
+        <ArrowLeft size={20} />
+      </Link>
       <div className="hidden w-[45%] flex-col justify-center gap-6 bg-primario px-16 py-12 md:flex">
         <Logo size={56} />
         <h1 className="text-pretty font-heading text-4xl leading-tight font-bold text-white">
@@ -34,7 +48,7 @@ export default async function LoginPage() {
               Prezu
             </span>
           </div>
-          <FormularioLogin />
+          <FormularioLogin volver={volver} errorInicial={error} />
         </div>
       </div>
     </div>

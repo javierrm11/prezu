@@ -5,7 +5,7 @@ import { Boton } from "@/components/ui/Boton";
 import { Modal } from "@/components/ui/Modal";
 import { FormularioCliente } from "./formulario-cliente";
 
-export function BotonNuevoCliente({ empresaId }: { empresaId: string }) {
+export function BotonNuevoCliente({ empresaId }: { empresaId: string | null }) {
   const [abierto, setAbierto] = useState(false);
 
   return (

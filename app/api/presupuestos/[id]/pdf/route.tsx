@@ -16,6 +16,8 @@ type FilaPresupuestoDB = {
   total_iva: number;
   total: number;
   condiciones: string | null;
+  cliente_nombre: string | null;
+  cliente_nif: string | null;
   clientes: { nombre: string; nif: string | null; ciudad: string | null } | null;
   empresas: {
     nombre: string;
@@ -46,7 +48,7 @@ export async function GET(
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto, pdf_plantilla)",
+      "id, numero, anio, fecha_emision, valido_hasta, base_imponible, total_iva, total, condiciones, cliente_nombre, cliente_nif, clientes(nombre, nif, ciudad), empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, serie_presupuesto, pdf_plantilla)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -96,8 +98,8 @@ export async function GET(
         logoUrl: urlLogo,
       },
       cliente: {
-        nombre: presupuesto.clientes?.nombre ?? "Sin cliente",
-        nif: presupuesto.clientes?.nif ?? null,
+        nombre: presupuesto.clientes?.nombre ?? presupuesto.cliente_nombre ?? "Sin cliente",
+        nif: presupuesto.clientes?.nif ?? presupuesto.cliente_nif ?? null,
         ciudad: presupuesto.clientes?.ciudad ?? null,
       },
       numeroDocumento,

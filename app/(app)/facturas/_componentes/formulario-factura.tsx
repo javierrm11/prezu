@@ -6,6 +6,7 @@ import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
 import { formatearEuros } from "@/lib/formato";
 import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import {
   lineaVacia,
   TablaPartidas,
@@ -47,7 +48,14 @@ export function FormularioFactura({
   catalogo,
 }: FormularioFacturaProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
+  const [modoCliente, setModoCliente] = useState<"existente" | "nuevo">(
+    clientes.length === 0 ? "nuevo" : "existente",
+  );
   const [clienteId, setClienteId] = useState(clientes[0]?.id ?? "");
+  const [nombreNuevoCliente, setNombreNuevoCliente] = useState("");
+  const [nifNuevoCliente, setNifNuevoCliente] = useState("");
+  const [direccionNuevoCliente, setDireccionNuevoCliente] = useState("");
   const [fecha, setFecha] = useState(hoyISO());
   const [vencimiento, setVencimiento] = useState(sumarDias(hoyISO(), 30));
   const [formaPago, setFormaPago] = useState("");
@@ -79,6 +87,8 @@ export function FormularioFactura({
   async function enviarNotaVoz() {
     if (!notaVoz.trim()) return;
 
+    if (!(await exigirSesion())) return;
+
     setInterpretandoVoz(true);
     const partidas = await interpretarNotaVoz(notaVoz, ivaDefecto);
     setInterpretandoVoz(false);
@@ -98,14 +108,16 @@ export function FormularioFactura({
 
     const lineasValidas = lineas.filter((linea) => linea.concepto.trim() && linea.cantidad > 0);
 
-    if (!clienteId) {
-      setError("Elige un cliente");
+    if (modoCliente === "existente" ? !clienteId : !nombreNuevoCliente.trim()) {
+      setError(modoCliente === "existente" ? "Elige un cliente" : "Escribe el nombre del cliente");
       return;
     }
     if (lineasValidas.length === 0) {
       setError("Añade al menos una partida");
       return;
     }
+
+    if (!(await exigirSesion())) return;
 
     const limite = await puedeCrearDocumento(crearClienteNavegador(), empresaId, plan);
     if (!limite.ok) {
@@ -125,17 +137,30 @@ export function FormularioFactura({
     const supabase = crearClienteNavegador();
 
     // Snapshot de los datos fiscales del cliente en el momento de
-    // emitir, no una referencia compartida (regla de negocio 9).
-    const { data: cliente, error: errorCliente } = await supabase
-      .from("clientes")
-      .select("nombre, nif, direccion")
-      .eq("id", clienteId)
-      .single();
+    // emitir, no una referencia compartida (regla de negocio 9). Si
+    // es un cliente "solo para esta factura", ya tenemos sus datos
+    // escritos a mano; si no, se leen de su ficha.
+    let cliente: { nombre: string; nif: string | null; direccion: string | null };
 
-    if (errorCliente || !cliente) {
-      setError("No se han podido leer los datos fiscales del cliente");
-      setGuardando(false);
-      return;
+    if (modoCliente === "nuevo") {
+      cliente = {
+        nombre: nombreNuevoCliente.trim(),
+        nif: nifNuevoCliente.trim() || null,
+        direccion: direccionNuevoCliente.trim() || null,
+      };
+    } else {
+      const { data: clienteDB, error: errorCliente } = await supabase
+        .from("clientes")
+        .select("nombre, nif, direccion")
+        .eq("id", clienteId)
+        .single();
+
+      if (errorCliente || !clienteDB) {
+        setError("No se han podido leer los datos fiscales del cliente");
+        setGuardando(false);
+        return;
+      }
+      cliente = clienteDB;
     }
 
     const anio = new Date(fecha).getFullYear();
@@ -157,7 +182,7 @@ export function FormularioFactura({
       .from("facturas")
       .insert({
         empresa_id: empresaId,
-        cliente_id: clienteId,
+        cliente_id: modoCliente === "existente" ? clienteId : null,
         presupuesto_id: null,
         numero,
         serie: serieFactura,
@@ -219,24 +244,67 @@ export function FormularioFactura({
     <form onSubmit={enviar} className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-3 rounded-xl border border-borde bg-superficie p-4 shadow-tarjeta">
         <div className="min-w-[200px] flex-[2]">
-          <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="cliente">
-            Cliente
-          </label>
-          <select
-            id="cliente"
-            value={clienteId}
-            onChange={(evento) => setClienteId(evento.target.value)}
-            className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-          >
-            <option value="" disabled>
-              Elige un cliente…
-            </option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nombre}
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <label className="block text-sm font-medium text-texto" htmlFor="cliente">
+              Cliente
+            </label>
+            {clientes.length > 0 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setModoCliente((actual) => (actual === "existente" ? "nuevo" : "existente"))
+                }
+                className="text-xs font-medium text-secundario hover:underline"
+              >
+                {modoCliente === "existente" ? "+ Cliente nuevo" : "Elegir cliente existente"}
+              </button>
+            )}
+          </div>
+
+          {modoCliente === "existente" ? (
+            <select
+              id="cliente"
+              value={clienteId}
+              onChange={(evento) => setClienteId(evento.target.value)}
+              className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+            >
+              <option value="" disabled>
+                Elige un cliente…
               </option>
-            ))}
-          </select>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nombre}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <input
+                id="cliente"
+                value={nombreNuevoCliente}
+                onChange={(evento) => setNombreNuevoCliente(evento.target.value)}
+                placeholder="Nombre del cliente"
+                className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={nifNuevoCliente}
+                  onChange={(evento) => setNifNuevoCliente(evento.target.value)}
+                  placeholder="NIF (opcional)"
+                  className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+                <input
+                  value={direccionNuevoCliente}
+                  onChange={(evento) => setDireccionNuevoCliente(evento.target.value)}
+                  placeholder="Dirección (opcional)"
+                  className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+              </div>
+              <p className="text-xs text-texto-secundario">
+                No se guarda en tu lista de Clientes, solo en esta factura.
+              </p>
+            </div>
+          )}
         </div>
         <div className="min-w-[130px] flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="fecha">

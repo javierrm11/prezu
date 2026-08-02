@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import { SelectorPlantillaPDF } from "@/components/ui/SelectorPlantillaPDF";
 import type { IdPlantillaPDF } from "@/lib/pdf/plantillas";
 
@@ -14,12 +15,16 @@ export function SeccionPlantillaPDF({
   plantillaActual: IdPlantillaPDF | null;
 }) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [actual, setActual] = useState(plantillaActual);
   const [cargando, setCargando] = useState<IdPlantillaPDF | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function elegir(id: IdPlantillaPDF) {
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setCargando(id);
 
     const supabase = crearClienteNavegador();

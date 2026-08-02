@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { crearUrlFirmadaLogo } from "@/lib/supabase/storage";
@@ -13,9 +14,13 @@ export default async function AjustesPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) {
+    redirect(`/login?volver=${encodeURIComponent("/ajustes")}`);
+  }
+
   const empresaId = await obtenerEmpresaId(supabase);
 
-  if (!empresaId || !user) {
+  if (!empresaId) {
     return (
       <p className="text-sm text-texto-secundario">
         No se ha encontrado tu negocio.

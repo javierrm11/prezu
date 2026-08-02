@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 
 type TituloPresupuestoEditableProps = {
   presupuestoId: string;
@@ -12,6 +13,7 @@ export function TituloPresupuestoEditable({
   presupuestoId,
   nombreInicial,
 }: TituloPresupuestoEditableProps) {
+  const exigirSesion = useExigirSesion();
   const [valor, setValor] = useState(nombreInicial);
   const [guardado, setGuardado] = useState(nombreInicial);
 
@@ -26,6 +28,8 @@ export function TituloPresupuestoEditable({
       setValor(limpio);
       return;
     }
+
+    if (!(await exigirSesion())) return;
 
     setValor(limpio);
     setGuardado(limpio);

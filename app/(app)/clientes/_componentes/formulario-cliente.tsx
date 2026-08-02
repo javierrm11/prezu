@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 
@@ -15,7 +16,7 @@ export type Cliente = {
 };
 
 type FormularioClienteProps = {
-  empresaId: string;
+  empresaId: string | null;
   cliente?: Cliente;
   onGuardado: () => void;
   onCancelar: () => void;
@@ -28,6 +29,7 @@ export function FormularioCliente({
   onCancelar,
 }: FormularioClienteProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [nombre, setNombre] = useState(cliente?.nombre ?? "");
   const [nif, setNif] = useState(cliente?.nif ?? "");
   const [telefono, setTelefono] = useState(cliente?.telefono ?? "");
@@ -38,6 +40,14 @@ export function FormularioCliente({
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
+    if (!empresaId) {
+      setError("No se ha encontrado tu negocio");
+      return;
+    }
+
     setGuardando(true);
 
     const supabase = crearClienteNavegador();

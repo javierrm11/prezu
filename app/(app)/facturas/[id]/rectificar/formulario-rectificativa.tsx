@@ -6,6 +6,7 @@ import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
 import { formatearEuros } from "@/lib/formato";
 import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import {
   lineaVacia,
   TablaPartidas,
@@ -55,6 +56,7 @@ export function FormularioRectificativa({
   catalogo,
 }: FormularioRectificativaProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [fecha, setFecha] = useState(hoyISO());
   const [vencimiento, setVencimiento] = useState(vencimientoInicial ?? "");
   const [formaPago, setFormaPago] = useState(formaPagoInicial);
@@ -98,6 +100,8 @@ export function FormularioRectificativa({
       setError("Añade al menos una partida");
       return;
     }
+
+    if (!(await exigirSesion())) return;
 
     const limite = await puedeCrearDocumento(crearClienteNavegador(), empresaId, plan);
     if (!limite.ok) {

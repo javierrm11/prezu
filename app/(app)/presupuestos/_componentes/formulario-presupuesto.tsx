@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { calcularLinea, calcularTotales } from "@/lib/importes";
 import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import {
   lineaVacia,
   TablaPartidas,
@@ -58,9 +59,16 @@ export function FormularioPresupuesto({
   presupuestoExistente,
 }: FormularioPresupuestoProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
+  const [modoCliente, setModoCliente] = useState<"existente" | "nuevo">(
+    !presupuestoExistente && clientes.length === 0 ? "nuevo" : "existente",
+  );
   const [clienteId, setClienteId] = useState(
     presupuestoExistente?.clienteId ?? clientes[0]?.id ?? "",
   );
+  const [nombreNuevoCliente, setNombreNuevoCliente] = useState("");
+  const [nifNuevoCliente, setNifNuevoCliente] = useState("");
+  const [direccionNuevoCliente, setDireccionNuevoCliente] = useState("");
   const [fecha, setFecha] = useState(presupuestoExistente?.fechaEmision ?? hoyISO());
   const [validezDias, setValidezDias] = useState(presupuestoExistente?.validezDias ?? 30);
   const [lineas, setLineas] = useState<LineaConId[]>(() =>
@@ -91,6 +99,8 @@ export function FormularioPresupuesto({
   async function enviarNotaVoz() {
     if (!notaVoz.trim()) return;
 
+    if (!(await exigirSesion())) return;
+
     setInterpretandoVoz(true);
     const partidas = await interpretarNotaVoz(notaVoz, ivaDefecto);
     setInterpretandoVoz(false);
@@ -112,14 +122,16 @@ export function FormularioPresupuesto({
       (linea) => linea.concepto.trim() && linea.cantidad > 0,
     );
 
-    if (!clienteId) {
-      setError("Elige un cliente");
+    if (modoCliente === "existente" ? !clienteId : !nombreNuevoCliente.trim()) {
+      setError(modoCliente === "existente" ? "Elige un cliente" : "Escribe el nombre del cliente");
       return;
     }
     if (lineasValidas.length === 0) {
       setError("Añade al menos una partida");
       return;
     }
+
+    if (!(await exigirSesion())) return;
 
     setGuardando(true);
     const supabase = crearClienteNavegador();
@@ -139,9 +151,8 @@ export function FormularioPresupuesto({
     const validoHasta = new Date(fecha);
     validoHasta.setDate(validoHasta.getDate() + validezDias);
 
-    const datosPresupuesto = {
+    const datosComunes = {
       empresa_id: empresaId,
-      cliente_id: clienteId,
       fecha_emision: fecha,
       valido_hasta: validoHasta.toISOString().slice(0, 10),
       origen: "formulario" as const,
@@ -153,9 +164,13 @@ export function FormularioPresupuesto({
     let presupuestoId = presupuestoExistente?.id;
 
     if (presupuestoId) {
+      // Al editar solo se permite reasignar a un cliente ya dado de
+      // alta (modoCliente siempre es "existente" aquí); no se toca
+      // cliente_nombre/nif/direccion para no perder los datos de un
+      // cliente "solo para este presupuesto" ya guardado.
       const { error: errorUpdate } = await supabase
         .from("presupuestos")
-        .update(datosPresupuesto)
+        .update({ ...datosComunes, cliente_id: clienteId })
         .eq("id", presupuestoId);
 
       if (errorUpdate) {
@@ -166,11 +181,19 @@ export function FormularioPresupuesto({
 
       await supabase.from("presupuesto_lineas").delete().eq("presupuesto_id", presupuestoId);
     } else {
-      const nombreCliente = clientes.find((cliente) => cliente.id === clienteId)?.nombre ?? "";
+      const nombreCliente =
+        modoCliente === "existente"
+          ? (clientes.find((cliente) => cliente.id === clienteId)?.nombre ?? "")
+          : nombreNuevoCliente.trim();
+
       const { data: nuevoPresupuesto, error: errorInsert } = await supabase
         .from("presupuestos")
         .insert({
-          ...datosPresupuesto,
+          ...datosComunes,
+          cliente_id: modoCliente === "existente" ? clienteId : null,
+          cliente_nombre: modoCliente === "nuevo" ? nombreCliente : null,
+          cliente_nif: modoCliente === "nuevo" ? nifNuevoCliente.trim() || null : null,
+          cliente_direccion: modoCliente === "nuevo" ? direccionNuevoCliente.trim() || null : null,
           estado: "borrador",
           nombre: `Presupuesto ${nombreCliente}`.trim(),
         })
@@ -225,24 +248,67 @@ export function FormularioPresupuesto({
     <form onSubmit={enviar} className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-3 rounded-xl border border-borde bg-superficie p-4 shadow-tarjeta">
         <div className="min-w-[200px] flex-[2]">
-          <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="cliente">
-            Cliente
-          </label>
-          <select
-            id="cliente"
-            value={clienteId}
-            onChange={(evento) => setClienteId(evento.target.value)}
-            className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-          >
-            <option value="" disabled>
-              Elige un cliente…
-            </option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nombre}
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <label className="block text-sm font-medium text-texto" htmlFor="cliente">
+              Cliente
+            </label>
+            {!presupuestoExistente && clientes.length > 0 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setModoCliente((actual) => (actual === "existente" ? "nuevo" : "existente"))
+                }
+                className="text-xs font-medium text-secundario hover:underline"
+              >
+                {modoCliente === "existente" ? "+ Cliente nuevo" : "Elegir cliente existente"}
+              </button>
+            )}
+          </div>
+
+          {modoCliente === "existente" ? (
+            <select
+              id="cliente"
+              value={clienteId}
+              onChange={(evento) => setClienteId(evento.target.value)}
+              className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+            >
+              <option value="" disabled>
+                Elige un cliente…
               </option>
-            ))}
-          </select>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nombre}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <input
+                id="cliente"
+                value={nombreNuevoCliente}
+                onChange={(evento) => setNombreNuevoCliente(evento.target.value)}
+                placeholder="Nombre del cliente"
+                className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={nifNuevoCliente}
+                  onChange={(evento) => setNifNuevoCliente(evento.target.value)}
+                  placeholder="NIF (opcional)"
+                  className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+                <input
+                  value={direccionNuevoCliente}
+                  onChange={(evento) => setDireccionNuevoCliente(evento.target.value)}
+                  placeholder="Dirección (opcional)"
+                  className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+              </div>
+              <p className="text-xs text-texto-secundario">
+                No se guarda en tu lista de Clientes, solo en este presupuesto.
+              </p>
+            </div>
+          )}
         </div>
         <div className="min-w-[130px] flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="fecha">

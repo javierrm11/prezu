@@ -6,6 +6,7 @@ import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
 import { puedeCrearDocumento, type Plan } from "@/lib/limitesPlan";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 
 export type LineaParaFactura = {
   concepto: string;
@@ -32,6 +33,9 @@ type BotonConvertirFacturaProps = {
   presupuesto: PresupuestoActual;
   seriePresupuesto: string;
   clienteId: string | null;
+  clienteNombre: string | null;
+  clienteNif: string | null;
+  clienteDireccion: string | null;
   lineas: LineaParaFactura[];
   baseImponible: number;
   totalIva: number;
@@ -45,6 +49,9 @@ export function BotonConvertirFactura({
   presupuesto,
   seriePresupuesto,
   clienteId,
+  clienteNombre,
+  clienteNif,
+  clienteDireccion,
   lineas,
   baseImponible,
   totalIva,
@@ -52,13 +59,14 @@ export function BotonConvertirFactura({
   serieFactura,
 }: BotonConvertirFacturaProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [error, setError] = useState<string | null>(null);
   const [convirtiendo, setConvirtiendo] = useState(false);
 
   async function convertir() {
     const presupuestoId = presupuesto.id;
 
-    if (!clienteId) {
+    if (!clienteId && !clienteNombre) {
       setError("El presupuesto no tiene cliente asignado");
       return;
     }
@@ -68,6 +76,9 @@ export function BotonConvertirFactura({
     }
 
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setConvirtiendo(true);
     const supabase = crearClienteNavegador();
 
@@ -96,16 +107,25 @@ export function BotonConvertirFactura({
 
     // Snapshot de los datos fiscales del cliente en el momento de
     // convertir, no una referencia compartida (regla de negocio 9).
-    const { data: cliente, error: errorCliente } = await supabase
-      .from("clientes")
-      .select("nombre, nif, direccion")
-      .eq("id", clienteId)
-      .single();
+    // Si el presupuesto usaba un cliente "solo para este documento",
+    // ya tenemos sus datos en el propio presupuesto.
+    let cliente: { nombre: string; nif: string | null; direccion: string | null };
 
-    if (errorCliente || !cliente) {
-      setError("No se han podido leer los datos fiscales del cliente");
-      setConvirtiendo(false);
-      return;
+    if (clienteId) {
+      const { data: clienteDB, error: errorCliente } = await supabase
+        .from("clientes")
+        .select("nombre, nif, direccion")
+        .eq("id", clienteId)
+        .single();
+
+      if (errorCliente || !clienteDB) {
+        setError("No se han podido leer los datos fiscales del cliente");
+        setConvirtiendo(false);
+        return;
+      }
+      cliente = clienteDB;
+    } else {
+      cliente = { nombre: clienteNombre ?? "", nif: clienteNif, direccion: clienteDireccion };
     }
 
     const anio = new Date().getFullYear();

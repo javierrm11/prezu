@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/Boton";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 
 type Estado = "aceptado" | "rechazado";
 
@@ -29,11 +30,15 @@ export function AccionesEstadoPresupuesto({
   seriePresupuesto,
 }: AccionesEstadoPresupuestoProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [error, setError] = useState<string | null>(null);
   const [procesando, setProcesando] = useState<Estado | null>(null);
 
   async function cambiarEstado(estado: Estado) {
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setProcesando(estado);
     const supabase = crearClienteNavegador();
 

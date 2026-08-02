@@ -3,6 +3,7 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Textarea } from "@/components/ui/Textarea";
@@ -38,6 +39,7 @@ export function FormularioAjustes({
   proximoNumeroFacturaInicial,
 }: FormularioAjustesProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const inputLogoRef = useRef<HTMLInputElement>(null);
   const [nombre, setNombre] = useState(empresa.nombre);
   const [nif, setNif] = useState(empresa.nif);
@@ -73,6 +75,9 @@ export function FormularioAjustes({
     }
 
     setErrorLogo(null);
+
+    if (!(await exigirSesion())) return;
+
     setSubiendoLogo(true);
     setLogoLocal(URL.createObjectURL(archivo));
 
@@ -108,6 +113,9 @@ export function FormularioAjustes({
     evento.preventDefault();
     setError(null);
     setMensaje(null);
+
+    if (!(await exigirSesion())) return;
+
     setGuardando(true);
 
     const seriePresupuestoLimpia = seriePresupuesto.trim().toUpperCase();

@@ -33,6 +33,7 @@ type FilaPublica = {
   aceptado_por: string | null;
   condiciones: string | null;
   clientes: { nombre: string } | null;
+  cliente_nombre: string | null;
   empresas: {
     nombre: string;
     nif: string | null;
@@ -58,7 +59,7 @@ export default async function PaginaPublicaPresupuesto({
   const { data } = await admin
     .from("presupuestos")
     .select(
-      "id, empresa_id, numero, anio, estado, fecha_emision, valido_hasta, base_imponible, total_iva, total, visto_at, aceptado_at, aceptado_por, condiciones, clientes(nombre), empresas(nombre, nif, direccion, telefono, email, condiciones_defecto, logo_url, serie_presupuesto)",
+      "id, empresa_id, numero, anio, estado, fecha_emision, valido_hasta, base_imponible, total_iva, total, visto_at, aceptado_at, aceptado_por, condiciones, clientes(nombre), cliente_nombre, empresas(nombre, nif, direccion, telefono, email, condiciones_defecto, logo_url, serie_presupuesto)",
     )
     .eq("token_publico", token)
     .maybeSingle();
@@ -147,7 +148,7 @@ export default async function PaginaPublicaPresupuesto({
               Presupuesto {etiquetaNumero}
             </h1>
             <div className="mt-0.5 text-[13px] text-texto-secundario">
-              {presupuesto.clientes?.nombre}
+              {presupuesto.clientes?.nombre ?? presupuesto.cliente_nombre}
               {presupuesto.fecha_emision &&
                 ` · Emitido el ${formatearFecha(presupuesto.fecha_emision)}`}
               {presupuesto.valido_hasta &&

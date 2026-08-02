@@ -9,37 +9,35 @@ export default async function ClientesPage() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
-  if (!empresaId) {
-    return (
-      <p className="text-sm text-texto-secundario">
-        No se ha encontrado tu negocio.
-      </p>
-    );
-  }
-
-  const { data: clientes } = await supabase
-    .from("clientes")
-    .select("id, nombre, nif, telefono")
-    .eq("empresa_id", empresaId)
-    .order("nombre");
-
-  const { data: presupuestos } = await supabase
-    .from("presupuestos")
-    .select("cliente_id")
-    .eq("empresa_id", empresaId);
-
-  const { data: facturas } = await supabase
-    .from("facturas")
-    .select("cliente_id")
-    .eq("empresa_id", empresaId);
-
   const documentosPorCliente = new Map<string, number>();
-  for (const fila of [...(presupuestos ?? []), ...(facturas ?? [])]) {
-    if (!fila.cliente_id) continue;
-    documentosPorCliente.set(
-      fila.cliente_id,
-      (documentosPorCliente.get(fila.cliente_id) ?? 0) + 1,
-    );
+  let clientes: { id: string; nombre: string; nif: string | null; telefono: string | null }[] = [];
+
+  if (empresaId) {
+    const { data: clientesDB } = await supabase
+      .from("clientes")
+      .select("id, nombre, nif, telefono")
+      .eq("empresa_id", empresaId)
+      .order("nombre");
+
+    const { data: presupuestos } = await supabase
+      .from("presupuestos")
+      .select("cliente_id")
+      .eq("empresa_id", empresaId);
+
+    const { data: facturas } = await supabase
+      .from("facturas")
+      .select("cliente_id")
+      .eq("empresa_id", empresaId);
+
+    for (const fila of [...(presupuestos ?? []), ...(facturas ?? [])]) {
+      if (!fila.cliente_id) continue;
+      documentosPorCliente.set(
+        fila.cliente_id,
+        (documentosPorCliente.get(fila.cliente_id) ?? 0) + 1,
+      );
+    }
+
+    clientes = clientesDB ?? [];
   }
 
   return (
@@ -51,7 +49,7 @@ export default async function ClientesPage() {
         <BotonNuevoCliente empresaId={empresaId} />
       </div>
 
-      {!clientes || clientes.length === 0 ? (
+      {clientes.length === 0 ? (
         <p className="text-sm text-texto-secundario">
           Todavía no tienes clientes. Añade el primero.
         </p>

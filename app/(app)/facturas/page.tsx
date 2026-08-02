@@ -19,25 +19,21 @@ export default async function FacturasPage() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
-  if (!empresaId) {
-    return (
-      <p className="text-sm text-texto-secundario">
-        No se ha encontrado tu negocio.
-      </p>
-    );
+  let filas: FilaFacturaDB[] = [];
+
+  if (empresaId) {
+    const { data } = await supabase
+      .from("facturas")
+      .select(
+        "id, numero, anio, serie, cliente_nombre, fecha_emision, vencimiento, total, estado_cobro, factura_lineas(concepto)",
+      )
+      .eq("empresa_id", empresaId)
+      .order("orden", { foreignTable: "factura_lineas" })
+      .limit(1, { foreignTable: "factura_lineas" })
+      .order("fecha_emision", { ascending: false });
+
+    filas = (data as unknown as FilaFacturaDB[] | null) ?? [];
   }
-
-  const { data } = await supabase
-    .from("facturas")
-    .select(
-      "id, numero, anio, serie, cliente_nombre, fecha_emision, vencimiento, total, estado_cobro, factura_lineas(concepto)",
-    )
-    .eq("empresa_id", empresaId)
-    .order("orden", { foreignTable: "factura_lineas" })
-    .limit(1, { foreignTable: "factura_lineas" })
-    .order("fecha_emision", { ascending: false });
-
-  const filas = (data as unknown as FilaFacturaDB[] | null) ?? [];
 
   const facturas: FacturaFila[] = filas.map((fila) => ({
     id: fila.id,

@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { IconoGoogle } from "@/components/ui/IconoGoogle";
 import { registrarEmpresa } from "./acciones";
 
-export function FormularioRegistroEmpresa() {
+export function FormularioRegistroEmpresa({ volver }: { volver?: string }) {
   const router = useRouter();
   const [nombreNegocio, setNombreNegocio] = useState("");
   const [nif, setNif] = useState("");
@@ -16,6 +17,10 @@ export function FormularioRegistroEmpresa() {
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [cargandoGoogle, setCargandoGoogle] = useState(false);
+
+  const destinoInvitado =
+    volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard";
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -53,13 +58,45 @@ export function FormularioRegistroEmpresa() {
     }
 
     router.refresh();
-    // Sin pasarela de pago aquí: se pide tarjeta más adelante, la
-    // primera vez que el negocio intente descargar un PDF.
-    router.push("/dashboard");
+    router.push(volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard");
+  }
+
+  async function continuarConGoogle() {
+    setError(null);
+    setCargandoGoogle(true);
+
+    const supabase = crearClienteNavegador();
+    const { error: errorGoogle } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/confirm?next=${destinoInvitado}` },
+    });
+
+    if (errorGoogle) {
+      setError("No se ha podido continuar con Google");
+      setCargandoGoogle(false);
+    }
+    // Si no hay error, el navegador ya está navegando a Google.
   }
 
   return (
     <form onSubmit={enviar} className="flex w-full flex-col gap-5">
+      <Boton
+        type="button"
+        variante="secundario"
+        onClick={continuarConGoogle}
+        disabled={cargandoGoogle}
+        className="inline-flex w-full items-center justify-center gap-2.5"
+      >
+        <IconoGoogle />
+        {cargandoGoogle ? "Redirigiendo…" : "Continuar con Google"}
+      </Boton>
+
+      <div className="flex items-center gap-3 text-xs text-texto-secundario">
+        <span className="h-px flex-1 bg-borde" />
+        o con tu email
+        <span className="h-px flex-1 bg-borde" />
+      </div>
+
       <Campo
         id="nombre-negocio"
         label="Nombre del negocio"

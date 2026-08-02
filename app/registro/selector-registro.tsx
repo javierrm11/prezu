@@ -5,17 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormularioCliente } from "@/app/(app)/clientes/_componentes/formulario-cliente";
 import { FormularioRegistroEmpresa } from "./formulario-registro-empresa";
+import { Boton } from "@/components/ui/Boton";
 
 type TipoRegistro = "empresa" | "cliente";
 
 type SelectorRegistroProps = {
   estaAutenticado: boolean;
   empresaId: string | null;
+  volver?: string;
 };
 
-export function SelectorRegistro({ estaAutenticado, empresaId }: SelectorRegistroProps) {
+export function SelectorRegistro({ estaAutenticado, empresaId, volver }: SelectorRegistroProps) {
   const router = useRouter();
   const [tipo, setTipo] = useState<TipoRegistro>(estaAutenticado ? "cliente" : "empresa");
+  const destinoInvitado =
+    volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard";
 
   return (
     <div className="flex w-full flex-col gap-5">
@@ -41,7 +45,7 @@ export function SelectorRegistro({ estaAutenticado, empresaId }: SelectorRegistr
             &quot;Cliente nuevo&quot; arriba.
           </p>
         ) : (
-          <FormularioRegistroEmpresa />
+          <FormularioRegistroEmpresa volver={volver} />
         ))}
 
       {tipo === "cliente" &&
@@ -62,12 +66,22 @@ export function SelectorRegistro({ estaAutenticado, empresaId }: SelectorRegistr
         ))}
 
       {!estaAutenticado && (
-        <p className="text-center text-[13px] text-texto-secundario">
-          ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="font-medium text-secundario">
-            Inicia sesión
+        <>
+          <Link href={destinoInvitado}>
+            <Boton type="button" variante="secundario" className="w-full">
+              Continuar como invitado
+            </Boton>
           </Link>
-        </p>
+          <p className="text-center text-[13px] text-texto-secundario">
+            ¿Ya tienes cuenta?{" "}
+            <Link
+              href={`/login${volver ? `?volver=${encodeURIComponent(volver)}` : ""}`}
+              className="font-medium text-secundario"
+            >
+              Inicia sesión
+            </Link>
+          </p>
+        </>
       )}
     </div>
   );

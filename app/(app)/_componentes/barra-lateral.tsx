@@ -12,11 +12,12 @@ import {
 } from "./navegacion";
 
 type BarraLateralProps = {
+  autenticado: boolean;
   negocio: string;
   iniciales: string;
 };
 
-export function BarraLateral({ negocio, iniciales }: BarraLateralProps) {
+export function BarraLateral({ autenticado, negocio, iniciales }: BarraLateralProps) {
   const pathname = usePathname();
 
   return (
@@ -41,17 +42,27 @@ export function BarraLateral({ negocio, iniciales }: BarraLateralProps) {
 
       <div className="flex-1" />
 
-      <div className="mt-1 flex items-center gap-2.5 border-t border-white/10 px-2 pt-2.5">
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-acento text-[13px] font-bold text-primario">
-          {iniciales}
-        </div>
-        <div className="min-w-0">
-          <div className="truncate text-[13px] font-semibold text-white">
-            {negocio}
+      {autenticado ? (
+        <div className="mt-1 flex items-center gap-2.5 border-t border-white/10 px-2 pt-2.5">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-acento text-[13px] font-bold text-primario">
+            {iniciales}
           </div>
-          <div className="text-[11px] text-white/55">Plan Autónomo</div>
+          <div className="min-w-0">
+            <div className="truncate text-[13px] font-semibold text-white">
+              {negocio}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-1 border-t border-white/10 px-2 pt-2.5">
+          <Link
+            href={`/login?volver=${encodeURIComponent(pathname)}`}
+            className="flex h-10 items-center justify-center rounded-lg bg-white/10 text-sm font-medium text-white hover:bg-white/15"
+          >
+            Iniciar sesión o crear cuenta
+          </Link>
+        </div>
+      )}
     </aside>
   );
 }

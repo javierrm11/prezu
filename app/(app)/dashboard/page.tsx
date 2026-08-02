@@ -33,85 +33,100 @@ type FilaUltimoPresupuesto = {
   total: number;
   created_at: string;
   clientes: { nombre: string } | null;
+  cliente_nombre: string | null;
   presupuesto_lineas: { concepto: string }[];
+};
+
+type FilaFacturaPendiente = {
+  id: string;
+  numero: number | null;
+  anio: number | null;
+  serie: string;
+  cliente_nombre: string;
+  vencimiento: string | null;
+  total: number;
+  estado_cobro: string;
+  estadoEfectivo: string;
 };
 
 export default async function DashboardPage() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
-  if (!empresaId) {
-    return (
-      <p className="text-sm text-texto-secundario">
-        No se ha encontrado tu negocio.
-      </p>
+  let negocio = "tu negocio";
+  let presupuestosEsteMes = 0;
+  let facturasEmitidas = 0;
+  let tasaAceptacion: number | null = null;
+  let facturasPendientes: FilaFacturaPendiente[] = [];
+  let pendienteCobro = 0;
+  let ultimosPresupuestos: FilaUltimoPresupuesto[] = [];
+
+  if (empresaId) {
+    const { data: empresa } = await supabase
+      .from("empresas")
+      .select("nombre")
+      .eq("id", empresaId)
+      .single();
+
+    const inicioMes = new Date();
+    inicioMes.setDate(1);
+    inicioMes.setHours(0, 0, 0, 0);
+
+    const { count: countPresupuestosEsteMes } = await supabase
+      .from("presupuestos")
+      .select("id", { count: "exact", head: true })
+      .eq("empresa_id", empresaId)
+      .gte("created_at", inicioMes.toISOString());
+
+    const { count: countFacturasEmitidas } = await supabase
+      .from("facturas")
+      .select("id", { count: "exact", head: true })
+      .eq("empresa_id", empresaId);
+
+    const { data: estadosPresupuestos } = await supabase
+      .from("presupuestos")
+      .select("estado")
+      .eq("empresa_id", empresaId);
+
+    const resueltos = (estadosPresupuestos ?? []).filter((p) =>
+      ESTADOS_PRESUPUESTO_RESUELTOS.includes(p.estado),
     );
+    const aceptados = resueltos.filter((p) =>
+      ESTADOS_PRESUPUESTO_ACEPTADOS.includes(p.estado),
+    );
+
+    const { data: facturasPendientesDB } = await supabase
+      .from("facturas")
+      .select("id, numero, anio, serie, cliente_nombre, vencimiento, total, estado_cobro")
+      .eq("empresa_id", empresaId)
+      .neq("estado_cobro", "cobrada")
+      .order("vencimiento", { ascending: true, nullsFirst: false });
+
+    const { data: ultimosPresupuestosDB } = await supabase
+      .from("presupuestos")
+      .select(
+        "id, numero, anio, estado, total, created_at, clientes(nombre), cliente_nombre, presupuesto_lineas(concepto)",
+      )
+      .eq("empresa_id", empresaId)
+      .order("orden", { foreignTable: "presupuesto_lineas" })
+      .limit(1, { foreignTable: "presupuesto_lineas" })
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    negocio = empresa?.nombre ?? "tu negocio";
+    presupuestosEsteMes = countPresupuestosEsteMes ?? 0;
+    facturasEmitidas = countFacturasEmitidas ?? 0;
+    tasaAceptacion =
+      resueltos.length > 0 ? Math.round((aceptados.length / resueltos.length) * 100) : null;
+    facturasPendientes = (facturasPendientesDB ?? []).map((f) => ({
+      ...f,
+      total: Number(f.total),
+      estadoEfectivo: estadoCobroEfectivo(f.estado_cobro, f.vencimiento),
+    }));
+    pendienteCobro = facturasPendientes.reduce((acumulado, f) => acumulado + f.total, 0);
+    ultimosPresupuestos = (ultimosPresupuestosDB as unknown as FilaUltimoPresupuesto[]) ?? [];
   }
 
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("nombre")
-    .eq("id", empresaId)
-    .single();
-
-  const inicioMes = new Date();
-  inicioMes.setDate(1);
-  inicioMes.setHours(0, 0, 0, 0);
-
-  const { count: presupuestosEsteMes } = await supabase
-    .from("presupuestos")
-    .select("id", { count: "exact", head: true })
-    .eq("empresa_id", empresaId)
-    .gte("created_at", inicioMes.toISOString());
-
-  const { count: facturasEmitidas } = await supabase
-    .from("facturas")
-    .select("id", { count: "exact", head: true })
-    .eq("empresa_id", empresaId);
-
-  const { data: estadosPresupuestos } = await supabase
-    .from("presupuestos")
-    .select("estado")
-    .eq("empresa_id", empresaId);
-
-  const resueltos = (estadosPresupuestos ?? []).filter((p) =>
-    ESTADOS_PRESUPUESTO_RESUELTOS.includes(p.estado),
-  );
-  const aceptados = resueltos.filter((p) =>
-    ESTADOS_PRESUPUESTO_ACEPTADOS.includes(p.estado),
-  );
-  const tasaAceptacion =
-    resueltos.length > 0 ? Math.round((aceptados.length / resueltos.length) * 100) : null;
-
-  const { data: facturasPendientesDB } = await supabase
-    .from("facturas")
-    .select("id, numero, anio, serie, cliente_nombre, vencimiento, total, estado_cobro")
-    .eq("empresa_id", empresaId)
-    .neq("estado_cobro", "cobrada")
-    .order("vencimiento", { ascending: true, nullsFirst: false });
-
-  const facturasPendientes = (facturasPendientesDB ?? []).map((f) => ({
-    ...f,
-    total: Number(f.total),
-    estadoEfectivo: estadoCobroEfectivo(f.estado_cobro, f.vencimiento),
-  }));
-
-  const pendienteCobro = facturasPendientes.reduce((acumulado, f) => acumulado + f.total, 0);
-
-  const { data: ultimosPresupuestosDB } = await supabase
-    .from("presupuestos")
-    .select(
-      "id, numero, anio, estado, total, created_at, clientes(nombre), presupuesto_lineas(concepto)",
-    )
-    .eq("empresa_id", empresaId)
-    .order("orden", { foreignTable: "presupuesto_lineas" })
-    .limit(1, { foreignTable: "presupuesto_lineas" })
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const ultimosPresupuestos = (ultimosPresupuestosDB as unknown as FilaUltimoPresupuesto[]) ?? [];
-
-  const negocio = empresa?.nombre ?? "tu negocio";
   const fechaHoy = capitalizar(formateadorFechaLarga.format(new Date()));
 
   return (
@@ -165,7 +180,7 @@ export default async function DashboardPage() {
                 >
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[15px] font-semibold text-texto">
-                      {presupuesto.clientes?.nombre ?? "Sin cliente"}
+                      {presupuesto.clientes?.nombre ?? presupuesto.cliente_nombre ?? "Sin cliente"}
                     </div>
                     <div className="truncate text-[13px] text-texto-secundario">
                       {presupuesto.presupuesto_lineas[0]?.concepto || "—"}

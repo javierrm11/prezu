@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, Copy } from "lucide-react";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
 import { asegurarPresupuestoEnviado } from "@/lib/enviarPresupuesto";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import { Boton } from "@/components/ui/Boton";
 
 type PresupuestoActual = {
@@ -30,12 +31,16 @@ export function AccionesEnviarPresupuesto({
   enlacePublico,
 }: AccionesEnviarPresupuestoProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
   async function copiarEnlace() {
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setCargando(true);
 
     // Copiar el enlace también entrega el presupuesto: si seguía en

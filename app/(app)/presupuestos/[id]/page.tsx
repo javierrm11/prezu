@@ -42,7 +42,7 @@ export default async function PresupuestoDetallePage({
   const { data } = await supabase
     .from("presupuestos")
     .select(
-      "id, numero, anio, serie, estado, nombre, cliente_id, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre)",
+      "id, numero, anio, serie, estado, nombre, cliente_id, cliente_nombre, cliente_nif, cliente_direccion, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -57,6 +57,9 @@ export default async function PresupuestoDetallePage({
         estado: string;
         nombre: string | null;
         cliente_id: string | null;
+        cliente_nombre: string | null;
+        cliente_nif: string | null;
+        cliente_direccion: string | null;
         factura_id: string | null;
         token_publico: string;
         fecha_emision: string | null;
@@ -73,6 +76,7 @@ export default async function PresupuestoDetallePage({
   }
 
   const fechaEmision = presupuesto.fecha_emision ?? new Date().toISOString().slice(0, 10);
+  const nombreCliente = presupuesto.clientes?.nombre ?? presupuesto.cliente_nombre ?? null;
 
   const { data: empresa } = await supabase
     .from("empresas")
@@ -126,17 +130,14 @@ export default async function PresupuestoDetallePage({
           <div className="flex flex-wrap items-center gap-2.5">
             <TituloPresupuestoEditable
               presupuestoId={presupuesto.id}
-              nombreInicial={
-                presupuesto.nombre ??
-                `Presupuesto ${presupuesto.clientes?.nombre ?? ""}`.trim()
-              }
+              nombreInicial={presupuesto.nombre ?? `Presupuesto ${nombreCliente ?? ""}`.trim()}
             />
             <Badge tono={tonoPresupuesto(presupuesto.estado)}>
               {presupuesto.estado}
             </Badge>
           </div>
           <div className="mt-0.5 text-sm text-texto-secundario">
-            {etiquetaNumero} · {presupuesto.clientes?.nombre ?? "Sin cliente"}
+            {etiquetaNumero} · {nombreCliente ?? "Sin cliente"}
             {presupuesto.fecha_emision &&
               ` · Emitido ${formatearFecha(presupuesto.fecha_emision)}`}
             {presupuesto.valido_hasta &&
@@ -260,6 +261,9 @@ export default async function PresupuestoDetallePage({
                 }}
                 seriePresupuesto={empresa?.serie_presupuesto ?? "P"}
                 clienteId={presupuesto.cliente_id}
+                clienteNombre={presupuesto.cliente_nombre}
+                clienteNif={presupuesto.cliente_nif}
+                clienteDireccion={presupuesto.cliente_direccion}
                 lineas={(lineas ?? []).map((linea) => ({
                   concepto: linea.concepto,
                   cantidad: Number(linea.cantidad),

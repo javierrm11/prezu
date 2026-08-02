@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ListPlus, Pencil, Plus } from "lucide-react";
 import { crearClienteNavegador } from "@/lib/supabase/browser";
+import { useExigirSesion } from "@/lib/hooks/useExigirSesion";
 import { formatearEuros } from "@/lib/formato";
 import { Boton } from "@/components/ui/Boton";
 import { UNIDADES } from "@/components/ui/TablaPartidas";
@@ -19,13 +20,14 @@ export type ItemCatalogo = {
 };
 
 type ListaCatalogoProps = {
-  empresaId: string;
+  empresaId: string | null;
   ivaDefecto: number;
   items: ItemCatalogo[];
 };
 
 export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoProps) {
   const router = useRouter();
+  const exigirSesion = useExigirSesion();
   const [nuevoAbierto, setNuevoAbierto] = useState(false);
   const [nuevoConcepto, setNuevoConcepto] = useState("");
   const [nuevaUnidad, setNuevaUnidad] = useState("ud");
@@ -44,6 +46,14 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
     }
 
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
+    if (!empresaId) {
+      setError("No se ha encontrado tu negocio");
+      return;
+    }
+
     setGuardando(true);
     const supabase = crearClienteNavegador();
 
@@ -77,6 +87,9 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
 
   async function guardarEdicion(id: string) {
     setError(null);
+
+    if (!(await exigirSesion())) return;
+
     setGuardando(true);
     const supabase = crearClienteNavegador();
 
