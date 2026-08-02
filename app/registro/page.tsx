@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
-import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { Logo } from "@/components/ui/Logo";
-import { SelectorRegistro } from "./selector-registro";
+import { Boton } from "@/components/ui/Boton";
+import { FormularioRegistroEmpresa } from "./formulario-registro-empresa";
 
 export default async function RegistroPage({
   searchParams,
@@ -16,12 +17,17 @@ export default async function RegistroPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const empresaId = user ? await obtenerEmpresaId(supabase) : null;
+  if (user) {
+    redirect(volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard");
+  }
+
+  const destinoInvitado =
+    volver?.startsWith("/") && !volver.startsWith("//") ? volver : "/dashboard";
 
   return (
     <div className="relative flex flex-1">
       <Link
-        href="/"
+        href="/dashboard"
         aria-label="Volver"
         className="absolute top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-borde bg-superficie text-primario hover:bg-fondo"
       >
@@ -46,7 +52,23 @@ export default async function RegistroPage({
               Prezu
             </span>
           </div>
-          <SelectorRegistro estaAutenticado={Boolean(user)} empresaId={empresaId} volver={volver} />
+
+          <FormularioRegistroEmpresa volver={volver} />
+
+          <Link href={destinoInvitado}>
+            <Boton type="button" variante="secundario" className="w-full">
+              Continuar como invitado
+            </Boton>
+          </Link>
+          <p className="text-center text-[13px] text-texto-secundario">
+            ¿Ya tienes cuenta?{" "}
+            <Link
+              href={`/login${volver ? `?volver=${encodeURIComponent(volver)}` : ""}`}
+              className="font-medium text-secundario"
+            >
+              Inicia sesión
+            </Link>
+          </p>
         </div>
       </div>
     </div>

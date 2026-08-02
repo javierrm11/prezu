@@ -23,7 +23,7 @@ export default async function LoginPage({
   return (
     <div className="relative flex flex-1">
       <Link
-        href="/"
+        href="/dashboard"
         aria-label="Volver"
         className="absolute top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-borde bg-superficie text-primario hover:bg-fondo"
       >
