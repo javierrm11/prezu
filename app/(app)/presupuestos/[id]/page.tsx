@@ -39,14 +39,34 @@ export default async function PresupuestoDetallePage({
     );
   }
 
-  const { data } = await supabase
-    .from("presupuestos")
-    .select(
-      "id, numero, anio, serie, estado, nombre, cliente_id, cliente_nombre, cliente_nif, cliente_direccion, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre)",
-    )
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  // Las cuatro consultas son independientes entre sí (solo dependen
+  // de id/empresaId, ya conocidos), así que se piden a la vez.
+  const [{ data }, { data: empresa }, { data: lineas }, { data: eventos }] = await Promise.all([
+    supabase
+      .from("presupuestos")
+      .select(
+        "id, numero, anio, serie, estado, nombre, cliente_id, cliente_nombre, cliente_nif, cliente_direccion, factura_id, token_publico, fecha_emision, valido_hasta, base_imponible, total_iva, total, clientes(nombre)",
+      )
+      .eq("id", id)
+      .eq("empresa_id", empresaId)
+      .single(),
+    supabase
+      .from("empresas")
+      .select("serie_presupuesto, serie_factura, pdf_plantilla, plan")
+      .eq("id", empresaId)
+      .single(),
+    supabase
+      .from("presupuesto_lineas")
+      .select("id, concepto, cantidad, unidad, precio_unitario, descuento_pct, tipo_iva, importe")
+      .eq("presupuesto_id", id)
+      .order("orden"),
+    supabase
+      .from("eventos")
+      .select("id, tipo, created_at")
+      .eq("entidad", "presupuesto")
+      .eq("entidad_id", id)
+      .order("created_at", { ascending: true }),
+  ]);
 
   const presupuesto = data as unknown as
     | {
@@ -78,32 +98,11 @@ export default async function PresupuestoDetallePage({
   const fechaEmision = presupuesto.fecha_emision ?? new Date().toISOString().slice(0, 10);
   const nombreCliente = presupuesto.clientes?.nombre ?? presupuesto.cliente_nombre ?? null;
 
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("serie_presupuesto, serie_factura, pdf_plantilla, plan")
-    .eq("id", empresaId)
-    .single();
-
   const enlacePdf = calcularEnlacePdf({
     pdfPlantilla: empresa?.pdf_plantilla,
     rutaApiPdf: `/api/presupuestos/${presupuesto.id}/pdf`,
     rutaElegirPlantilla: `/presupuestos/${presupuesto.id}/elegir-plantilla`,
   });
-
-  const { data: lineas } = await supabase
-    .from("presupuesto_lineas")
-    .select(
-      "id, concepto, cantidad, unidad, precio_unitario, descuento_pct, tipo_iva, importe",
-    )
-    .eq("presupuesto_id", id)
-    .order("orden");
-
-  const { data: eventos } = await supabase
-    .from("eventos")
-    .select("id, tipo, created_at")
-    .eq("entidad", "presupuesto")
-    .eq("entidad_id", id)
-    .order("created_at", { ascending: true });
 
   const etiquetaNumero =
     presupuesto.numero != null

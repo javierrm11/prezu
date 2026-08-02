@@ -32,14 +32,36 @@ export default async function FacturaDetallePage({
     );
   }
 
-  const { data } = await supabase
-    .from("facturas")
-    .select(
-      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total",
-    )
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  // Estas cuatro solo dependen de id/empresaId (ya conocidos), así
+  // que se piden a la vez en vez de una detrás de otra.
+  const [{ data }, { data: lineas }, { data: eventos }, { data: rectificadaPor }] =
+    await Promise.all([
+      supabase
+        .from("facturas")
+        .select(
+          "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, estado_cobro, cliente_nombre, cliente_nif, cliente_direccion, base_imponible, total_iva, total",
+        )
+        .eq("id", id)
+        .eq("empresa_id", empresaId)
+        .single(),
+      supabase
+        .from("factura_lineas")
+        .select("id, concepto, cantidad, unidad, precio_unitario, tipo_iva, importe")
+        .eq("factura_id", id)
+        .order("orden"),
+      supabase
+        .from("eventos")
+        .select("id, tipo, created_at")
+        .eq("entidad", "factura")
+        .eq("entidad_id", id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("facturas")
+        .select("id, serie, numero, anio")
+        .eq("rectifica_a", id)
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
   const factura = data as unknown as
     | {
@@ -65,21 +87,15 @@ export default async function FacturaDetallePage({
     notFound();
   }
 
-  const [{ data: original }, { data: rectificadaPor }] = await Promise.all([
-    factura.rectifica_a
-      ? supabase
-          .from("facturas")
-          .select("id, serie, numero, anio")
-          .eq("id", factura.rectifica_a)
-          .single()
-      : Promise.resolve({ data: null }),
-    supabase
-      .from("facturas")
-      .select("id, serie, numero, anio")
-      .eq("rectifica_a", id)
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  // Esta sí depende del resultado de factura (rectifica_a), así que
+  // va aparte, después de las cuatro de arriba.
+  const { data: original } = factura.rectifica_a
+    ? await supabase
+        .from("facturas")
+        .select("id, serie, numero, anio")
+        .eq("id", factura.rectifica_a)
+        .single()
+    : { data: null };
 
   // Las facturas no tienen paso de "elegir plantilla" (usan la que
   // ya se eligió en un presupuesto o en Ajustes, "clásico" si aún
@@ -87,19 +103,6 @@ export default async function FacturaDetallePage({
   // directamente.
   const enlaceVerPdf = `/api/facturas/${factura.id}/pdf`;
   const enlaceDescargarPdf = `/api/facturas/${factura.id}/pdf?descarga=1`;
-
-  const { data: lineas } = await supabase
-    .from("factura_lineas")
-    .select("id, concepto, cantidad, unidad, precio_unitario, tipo_iva, importe")
-    .eq("factura_id", id)
-    .order("orden");
-
-  const { data: eventos } = await supabase
-    .from("eventos")
-    .select("id, tipo, created_at")
-    .eq("entidad", "factura")
-    .eq("entidad_id", id)
-    .order("created_at", { ascending: true });
 
   const etiquetaNumero = formatearNumeroDocumento(factura.serie, factura.numero, factura.anio);
   const estadoEfectivo = estadoCobroEfectivo(factura.estado_cobro, factura.vencimiento);

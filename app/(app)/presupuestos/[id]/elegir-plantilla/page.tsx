@@ -23,22 +23,14 @@ export default async function ElegirPlantillaPage({
     );
   }
 
-  const { data: presupuesto } = await supabase
-    .from("presupuestos")
-    .select("id")
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  const [{ data: presupuesto }, { data: empresa }] = await Promise.all([
+    supabase.from("presupuestos").select("id").eq("id", id).eq("empresa_id", empresaId).single(),
+    supabase.from("empresas").select("pdf_plantilla").eq("id", empresaId).single(),
+  ]);
 
   if (!presupuesto) {
     notFound();
   }
-
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("pdf_plantilla")
-    .eq("id", empresaId)
-    .single();
 
   return (
     <div>

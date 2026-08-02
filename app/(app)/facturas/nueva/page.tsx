@@ -16,24 +16,20 @@ export default async function NuevaFacturaPage() {
   let catalogo: { concepto: string; unidad: string; precioUnitario: number; tipoIva: number }[] = [];
 
   if (empresaId) {
-    const { data: clientesDB } = await supabase
-      .from("clientes")
-      .select("id, nombre")
-      .eq("empresa_id", empresaId)
-      .order("nombre");
-
-    const { data: empresa } = await supabase
-      .from("empresas")
-      .select("iva_defecto, serie_factura, plan")
-      .eq("id", empresaId)
-      .single();
-
-    const { data: catalogoDB } = await supabase
-      .from("catalogo")
-      .select("concepto, unidad, precio_unitario, tipo_iva")
-      .eq("empresa_id", empresaId)
-      .order("veces_usado", { ascending: false })
-      .order("concepto");
+    const [{ data: clientesDB }, { data: empresa }, { data: catalogoDB }] = await Promise.all([
+      supabase.from("clientes").select("id, nombre").eq("empresa_id", empresaId).order("nombre"),
+      supabase
+        .from("empresas")
+        .select("iva_defecto, serie_factura, plan")
+        .eq("id", empresaId)
+        .single(),
+      supabase
+        .from("catalogo")
+        .select("concepto, unidad, precio_unitario, tipo_iva")
+        .eq("empresa_id", empresaId)
+        .order("veces_usado", { ascending: false })
+        .order("concepto"),
+    ]);
 
     clientes = clientesDB ?? [];
     plan = (empresa?.plan as Plan) ?? "gratis";

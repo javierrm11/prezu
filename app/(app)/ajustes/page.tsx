@@ -28,13 +28,16 @@ export default async function AjustesPage() {
     );
   }
 
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select(
-      "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, serie_rectificativa, plan, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
-    )
-    .eq("id", empresaId)
-    .single();
+  const [{ data: empresa }, documentosUsadosEsteMes] = await Promise.all([
+    supabase
+      .from("empresas")
+      .select(
+        "id, nombre, nif, direccion, telefono, email, iva_defecto, condiciones_defecto, logo_url, serie_presupuesto, serie_factura, serie_rectificativa, plan, estado_suscripcion, suscripcion_periodo_fin, suscripcion_cancela_al_final, pdf_plantilla",
+      )
+      .eq("id", empresaId)
+      .single(),
+    contarDocumentosDelMes(supabase, empresaId),
+  ]);
 
   if (!empresa) {
     return (
@@ -44,22 +47,23 @@ export default async function AjustesPage() {
     );
   }
 
-  const urlLogoInicial = await crearUrlFirmadaLogo(supabase, empresa.logo_url);
-
   const anioActual = new Date().getFullYear();
 
-  const { data: serieActual } = await supabase
-    .from("series")
-    .select("ultimo_numero")
-    .eq("empresa_id", empresaId)
-    .eq("tipo", "factura")
-    .eq("codigo", empresa.serie_factura)
-    .eq("anio", anioActual)
-    .maybeSingle();
+  // Estas dos sí dependen de datos de empresa (logo_url, serie_factura),
+  // así que van después de tenerla, pero entre sí son independientes.
+  const [urlLogoInicial, { data: serieActual }] = await Promise.all([
+    crearUrlFirmadaLogo(supabase, empresa.logo_url),
+    supabase
+      .from("series")
+      .select("ultimo_numero")
+      .eq("empresa_id", empresaId)
+      .eq("tipo", "factura")
+      .eq("codigo", empresa.serie_factura)
+      .eq("anio", anioActual)
+      .maybeSingle(),
+  ]);
 
   const proximoNumeroFacturaInicial = (serieActual?.ultimo_numero ?? 0) + 1;
-
-  const documentosUsadosEsteMes = await contarDocumentosDelMes(supabase, empresaId);
 
   return (
     <div className="max-w-2xl">

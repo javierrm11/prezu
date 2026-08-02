@@ -13,21 +13,15 @@ export default async function ClientesPage() {
   let clientes: { id: string; nombre: string; nif: string | null; telefono: string | null }[] = [];
 
   if (empresaId) {
-    const { data: clientesDB } = await supabase
-      .from("clientes")
-      .select("id, nombre, nif, telefono")
-      .eq("empresa_id", empresaId)
-      .order("nombre");
-
-    const { data: presupuestos } = await supabase
-      .from("presupuestos")
-      .select("cliente_id")
-      .eq("empresa_id", empresaId);
-
-    const { data: facturas } = await supabase
-      .from("facturas")
-      .select("cliente_id")
-      .eq("empresa_id", empresaId);
+    const [{ data: clientesDB }, { data: presupuestos }, { data: facturas }] = await Promise.all([
+      supabase
+        .from("clientes")
+        .select("id, nombre, nif, telefono")
+        .eq("empresa_id", empresaId)
+        .order("nombre"),
+      supabase.from("presupuestos").select("cliente_id").eq("empresa_id", empresaId),
+      supabase.from("facturas").select("cliente_id").eq("empresa_id", empresaId),
+    ]);
 
     for (const fila of [...(presupuestos ?? []), ...(facturas ?? [])]) {
       if (!fila.cliente_id) continue;

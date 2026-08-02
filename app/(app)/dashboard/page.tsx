@@ -62,31 +62,50 @@ export default async function DashboardPage() {
   let ultimosPresupuestos: FilaUltimoPresupuesto[] = [];
 
   if (empresaId) {
-    const { data: empresa } = await supabase
-      .from("empresas")
-      .select("nombre")
-      .eq("id", empresaId)
-      .single();
-
     const inicioMes = new Date();
     inicioMes.setDate(1);
     inicioMes.setHours(0, 0, 0, 0);
 
-    const { count: countPresupuestosEsteMes } = await supabase
-      .from("presupuestos")
-      .select("id", { count: "exact", head: true })
-      .eq("empresa_id", empresaId)
-      .gte("created_at", inicioMes.toISOString());
-
-    const { count: countFacturasEmitidas } = await supabase
-      .from("facturas")
-      .select("id", { count: "exact", head: true })
-      .eq("empresa_id", empresaId);
-
-    const { data: estadosPresupuestos } = await supabase
-      .from("presupuestos")
-      .select("estado")
-      .eq("empresa_id", empresaId);
+    // Las seis consultas son independientes entre sí (todas solo
+    // necesitan empresaId), así que se lanzan a la vez en vez de
+    // esperarlas una detrás de otra — eso es lo que se notaba al
+    // cambiar de pestaña.
+    const [
+      { data: empresa },
+      { count: countPresupuestosEsteMes },
+      { count: countFacturasEmitidas },
+      { data: estadosPresupuestos },
+      { data: facturasPendientesDB },
+      { data: ultimosPresupuestosDB },
+    ] = await Promise.all([
+      supabase.from("empresas").select("nombre").eq("id", empresaId).single(),
+      supabase
+        .from("presupuestos")
+        .select("id", { count: "exact", head: true })
+        .eq("empresa_id", empresaId)
+        .gte("created_at", inicioMes.toISOString()),
+      supabase
+        .from("facturas")
+        .select("id", { count: "exact", head: true })
+        .eq("empresa_id", empresaId),
+      supabase.from("presupuestos").select("estado").eq("empresa_id", empresaId),
+      supabase
+        .from("facturas")
+        .select("id, numero, anio, serie, cliente_nombre, vencimiento, total, estado_cobro")
+        .eq("empresa_id", empresaId)
+        .neq("estado_cobro", "cobrada")
+        .order("vencimiento", { ascending: true, nullsFirst: false }),
+      supabase
+        .from("presupuestos")
+        .select(
+          "id, numero, anio, estado, total, created_at, clientes(nombre), cliente_nombre, presupuesto_lineas(concepto)",
+        )
+        .eq("empresa_id", empresaId)
+        .order("orden", { foreignTable: "presupuesto_lineas" })
+        .limit(1, { foreignTable: "presupuesto_lineas" })
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
     const resueltos = (estadosPresupuestos ?? []).filter((p) =>
       ESTADOS_PRESUPUESTO_RESUELTOS.includes(p.estado),
@@ -94,24 +113,6 @@ export default async function DashboardPage() {
     const aceptados = resueltos.filter((p) =>
       ESTADOS_PRESUPUESTO_ACEPTADOS.includes(p.estado),
     );
-
-    const { data: facturasPendientesDB } = await supabase
-      .from("facturas")
-      .select("id, numero, anio, serie, cliente_nombre, vencimiento, total, estado_cobro")
-      .eq("empresa_id", empresaId)
-      .neq("estado_cobro", "cobrada")
-      .order("vencimiento", { ascending: true, nullsFirst: false });
-
-    const { data: ultimosPresupuestosDB } = await supabase
-      .from("presupuestos")
-      .select(
-        "id, numero, anio, estado, total, created_at, clientes(nombre), cliente_nombre, presupuesto_lineas(concepto)",
-      )
-      .eq("empresa_id", empresaId)
-      .order("orden", { foreignTable: "presupuesto_lineas" })
-      .limit(1, { foreignTable: "presupuesto_lineas" })
-      .order("created_at", { ascending: false })
-      .limit(5);
 
     negocio = empresa?.nombre ?? "tu negocio";
     presupuestosEsteMes = countPresupuestosEsteMes ?? 0;

@@ -24,37 +24,43 @@ export default async function RectificarFacturaPage({
     );
   }
 
-  const { data: original } = await supabase
-    .from("facturas")
-    .select(
-      "id, numero, anio, serie, cliente_id, cliente_nombre, cliente_nif, cliente_direccion, forma_pago, vencimiento",
-    )
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  const [{ data: original }, { data: lineasDB }, { data: empresa }, { data: catalogoDB }, { data: yaRectificadaPor }] =
+    await Promise.all([
+      supabase
+        .from("facturas")
+        .select(
+          "id, numero, anio, serie, cliente_id, cliente_nombre, cliente_nif, cliente_direccion, forma_pago, vencimiento",
+        )
+        .eq("id", id)
+        .eq("empresa_id", empresaId)
+        .single(),
+      supabase
+        .from("factura_lineas")
+        .select("concepto, cantidad, unidad, precio_unitario, tipo_iva")
+        .eq("factura_id", id)
+        .order("orden"),
+      supabase
+        .from("empresas")
+        .select("iva_defecto, serie_rectificativa, plan")
+        .eq("id", empresaId)
+        .single(),
+      supabase
+        .from("catalogo")
+        .select("concepto, unidad, precio_unitario, tipo_iva")
+        .eq("empresa_id", empresaId)
+        .order("veces_usado", { ascending: false })
+        .order("concepto"),
+      supabase
+        .from("facturas")
+        .select("serie, numero, anio")
+        .eq("rectifica_a", id)
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
   if (!original) {
     notFound();
   }
-
-  const { data: lineasDB } = await supabase
-    .from("factura_lineas")
-    .select("concepto, cantidad, unidad, precio_unitario, tipo_iva")
-    .eq("factura_id", id)
-    .order("orden");
-
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("iva_defecto, serie_rectificativa, plan")
-    .eq("id", empresaId)
-    .single();
-
-  const { data: catalogoDB } = await supabase
-    .from("catalogo")
-    .select("concepto, unidad, precio_unitario, tipo_iva")
-    .eq("empresa_id", empresaId)
-    .order("veces_usado", { ascending: false })
-    .order("concepto");
 
   const catalogo = (catalogoDB ?? []).map((item) => ({
     concepto: item.concepto,
@@ -62,13 +68,6 @@ export default async function RectificarFacturaPage({
     precioUnitario: Number(item.precio_unitario),
     tipoIva: Number(item.tipo_iva),
   }));
-
-  const { data: yaRectificadaPor } = await supabase
-    .from("facturas")
-    .select("serie, numero, anio")
-    .eq("rectifica_a", id)
-    .limit(1)
-    .maybeSingle();
 
   const etiquetaOriginal = formatearNumeroDocumento(original.serie, original.numero, original.anio);
 

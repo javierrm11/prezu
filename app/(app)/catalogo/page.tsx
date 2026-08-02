@@ -10,17 +10,14 @@ export default async function CatalogoPage() {
   let ivaDefecto = 21;
 
   if (empresaId) {
-    const { data: catalogoDB } = await supabase
-      .from("catalogo")
-      .select("id, concepto, unidad, precio_unitario, tipo_iva, veces_usado")
-      .eq("empresa_id", empresaId)
-      .order("concepto");
-
-    const { data: empresa } = await supabase
-      .from("empresas")
-      .select("iva_defecto")
-      .eq("id", empresaId)
-      .single();
+    const [{ data: catalogoDB }, { data: empresa }] = await Promise.all([
+      supabase
+        .from("catalogo")
+        .select("id, concepto, unidad, precio_unitario, tipo_iva, veces_usado")
+        .eq("empresa_id", empresaId)
+        .order("concepto"),
+      supabase.from("empresas").select("iva_defecto").eq("id", empresaId).single(),
+    ]);
 
     items = (catalogoDB ?? []).map((item) => ({
       id: item.id,

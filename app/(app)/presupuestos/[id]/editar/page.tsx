@@ -39,12 +39,31 @@ export default async function EditarPresupuestoPage({
     );
   }
 
-  const { data: presupuesto } = await supabase
-    .from("presupuestos")
-    .select("id, cliente_id, estado, fecha_emision, valido_hasta")
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  // Todas dependen solo de id/empresaId (ya conocidos), así que se
+  // piden a la vez; los redirect/notFound de abajo se comprueban
+  // después de tenerlas todas.
+  const [{ data: presupuesto }, { data: lineas }, { data: clientes }, { data: empresa }, { data: catalogoDB }] =
+    await Promise.all([
+      supabase
+        .from("presupuestos")
+        .select("id, cliente_id, estado, fecha_emision, valido_hasta")
+        .eq("id", id)
+        .eq("empresa_id", empresaId)
+        .single(),
+      supabase
+        .from("presupuesto_lineas")
+        .select("concepto, cantidad, unidad, precio_unitario, tipo_iva")
+        .eq("presupuesto_id", id)
+        .order("orden"),
+      supabase.from("clientes").select("id, nombre").eq("empresa_id", empresaId).order("nombre"),
+      supabase.from("empresas").select("iva_defecto, plan").eq("id", empresaId).single(),
+      supabase
+        .from("catalogo")
+        .select("concepto, unidad, precio_unitario, tipo_iva")
+        .eq("empresa_id", empresaId)
+        .order("veces_usado", { ascending: false })
+        .order("concepto"),
+    ]);
 
   if (!presupuesto) {
     notFound();
@@ -53,31 +72,6 @@ export default async function EditarPresupuestoPage({
   if (presupuesto.estado !== "borrador") {
     redirect(`/presupuestos/${id}`);
   }
-
-  const { data: lineas } = await supabase
-    .from("presupuesto_lineas")
-    .select("concepto, cantidad, unidad, precio_unitario, tipo_iva")
-    .eq("presupuesto_id", id)
-    .order("orden");
-
-  const { data: clientes } = await supabase
-    .from("clientes")
-    .select("id, nombre")
-    .eq("empresa_id", empresaId)
-    .order("nombre");
-
-  const { data: empresa } = await supabase
-    .from("empresas")
-    .select("iva_defecto, plan")
-    .eq("id", empresaId)
-    .single();
-
-  const { data: catalogoDB } = await supabase
-    .from("catalogo")
-    .select("concepto, unidad, precio_unitario, tipo_iva")
-    .eq("empresa_id", empresaId)
-    .order("veces_usado", { ascending: false })
-    .order("concepto");
 
   const catalogo = (catalogoDB ?? []).map((item) => ({
     concepto: item.concepto,

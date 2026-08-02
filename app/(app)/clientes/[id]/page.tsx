@@ -30,30 +30,30 @@ export default async function ClienteDetallePage({
     );
   }
 
-  const { data: cliente } = await supabase
-    .from("clientes")
-    .select("id, nombre, nif, telefono, direccion")
-    .eq("id", id)
-    .eq("empresa_id", empresaId)
-    .single();
+  const [{ data: cliente }, { data: presupuestos }, { data: facturas }] = await Promise.all([
+    supabase
+      .from("clientes")
+      .select("id, nombre, nif, telefono, direccion")
+      .eq("id", id)
+      .eq("empresa_id", empresaId)
+      .single(),
+    supabase
+      .from("presupuestos")
+      .select("id, numero, anio, estado, total, fecha_emision, created_at")
+      .eq("empresa_id", empresaId)
+      .eq("cliente_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("facturas")
+      .select("id, numero, anio, estado_cobro, total, fecha_emision, created_at")
+      .eq("empresa_id", empresaId)
+      .eq("cliente_id", id)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (!cliente) {
     notFound();
   }
-
-  const { data: presupuestos } = await supabase
-    .from("presupuestos")
-    .select("id, numero, anio, estado, total, fecha_emision, created_at")
-    .eq("empresa_id", empresaId)
-    .eq("cliente_id", id)
-    .order("created_at", { ascending: false });
-
-  const { data: facturas } = await supabase
-    .from("facturas")
-    .select("id, numero, anio, estado_cobro, total, fecha_emision, created_at")
-    .eq("empresa_id", empresaId)
-    .eq("cliente_id", id)
-    .order("created_at", { ascending: false });
 
   const historial = [
     ...(presupuestos ?? []).map((p) => ({

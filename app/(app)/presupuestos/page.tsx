@@ -23,21 +23,18 @@ export default async function PresupuestosPage() {
   let seriePresupuesto = "P";
 
   if (empresaId) {
-    const { data } = await supabase
-      .from("presupuestos")
-      .select(
-        "id, numero, anio, estado, total, fecha_emision, created_at, clientes(nombre), cliente_nombre, presupuesto_lineas(concepto)",
-      )
-      .eq("empresa_id", empresaId)
-      .order("orden", { foreignTable: "presupuesto_lineas" })
-      .limit(1, { foreignTable: "presupuesto_lineas" })
-      .order("created_at", { ascending: false });
-
-    const { data: empresa } = await supabase
-      .from("empresas")
-      .select("serie_presupuesto")
-      .eq("id", empresaId)
-      .single();
+    const [{ data }, { data: empresa }] = await Promise.all([
+      supabase
+        .from("presupuestos")
+        .select(
+          "id, numero, anio, estado, total, fecha_emision, created_at, clientes(nombre), cliente_nombre, presupuesto_lineas(concepto)",
+        )
+        .eq("empresa_id", empresaId)
+        .order("orden", { foreignTable: "presupuesto_lineas" })
+        .limit(1, { foreignTable: "presupuesto_lineas" })
+        .order("created_at", { ascending: false }),
+      supabase.from("empresas").select("serie_presupuesto").eq("id", empresaId).single(),
+    ]);
 
     filas = (data as unknown as FilaPresupuestoDB[] | null) ?? [];
     seriePresupuesto = empresa?.serie_presupuesto ?? "P";
