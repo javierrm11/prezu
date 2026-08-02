@@ -75,13 +75,6 @@ export function ListaPresupuestos({
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-primario">Presupuestos</h1>
-        <Link href="/presupuestos/nuevo">
-          <Boton>Nuevo presupuesto</Boton>
-        </Link>
-      </div>
-
       <div className="relative mb-3 max-w-[420px]">
         <Search
           size={18}

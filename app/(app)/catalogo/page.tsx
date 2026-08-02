@@ -1,8 +1,24 @@
+import { Suspense } from "react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
+import { SpinnerListado } from "@/components/ui/SpinnerListado";
 import { ListaCatalogo, type ItemCatalogo } from "./_componentes/lista-catalogo";
 
-export default async function CatalogoPage() {
+export default function CatalogoPage() {
+  return (
+    <div>
+      <h1 className="mb-3 font-heading text-2xl font-bold text-primario">
+        Catálogo de precios
+      </h1>
+
+      <Suspense fallback={<SpinnerListado />}>
+        <ListaCatalogoDatos />
+      </Suspense>
+    </div>
+  );
+}
+
+async function ListaCatalogoDatos() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 

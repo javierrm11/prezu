@@ -115,26 +115,21 @@ export function ListaCatalogo({ empresaId, ivaDefecto, items }: ListaCatalogoPro
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-primario">
-          Catálogo de precios
-        </h1>
-        <div className="flex flex-shrink-0 gap-2.5">
-          <Boton
-            variante="secundario"
-            className="inline-flex items-center gap-1.5"
-            onClick={() => setSelectorAbierto(true)}
-          >
-            <ListPlus size={16} />
-            Elegir de la lista
-          </Boton>
-          <Boton
-            variante="secundario"
-            onClick={() => setNuevoAbierto((abierto) => !abierto)}
-          >
-            Añadir partida
-          </Boton>
-        </div>
+      <div className="mb-3 flex justify-end gap-2.5">
+        <Boton
+          variante="secundario"
+          className="inline-flex items-center gap-1.5"
+          onClick={() => setSelectorAbierto(true)}
+        >
+          <ListPlus size={16} />
+          Elegir de la lista
+        </Boton>
+        <Boton
+          variante="secundario"
+          onClick={() => setNuevoAbierto((abierto) => !abierto)}
+        >
+          Añadir partida
+        </Boton>
       </div>
 
       {selectorAbierto && (

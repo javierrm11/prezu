@@ -5,7 +5,6 @@ import Link from "next/link";
 import { formatearEuros, formatearFecha, formatearNumeroDocumento } from "@/lib/formato";
 import { estadoCobroEfectivo, tonoFactura } from "@/lib/estados";
 import { Badge } from "@/components/ui/Badge";
-import { Boton } from "@/components/ui/Boton";
 
 export type FacturaFila = {
   id: string;
@@ -98,24 +97,18 @@ export function ListaFacturas({ facturas }: { facturas: FacturaFila[] }) {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-primario">Facturas</h1>
-        <div className="flex items-center gap-2.5">
-          <select
-            value={mes}
-            onChange={(evento) => setMes(evento.target.value)}
-            className="h-10 rounded-lg border border-borde bg-superficie px-2.5 text-[13px] text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-          >
-            {opcionesMes.map((opcion) => (
-              <option key={opcion.valor} value={opcion.valor}>
-                {opcion.etiqueta}
-              </option>
-            ))}
-          </select>
-          <Link href="/facturas/nueva">
-            <Boton>Nueva factura</Boton>
-          </Link>
-        </div>
+      <div className="mb-4 flex justify-end">
+        <select
+          value={mes}
+          onChange={(evento) => setMes(evento.target.value)}
+          className="h-10 rounded-lg border border-borde bg-superficie px-2.5 text-[13px] text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+        >
+          {opcionesMes.map((opcion) => (
+            <option key={opcion.valor} value={opcion.valor}>
+              {opcion.etiqueta}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">

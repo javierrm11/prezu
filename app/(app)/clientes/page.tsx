@@ -1,11 +1,29 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { obtenerIniciales } from "@/lib/texto";
+import { SpinnerListado } from "@/components/ui/SpinnerListado";
 import { BotonNuevoCliente } from "./_componentes/boton-nuevo-cliente";
 
-export default async function ClientesPage() {
+export default function ClientesPage() {
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold text-primario">
+          Clientes
+        </h1>
+      </div>
+
+      <Suspense fallback={<SpinnerListado />}>
+        <ListaClientesDatos />
+      </Suspense>
+    </div>
+  );
+}
+
+async function ListaClientesDatos() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
@@ -35,11 +53,8 @@ export default async function ClientesPage() {
   }
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-primario">
-          Clientes
-        </h1>
+    <>
+      <div className="mb-4 flex justify-end">
         <BotonNuevoCliente empresaId={empresaId} />
       </div>
 
@@ -84,6 +99,6 @@ export default async function ClientesPage() {
           })}
         </div>
       )}
-    </div>
+    </>
   );
 }

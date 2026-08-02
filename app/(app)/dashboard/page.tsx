@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
@@ -9,6 +10,7 @@ import {
 } from "@/lib/formato";
 import { estadoCobroEfectivo, tonoFactura, tonoPresupuesto } from "@/lib/estados";
 import { Badge } from "@/components/ui/Badge";
+import { SpinnerListado } from "@/components/ui/SpinnerListado";
 import { SaludoHorario } from "./_componentes/saludo-horario";
 
 const ESTADOS_PRESUPUESTO_RESUELTOS = ["aceptado", "rechazado", "caducado", "facturado"];
@@ -49,7 +51,26 @@ type FilaFacturaPendiente = {
   estadoEfectivo: string;
 };
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  const fechaHoy = capitalizar(formateadorFechaLarga.format(new Date()));
+
+  return (
+    <div>
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="text-sm text-texto-secundario">
+          <SaludoHorario />,
+        </div>
+        <div className="hidden pt-1.5 text-[13px] text-texto-secundario md:block">{fechaHoy}</div>
+      </div>
+
+      <Suspense fallback={<SpinnerListado />}>
+        <ContenidoDashboard />
+      </Suspense>
+    </div>
+  );
+}
+
+async function ContenidoDashboard() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
@@ -128,21 +149,11 @@ export default async function DashboardPage() {
     ultimosPresupuestos = (ultimosPresupuestosDB as unknown as FilaUltimoPresupuesto[]) ?? [];
   }
 
-  const fechaHoy = capitalizar(formateadorFechaLarga.format(new Date()));
-
   return (
-    <div>
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <div className="text-sm text-texto-secundario">
-            <SaludoHorario />,
-          </div>
-          <div className="font-heading text-2xl font-bold text-primario">{negocio}</div>
-        </div>
-        <div className="hidden pt-1.5 text-[13px] text-texto-secundario md:block">{fechaHoy}</div>
-      </div>
+    <>
+      <div className="font-heading text-2xl font-bold text-primario">{negocio}</div>
 
-      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:grid-rows-2 lg:gap-6">
+      <div className="mt-5 flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:grid-rows-2 lg:gap-6">
         <div className="grid grid-cols-2 gap-3 lg:col-start-2 lg:row-start-1">
           <TarjetaMetrica etiqueta="Presupuestos este mes" valor={String(presupuestosEsteMes ?? 0)} />
           <TarjetaMetrica
@@ -245,7 +256,7 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

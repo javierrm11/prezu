@@ -1,5 +1,9 @@
+import { Suspense } from "react";
+import Link from "next/link";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
+import { Boton } from "@/components/ui/Boton";
+import { SpinnerListado } from "@/components/ui/SpinnerListado";
 import { ListaFacturas, type FacturaFila } from "./_componentes/lista-facturas";
 
 type FilaFacturaDB = {
@@ -15,7 +19,24 @@ type FilaFacturaDB = {
   factura_lineas: { concepto: string }[];
 };
 
-export default async function FacturasPage() {
+export default function FacturasPage() {
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold text-primario">Facturas</h1>
+        <Link href="/facturas/nueva">
+          <Boton>Nueva factura</Boton>
+        </Link>
+      </div>
+
+      <Suspense fallback={<SpinnerListado />}>
+        <ListaFacturasDatos />
+      </Suspense>
+    </div>
+  );
+}
+
+async function ListaFacturasDatos() {
   const supabase = await crearClienteServidor();
   const empresaId = await obtenerEmpresaId(supabase);
 
