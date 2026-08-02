@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { obtenerIniciales } from "@/lib/texto";
-import { SpinnerListado } from "@/components/ui/SpinnerListado";
+import { EsqueletoLista } from "@/components/ui/EsqueletoLista";
 import { BotonNuevoCliente } from "./_componentes/boton-nuevo-cliente";
 
 export default function ClientesPage() {
@@ -16,7 +16,7 @@ export default function ClientesPage() {
         </h1>
       </div>
 
-      <Suspense fallback={<SpinnerListado />}>
+      <Suspense fallback={<EsqueletoLista />}>
         <ListaClientesDatos />
       </Suspense>
     </div>

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
-import { SpinnerListado } from "@/components/ui/SpinnerListado";
+import { EsqueletoLista } from "@/components/ui/EsqueletoLista";
 import { ListaCatalogo, type ItemCatalogo } from "./_componentes/lista-catalogo";
 
 export default function CatalogoPage() {
@@ -11,7 +11,7 @@ export default function CatalogoPage() {
         Catálogo de precios
       </h1>
 
-      <Suspense fallback={<SpinnerListado />}>
+      <Suspense fallback={<EsqueletoLista />}>
         <ListaCatalogoDatos />
       </Suspense>
     </div>

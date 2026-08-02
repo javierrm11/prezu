@@ -3,7 +3,7 @@ import Link from "next/link";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { Boton } from "@/components/ui/Boton";
-import { SpinnerListado } from "@/components/ui/SpinnerListado";
+import { EsqueletoLista } from "@/components/ui/EsqueletoLista";
 import { ListaPresupuestos, type PresupuestoFila } from "./_componentes/lista-presupuestos";
 
 type FilaPresupuestoDB = {
@@ -29,7 +29,7 @@ export default function PresupuestosPage() {
         </Link>
       </div>
 
-      <Suspense fallback={<SpinnerListado />}>
+      <Suspense fallback={<EsqueletoLista />}>
         <ListaPresupuestosDatos />
       </Suspense>
     </div>

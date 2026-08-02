@@ -10,7 +10,7 @@ import {
 } from "@/lib/formato";
 import { estadoCobroEfectivo, tonoFactura, tonoPresupuesto } from "@/lib/estados";
 import { Badge } from "@/components/ui/Badge";
-import { SpinnerListado } from "@/components/ui/SpinnerListado";
+import { EsqueletoLista } from "@/components/ui/EsqueletoLista";
 import { SaludoHorario } from "./_componentes/saludo-horario";
 
 const ESTADOS_PRESUPUESTO_RESUELTOS = ["aceptado", "rechazado", "caducado", "facturado"];
@@ -63,7 +63,7 @@ export default function DashboardPage() {
         <div className="hidden pt-1.5 text-[13px] text-texto-secundario md:block">{fechaHoy}</div>
       </div>
 
-      <Suspense fallback={<SpinnerListado />}>
+      <Suspense fallback={<EsqueletoLista />}>
         <ContenidoDashboard />
       </Suspense>
     </div>

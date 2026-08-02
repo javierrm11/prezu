@@ -3,7 +3,7 @@ import Link from "next/link";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { Boton } from "@/components/ui/Boton";
-import { SpinnerListado } from "@/components/ui/SpinnerListado";
+import { EsqueletoLista } from "@/components/ui/EsqueletoLista";
 import { ListaFacturas, type FacturaFila } from "./_componentes/lista-facturas";
 
 type FilaFacturaDB = {
@@ -29,7 +29,7 @@ export default function FacturasPage() {
         </Link>
       </div>
 
-      <Suspense fallback={<SpinnerListado />}>
+      <Suspense fallback={<EsqueletoLista />}>
         <ListaFacturasDatos />
       </Suspense>
     </div>
