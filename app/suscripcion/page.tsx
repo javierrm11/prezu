@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { obtenerEmpresaId } from "@/lib/supabase/empresa";
 import { Logo } from "@/components/ui/Logo";
@@ -50,6 +50,7 @@ export default async function SuscripcionPage({
 }) {
   const { volver } = await searchParams;
   const destinoVolver = volver?.startsWith("/") && !volver.startsWith("//") ? volver : null;
+  const destinoAtras = destinoVolver ?? "/dashboard";
 
   const supabase = await crearClienteServidor();
   const {
@@ -77,7 +78,15 @@ export default async function SuscripcionPage({
   const yaTienePlanPago = plan !== "gratis";
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-8 p-6 sm:p-10">
+    <div className="relative flex flex-1 flex-col items-center gap-8 p-6 sm:p-10">
+      <Link
+        href={destinoAtras}
+        aria-label="Volver"
+        className="absolute top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-borde bg-superficie text-primario hover:bg-fondo"
+      >
+        <ArrowLeft size={20} />
+      </Link>
+
       <div className="flex items-center gap-2.5">
         <Logo size={32} />
         <span className="font-heading text-[28px] font-bold text-primario">Prezu</span>
@@ -143,12 +152,6 @@ export default async function SuscripcionPage({
           );
         })}
       </div>
-
-      {destinoVolver && (
-        <Link href={destinoVolver} className="text-sm font-medium text-secundario hover:underline">
-          Volver
-        </Link>
-      )}
     </div>
   );
 }
