@@ -310,7 +310,7 @@ export function FormularioPresupuesto({
             </div>
           )}
         </div>
-        <div className="min-w-[130px] flex-1">
+        <div className="w-full sm:min-w-[130px] sm:w-auto sm:flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="fecha">
             Fecha
           </label>
@@ -322,7 +322,7 @@ export function FormularioPresupuesto({
             className="h-11 w-full rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
           />
         </div>
-        <div className="min-w-[130px] flex-1">
+        <div className="w-full sm:min-w-[130px] sm:w-auto sm:flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="validez">
             Validez
           </label>
