@@ -310,7 +310,7 @@ export function FormularioPresupuesto({
             </div>
           )}
         </div>
-        <div className="w-full sm:min-w-[130px] sm:w-auto sm:flex-1">
+        <div className="w-full overflow-hidden sm:min-w-[130px] sm:w-auto sm:flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="fecha">
             Fecha
           </label>

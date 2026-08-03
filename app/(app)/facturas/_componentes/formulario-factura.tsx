@@ -306,7 +306,7 @@ export function FormularioFactura({
             </div>
           )}
         </div>
-        <div className="w-full sm:min-w-[130px] sm:w-auto sm:flex-1">
+        <div className="w-full overflow-hidden sm:min-w-[130px] sm:w-auto sm:flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="fecha">
             Fecha de emisión
           </label>
@@ -318,7 +318,7 @@ export function FormularioFactura({
             className="h-11 w-full min-w-0 overflow-hidden rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
           />
         </div>
-        <div className="w-full sm:min-w-[130px] sm:w-auto sm:flex-1">
+        <div className="w-full overflow-hidden sm:min-w-[130px] sm:w-auto sm:flex-1">
           <label className="mb-1.5 block text-sm font-medium text-texto" htmlFor="vencimiento">
             Vencimiento
           </label>
