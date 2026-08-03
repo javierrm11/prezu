@@ -193,7 +193,7 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
                 </View>
               </View>
             </View>
-            <View style={{ marginTop: 14 }}>
+            <View style={{ marginTop: 24, alignItems: "flex-start" }}>
               <View style={estilos.insignia}>
                 <Text style={estilos.insigniaTexto}>{numeroDocumento}</Text>
               </View>
