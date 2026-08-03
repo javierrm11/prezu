@@ -194,7 +194,7 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
             </View>
           </View>
 
-          <View>
+          <View style={{ marginTop: 14 }}>
             <View style={estilos.tablaCabecera}>
               <Text style={estilos.colConcepto}>CONCEPTO</Text>
               <Text style={estilos.colCantidad}>CANT.</Text>
