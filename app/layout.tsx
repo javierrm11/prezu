@@ -23,6 +23,17 @@ export const metadata: Metadata = {
   description: "Presupuestos y facturas por voz para autónomos de oficios",
 };
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+const jsonLdOrganizacion = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Prezu",
+  url: APP_URL,
+  logo: `${APP_URL}/icon.png`,
+  email: "javierrumo2@gmail.com",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +44,13 @@ export default function RootLayout({
       lang="es"
       className={`${dmSans.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganizacion) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

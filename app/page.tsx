@@ -88,8 +88,42 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
+  const jsonLdSoftware = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Prezu",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description:
+      "Presupuestos y facturas por voz para autónomos de oficios: fontaneros, electricistas, talleres y reformas.",
+    offers: PLANES.map((plan) => ({
+      "@type": "Offer",
+      name: plan.nombre,
+      price: plan.precio.replace(/[^\d]/g, "") || "0",
+      priceCurrency: "EUR",
+    })),
+  };
+
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: PREGUNTAS.map((pregunta) => ({
+      "@type": "Question",
+      name: pregunta.pregunta,
+      acceptedAnswer: { "@type": "Answer", text: pregunta.respuesta },
+    })),
+  };
+
   return (
     <div id="top" className="flex flex-1 flex-col bg-fondo">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+      />
       <EncabezadoLanding />
       <Hero />
       <SeccionDolor />

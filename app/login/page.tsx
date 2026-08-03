@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { Logo } from "@/components/ui/Logo";
 import { FormularioLogin } from "./formulario-login";
+
+export const metadata: Metadata = {
+  title: "Iniciar sesión",
+  description: "Accede a tu cuenta de Prezu para gestionar tus presupuestos y facturas.",
+  alternates: { canonical: "/login" },
+};
 
 export default async function LoginPage({
   searchParams,

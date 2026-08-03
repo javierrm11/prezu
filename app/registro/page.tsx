@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -5,6 +6,13 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { Logo } from "@/components/ui/Logo";
 import { Boton } from "@/components/ui/Boton";
 import { FormularioRegistroEmpresa } from "./formulario-registro-empresa";
+
+export const metadata: Metadata = {
+  title: "Crea tu cuenta gratis",
+  description:
+    "Empieza gratis con Prezu: presupuestos y facturas por voz para fontaneros, electricistas, talleres y reformas. Sin tarjeta.",
+  alternates: { canonical: "/registro" },
+};
 
 export default async function RegistroPage({
   searchParams,
