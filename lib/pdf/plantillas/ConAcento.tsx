@@ -164,7 +164,7 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
             </View>
           </View>
 
-          <View style={estilos.filaDatos}>
+          <View style={{ marginTop: 26, marginBottom: 26 }}>
             <View>
               <Text style={estilos.etiquetaChica}>{etiquetas.cliente}</Text>
               <Text style={estilos.clienteNombre}>{cliente.nombre}</Text>
@@ -177,15 +177,15 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
                 </Text>
               )}
             </View>
-            <View style={{ alignItems: "flex-end" }}>
+            <View style={{ marginTop: 14, alignItems: "flex-start" }}>
               <View style={estilos.insignia}>
                 <Text style={estilos.insigniaTexto}>{numeroDocumento}</Text>
               </View>
-              <View style={estilos.filaMeta}>
+              <View style={[estilos.filaMeta, { justifyContent: "flex-start", marginTop: 8 }]}>
                 <Text style={estilos.metaEtiqueta}>{etiquetas.fecha}</Text>
                 <Text style={estilos.metaValor}>{fecha ? formatearFecha(fecha) : "—"}</Text>
               </View>
-              <View style={estilos.filaMeta}>
+              <View style={[estilos.filaMeta, { justifyContent: "flex-start" }]}>
                 <Text style={estilos.metaEtiqueta}>{etiquetas.fechaSecundaria}</Text>
                 <Text style={estilos.metaValor}>
                   {fechaSecundaria ? formatearFecha(fechaSecundaria) : "—"}
