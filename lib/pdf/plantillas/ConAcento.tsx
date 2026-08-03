@@ -165,31 +165,37 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
           </View>
 
           <View style={{ marginTop: 26, marginBottom: 26 }}>
-            <View>
-              <Text style={estilos.etiquetaChica}>{etiquetas.cliente}</Text>
-              <Text style={estilos.clienteNombre}>{cliente.nombre}</Text>
-              {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
-              {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
-              {cliente.direccion && <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>}
-              {rectificaA && (
-                <Text style={[estilos.textoSecundario, { marginTop: 4 }]}>
-                  Rectifica a la factura {rectificaA}
-                </Text>
-              )}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <View>
+                <Text style={estilos.etiquetaChica}>{etiquetas.cliente}</Text>
+                <Text style={estilos.clienteNombre}>{cliente.nombre}</Text>
+                {cliente.nif && <Text style={estilos.textoSecundario}>NIF {cliente.nif}</Text>}
+                {cliente.ciudad && <Text style={estilos.textoSecundario}>{cliente.ciudad}</Text>}
+                {cliente.direccion && (
+                  <Text style={estilos.textoSecundario}>{cliente.direccion}</Text>
+                )}
+                {rectificaA && (
+                  <Text style={[estilos.textoSecundario, { marginTop: 4 }]}>
+                    Rectifica a la factura {rectificaA}
+                  </Text>
+                )}
+              </View>
+              <View style={{ alignItems: "flex-end" }}>
+                <View style={estilos.filaMeta}>
+                  <Text style={estilos.metaEtiqueta}>{etiquetas.fecha}</Text>
+                  <Text style={estilos.metaValor}>{fecha ? formatearFecha(fecha) : "—"}</Text>
+                </View>
+                <View style={estilos.filaMeta}>
+                  <Text style={estilos.metaEtiqueta}>{etiquetas.fechaSecundaria}</Text>
+                  <Text style={estilos.metaValor}>
+                    {fechaSecundaria ? formatearFecha(fechaSecundaria) : "—"}
+                  </Text>
+                </View>
+              </View>
             </View>
-            <View style={{ marginTop: 14, alignItems: "flex-start" }}>
+            <View style={{ marginTop: 14 }}>
               <View style={estilos.insignia}>
                 <Text style={estilos.insigniaTexto}>{numeroDocumento}</Text>
-              </View>
-              <View style={[estilos.filaMeta, { justifyContent: "flex-start", marginTop: 8 }]}>
-                <Text style={estilos.metaEtiqueta}>{etiquetas.fecha}</Text>
-                <Text style={estilos.metaValor}>{fecha ? formatearFecha(fecha) : "—"}</Text>
-              </View>
-              <View style={[estilos.filaMeta, { justifyContent: "flex-start" }]}>
-                <Text style={estilos.metaEtiqueta}>{etiquetas.fechaSecundaria}</Text>
-                <Text style={estilos.metaValor}>
-                  {fechaSecundaria ? formatearFecha(fechaSecundaria) : "—"}
-                </Text>
               </View>
             </View>
           </View>
