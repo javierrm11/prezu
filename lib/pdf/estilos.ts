@@ -107,7 +107,7 @@ export const estilosDocumento = StyleSheet.create({
   // verdad, así que lleva su propio recuadro destacado en vez de
   // perderse como una línea más del pie.
   ibanCaja: {
-    marginTop: 10,
+    marginTop: 32,
     alignSelf: "flex-start",
     backgroundColor: "#FCF3E3",
     borderWidth: 1,

@@ -106,14 +106,14 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLOR_BORDE,
     paddingTop: 16,
-    marginTop: 20,
+    marginTop: 32,
     fontSize: 9.5,
     color: COLOR_TEXTO_SECUNDARIO,
     lineHeight: 1.7,
   },
   pieTitulo: { fontFamily: "Helvetica-Bold", color: "#0D1B4B", marginBottom: 2, fontSize: 10.5 },
   ibanCaja: {
-    marginTop: 14,
+    marginTop: 32,
     alignSelf: "flex-start",
     backgroundColor: "#FCF3E3",
     borderWidth: 1,
@@ -237,8 +237,6 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
               <Text style={estilos.totalGrande}>{formatearEuros(total)}</Text>
             </View>
           </View>
-
-          <View style={{ flex: 1 }} />
 
           {(condiciones || formaPago) && (
             <View style={estilos.pie}>

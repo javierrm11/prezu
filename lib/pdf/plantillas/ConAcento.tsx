@@ -103,14 +103,14 @@ const estilos = StyleSheet.create({
     backgroundColor: COLOR_FONDO,
     borderRadius: 8,
     padding: 14,
-    marginTop: 20,
+    marginTop: 32,
     fontSize: 9.5,
     color: COLOR_TEXTO_SECUNDARIO,
     lineHeight: 1.7,
   },
   pieTitulo: { fontFamily: "Helvetica-Bold", color: "#0D1B4B", marginBottom: 2, fontSize: 10.5 },
   ibanCaja: {
-    marginTop: 14,
+    marginTop: 32,
     alignSelf: "flex-start",
     backgroundColor: "#FCEEDA",
     borderWidth: 1,
@@ -232,9 +232,7 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
             </View>
           </View>
 
-          <View style={{ flex: 1 }} />
-
-          {(condiciones || formaPago || mostrarIban) && (
+          {(condiciones || formaPago) && (
             <View style={estilos.pie}>
               {condiciones && (
                 <>
@@ -243,9 +241,12 @@ export function DocumentoConAcento(datos: DatosDocumentoPDF) {
                 </>
               )}
               {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
-              {mostrarIban && (
-                <Text style={{ marginTop: formaPago ? 2 : 6 }}>IBAN: {empresa.iban}</Text>
-              )}
+            </View>
+          )}
+          {mostrarIban && (
+            <View style={estilos.ibanCaja}>
+              <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>
+              <Text style={estilos.ibanValor}>{empresa.iban}</Text>
             </View>
           )}
         </View>

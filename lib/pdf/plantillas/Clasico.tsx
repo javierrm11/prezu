@@ -105,10 +105,8 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
           </View>
         </View>
 
-        <View style={{ flex: 1 }} />
-
         {(condiciones || formaPago) && (
-          <View style={estilos.pie}>
+          <View style={[estilos.pie, { marginTop: 32 }]}>
             {condiciones && (
               <>
                 <Text style={estilos.pieTitulo}>Condiciones</Text>

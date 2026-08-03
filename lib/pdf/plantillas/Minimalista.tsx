@@ -73,7 +73,7 @@ const estilos = StyleSheet.create({
   // Sin caja rellena (rompería el "solo líneas finas, sin cajas" de
   // esta plantilla): solo una regla fina arriba y texto grande en
   // negrita, que ya es suficiente para que destaque del resto.
-  ibanBloque: { marginTop: 14, borderTopWidth: 1, borderTopColor: COLOR_LINEA, paddingTop: 10 },
+  ibanBloque: { marginTop: 32, borderTopWidth: 1, borderTopColor: COLOR_LINEA, paddingTop: 10 },
   ibanEtiqueta: { fontSize: 8.5, color: COLOR_TEXTO_SECUNDARIO, letterSpacing: 1, marginBottom: 3 },
   ibanValor: { fontSize: 14, fontFamily: "Helvetica-Bold", color: "#0D1B4B" },
 });
@@ -170,10 +170,8 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
           </View>
         </View>
 
-        <View style={{ flex: 1 }} />
-
         {(condiciones || formaPago) && (
-          <View style={estilos.pie}>
+          <View style={[estilos.pie, { marginTop: 32 }]}>
             {condiciones && (
               <>
                 <Text style={estilos.pieTitulo}>CONDICIONES</Text>
