@@ -14,6 +14,7 @@ export default function ClientesPage() {
         <h1 className="font-heading text-2xl font-bold text-primario">
           Clientes
         </h1>
+        <BotonNuevoCliente />
       </div>
 
       <Suspense fallback={<EsqueletoLista />}>
@@ -54,10 +55,6 @@ async function ListaClientesDatos() {
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
-        <BotonNuevoCliente empresaId={empresaId} />
-      </div>
-
       {clientes.length === 0 ? (
         <p className="text-sm text-texto-secundario">
           Todavía no tienes clientes. Añade el primero.

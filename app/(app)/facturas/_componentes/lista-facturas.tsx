@@ -97,11 +97,11 @@ export function ListaFacturas({ facturas }: { facturas: FacturaFila[] }) {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex justify-start">
         <select
           value={mes}
           onChange={(evento) => setMes(evento.target.value)}
-          className="h-10 rounded-lg border border-borde bg-superficie px-2.5 text-[13px] text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+          className="h-11 w-44 rounded-lg border border-borde bg-superficie px-2.5 text-[13px] text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
         >
           {opcionesMes.map((opcion) => (
             <option key={opcion.valor} value={opcion.valor}>
