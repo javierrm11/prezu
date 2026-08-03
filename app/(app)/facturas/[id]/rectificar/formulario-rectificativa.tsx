@@ -237,7 +237,7 @@ export function FormularioRectificativa({
             type="date"
             value={fecha}
             onChange={(evento) => setFecha(evento.target.value)}
-            className="h-11 w-[90%] min-w-0 overflow-hidden rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+            className="h-11 w-[92%] min-w-0 overflow-hidden rounded-lg sm:w-full border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
           />
         </div>
         <div className="w-full overflow-hidden sm:min-w-[130px] sm:w-auto sm:flex-1">
@@ -249,7 +249,7 @@ export function FormularioRectificativa({
             type="date"
             value={vencimiento}
             onChange={(evento) => setVencimiento(evento.target.value)}
-            className="h-11 w-[90%] min-w-0 overflow-hidden rounded-lg border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+            className="h-11 w-[92%] min-w-0 overflow-hidden rounded-lg sm:w-full border border-borde bg-superficie px-3 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
           />
         </div>
         <div className="min-w-[160px] flex-1">
