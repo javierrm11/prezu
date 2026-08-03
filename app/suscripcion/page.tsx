@@ -24,6 +24,7 @@ const PLANES: {
   id: Plan;
   nombre: string;
   precio: string;
+  nota: string | null;
   descripcion: string;
   ventajas: string[];
 }[] = [
@@ -31,13 +32,15 @@ const PLANES: {
     id: "gratis",
     nombre: "Gratis",
     precio: "0 €",
+    nota: null,
     descripcion: "Captación / autónomo que factura muy poco",
     ventajas: ["Hasta 5 presupuestos o facturas al mes", "1 usuario"],
   },
   {
     id: "basico",
     nombre: "Básico",
-    precio: "9 €",
+    precio: "0,99 €",
+    nota: "el primer mes · luego 9 €/mes",
     descripcion: "Autónomo con actividad habitual",
     ventajas: ["Presupuestos y facturas ilimitadas", "1 usuario", "Seguimiento de cobros"],
   },
@@ -116,9 +119,14 @@ export default async function SuscripcionPage({
               </div>
 
               <div className="flex items-baseline gap-1">
-                <span className="font-heading text-3xl font-bold text-texto">{item.precio}</span>
+                <span className="font-heading text-3xl font-bold text-texto">
+                  {esActual && item.id === "basico" ? "9 €" : item.precio}
+                </span>
                 <span className="text-sm text-texto-secundario">/mes</span>
               </div>
+              {!esActual && item.nota && (
+                <p className="-mt-2.5 text-xs font-medium text-secundario">{item.nota}</p>
+              )}
 
               <div className="flex flex-1 flex-col gap-1.5 border-t border-[#EEF0F6] pt-3.5">
                 {item.ventajas.map((ventaja) => (
