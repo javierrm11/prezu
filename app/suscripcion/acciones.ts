@@ -56,12 +56,17 @@ export async function crearSesionCheckout(plan: "basico" | "pro", returnTo?: str
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
+  // Promo de lanzamiento del plan Básico: primer mes a 0,99 €, el
+  // resto ya a precio completo (cupón "once" en Stripe).
+  const cuponBasico = plan === "basico" ? process.env.STRIPE_COUPON_BASICO : undefined;
+
   let session: Stripe.Checkout.Session;
   try {
     session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: clienteId,
       line_items: [{ price: priceId, quantity: 1 }],
+      ...(cuponBasico ? { discounts: [{ coupon: cuponBasico }] } : {}),
       success_url: `${baseUrl}${destino}`,
       cancel_url: `${baseUrl}/suscripcion`,
     });

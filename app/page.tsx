@@ -99,7 +99,7 @@ export default async function Home() {
     offers: PLANES.map((plan) => ({
       "@type": "Offer",
       name: plan.nombre,
-      price: plan.precio.replace(/[^\d]/g, "") || "0",
+      price: String(plan.precioRegular),
       priceCurrency: "EUR",
     })),
   };
@@ -163,7 +163,7 @@ function Hero() {
             </a>
           </div>
           <div className="text-[13px] text-texto-secundario">
-            1 día gratis · 2 € el primer mes · 5 €/mes después
+            Empieza gratis · Básico a 0,99 € el primer mes, luego 9 €/mes
           </div>
           <div className="mt-0.5 flex items-center gap-2 border-t border-borde pt-4 text-[14px] text-texto-secundario">
             <ShieldCheck size={17} className="flex-shrink-0 text-secundario" />
@@ -570,13 +570,17 @@ const PLANES = [
   {
     nombre: "Gratis",
     precio: "0 €",
+    precioRegular: 0,
+    nota: null as string | null,
     descripcion: "Captación / autónomo que factura muy poco",
     ventajas: ["Hasta 5 presupuestos o facturas al mes", "1 usuario"],
     destacado: false,
   },
   {
     nombre: "Básico",
-    precio: "9 €",
+    precio: "0,99 €",
+    precioRegular: 9,
+    nota: "el primer mes · luego 9 €/mes",
     descripcion: "Autónomo con actividad habitual",
     ventajas: ["Presupuestos y facturas ilimitadas", "1 usuario", "Seguimiento de cobros"],
     destacado: true,
@@ -611,6 +615,9 @@ function Precios() {
                     </span>
                     <span className="text-[15px] text-texto-secundario">/mes</span>
                   </div>
+                  {plan.nota && (
+                    <div className="mt-1 text-[13px] font-medium text-secundario">{plan.nota}</div>
+                  )}
                 </div>
                 <div className="flex flex-1 flex-col gap-2.5 border-t border-[#EEF0F6] pt-5">
                   {plan.ventajas.map((ventaja) => (
