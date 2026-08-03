@@ -5,7 +5,7 @@ import { COLOR_PRIMARIO, COLOR_ACENTO, COLOR_TEXTO_SECUNDARIO, COLOR_BORDE, COLO
 import { etiquetasDocumento, type DatosDocumentoPDF } from "./tipos";
 
 const estilos = StyleSheet.create({
-  pagina: { fontSize: 10.5, color: "#0D1B4B", fontFamily: "Helvetica" },
+  pagina: { fontSize: 11.5, color: "#0D1B4B", fontFamily: "Helvetica" },
   banda: {
     backgroundColor: COLOR_PRIMARIO,
     paddingTop: 30,
@@ -46,35 +46,35 @@ const estilos = StyleSheet.create({
   },
   numeroDocumento: { textAlign: "right", color: "#FFFFFF", fontSize: 10, marginTop: 4 },
   contenido: { paddingHorizontal: 44, paddingTop: 26, paddingBottom: 44, flex: 1 },
-  filaDatos: { flexDirection: "row", justifyContent: "space-between", marginBottom: 22 },
+  filaDatos: { flexDirection: "row", justifyContent: "space-between", marginBottom: 26 },
   etiquetaChica: {
-    fontSize: 8,
+    fontSize: 8.5,
     fontFamily: "Helvetica-Bold",
     color: COLOR_TEXTO_SECUNDARIO,
     letterSpacing: 1,
-    marginBottom: 4,
+    marginBottom: 5,
   },
-  clienteNombre: { fontSize: 12, fontFamily: "Helvetica-Bold" },
-  textoSecundario: { color: COLOR_TEXTO_SECUNDARIO, fontSize: 9 },
-  cajaMeta: { textAlign: "right", fontSize: 9 },
-  filaMeta: { flexDirection: "row", justifyContent: "flex-end", gap: 8, marginBottom: 4 },
+  clienteNombre: { fontSize: 13, fontFamily: "Helvetica-Bold" },
+  textoSecundario: { color: COLOR_TEXTO_SECUNDARIO, fontSize: 9.5 },
+  cajaMeta: { textAlign: "right", fontSize: 10 },
+  filaMeta: { flexDirection: "row", justifyContent: "flex-end", gap: 8, marginBottom: 6 },
   metaEtiqueta: { color: COLOR_TEXTO_SECUNDARIO },
   metaValor: { color: "#0D1B4B", fontFamily: "Helvetica-Bold" },
   tablaCabecera: {
     flexDirection: "row",
     borderBottomWidth: 2,
     borderBottomColor: COLOR_ACENTO,
-    paddingBottom: 6,
-    fontSize: 8,
+    paddingBottom: 8,
+    fontSize: 9,
     fontFamily: "Helvetica-Bold",
     color: COLOR_PRIMARIO,
     letterSpacing: 0.5,
   },
   tablaFila: {
     flexDirection: "row",
-    paddingVertical: 8,
+    paddingVertical: 11,
     paddingHorizontal: 4,
-    fontSize: 10,
+    fontSize: 11,
   },
   filaImpar: { backgroundColor: COLOR_FONDO },
   colConcepto: { flex: 3 },
@@ -85,33 +85,51 @@ const estilos = StyleSheet.create({
   colImporte: { width: 80, textAlign: "right", fontFamily: "Helvetica-Bold" },
   totales: {
     alignSelf: "flex-end",
-    width: 200,
-    marginTop: 18,
-    gap: 6,
+    width: 220,
+    marginTop: 28,
+    gap: 9,
     borderLeftWidth: 3,
     borderLeftColor: COLOR_ACENTO,
-    paddingLeft: 12,
+    paddingLeft: 14,
   },
-  filaTotal: { flexDirection: "row", justifyContent: "space-between" },
+  filaTotal: { flexDirection: "row", justifyContent: "space-between", fontSize: 11 },
   filaTotalFinal: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderTopWidth: 1,
     borderTopColor: COLOR_BORDE,
-    paddingTop: 6,
-    marginTop: 2,
+    paddingTop: 9,
+    marginTop: 3,
   },
-  totalGrande: { fontFamily: "Helvetica-Bold", fontSize: 17, color: COLOR_PRIMARIO },
+  totalGrande: { fontFamily: "Helvetica-Bold", fontSize: 19, color: COLOR_PRIMARIO },
   pie: {
     borderTopWidth: 1,
     borderTopColor: COLOR_BORDE,
-    paddingTop: 12,
+    paddingTop: 16,
     marginTop: 20,
-    fontSize: 8.5,
+    fontSize: 9.5,
     color: COLOR_TEXTO_SECUNDARIO,
     lineHeight: 1.7,
   },
-  pieTitulo: { fontFamily: "Helvetica-Bold", color: "#0D1B4B", marginBottom: 2 },
+  pieTitulo: { fontFamily: "Helvetica-Bold", color: "#0D1B4B", marginBottom: 2, fontSize: 10.5 },
+  ibanCaja: {
+    marginTop: 14,
+    alignSelf: "flex-start",
+    backgroundColor: "#FCF3E3",
+    borderWidth: 1,
+    borderColor: "#F0D9A6",
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  ibanEtiqueta: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: COLOR_TEXTO_SECUNDARIO,
+    letterSpacing: 0.6,
+    marginBottom: 2,
+  },
+  ibanValor: { fontSize: 13, fontFamily: "Helvetica-Bold", color: COLOR_PRIMARIO },
 });
 
 export function DocumentoModerno(datos: DatosDocumentoPDF) {
@@ -222,7 +240,7 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
 
           <View style={{ flex: 1 }} />
 
-          {(condiciones || formaPago || mostrarIban) && (
+          {(condiciones || formaPago) && (
             <View style={estilos.pie}>
               {condiciones && (
                 <>
@@ -231,9 +249,12 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
                 </>
               )}
               {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
-              {mostrarIban && (
-                <Text style={{ marginTop: formaPago ? 2 : 6 }}>IBAN: {empresa.iban}</Text>
-              )}
+            </View>
+          )}
+          {mostrarIban && (
+            <View style={estilos.ibanCaja}>
+              <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>
+              <Text style={estilos.ibanValor}>{empresa.iban}</Text>
             </View>
           )}
         </View>

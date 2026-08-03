@@ -107,7 +107,7 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
 
         <View style={{ flex: 1 }} />
 
-        {(condiciones || formaPago || mostrarIban) && (
+        {(condiciones || formaPago) && (
           <View style={estilos.pie}>
             {condiciones && (
               <>
@@ -116,9 +116,12 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
               </>
             )}
             {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
-            {mostrarIban && (
-              <Text style={{ marginTop: formaPago ? 2 : 6 }}>IBAN: {empresa.iban}</Text>
-            )}
+          </View>
+        )}
+        {mostrarIban && (
+          <View style={estilos.ibanCaja}>
+            <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>
+            <Text style={estilos.ibanValor}>{empresa.iban}</Text>
           </View>
         )}
       </Page>
