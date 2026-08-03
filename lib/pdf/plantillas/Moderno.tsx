@@ -106,14 +106,13 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLOR_BORDE,
     paddingTop: 16,
-    marginTop: 32,
+    marginTop: 20,
     fontSize: 9.5,
     color: COLOR_TEXTO_SECUNDARIO,
     lineHeight: 1.7,
   },
   pieTitulo: { fontFamily: "Helvetica-Bold", color: "#0D1B4B", marginBottom: 2, fontSize: 10.5 },
   ibanCaja: {
-    marginTop: 32,
     alignSelf: "flex-start",
     backgroundColor: "#FCF3E3",
     borderWidth: 1,
@@ -223,6 +222,8 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
             ))}
           </View>
 
+          <View style={{ flex: 1 }} />
+
           <View style={estilos.totales}>
             <View style={estilos.filaTotal}>
               <Text style={{ color: COLOR_TEXTO_SECUNDARIO }}>Base imponible</Text>
@@ -249,6 +250,9 @@ export function DocumentoModerno(datos: DatosDocumentoPDF) {
               {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
             </View>
           )}
+
+          <View style={{ flex: 1 }} />
+
           {mostrarIban && (
             <View style={estilos.ibanCaja}>
               <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>

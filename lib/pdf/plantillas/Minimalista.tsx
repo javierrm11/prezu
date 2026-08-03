@@ -73,7 +73,7 @@ const estilos = StyleSheet.create({
   // Sin caja rellena (rompería el "solo líneas finas, sin cajas" de
   // esta plantilla): solo una regla fina arriba y texto grande en
   // negrita, que ya es suficiente para que destaque del resto.
-  ibanBloque: { marginTop: 32, borderTopWidth: 1, borderTopColor: COLOR_LINEA, paddingTop: 10 },
+  ibanBloque: { borderTopWidth: 1, borderTopColor: COLOR_LINEA, paddingTop: 10 },
   ibanEtiqueta: { fontSize: 8.5, color: COLOR_TEXTO_SECUNDARIO, letterSpacing: 1, marginBottom: 3 },
   ibanValor: { fontSize: 14, fontFamily: "Helvetica-Bold", color: "#0D1B4B" },
 });
@@ -155,6 +155,8 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
           ))}
         </View>
 
+        <View style={{ flex: 1 }} />
+
         <View style={estilos.totales}>
           <View style={estilos.filaTotal}>
             <Text style={{ color: COLOR_TEXTO_SECUNDARIO }}>Base imponible</Text>
@@ -171,7 +173,7 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
         </View>
 
         {(condiciones || formaPago) && (
-          <View style={[estilos.pie, { marginTop: 32 }]}>
+          <View style={[estilos.pie, { marginTop: 20 }]}>
             {condiciones && (
               <>
                 <Text style={estilos.pieTitulo}>CONDICIONES</Text>
@@ -181,6 +183,9 @@ export function DocumentoMinimalista(datos: DatosDocumentoPDF) {
             {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
           </View>
         )}
+
+        <View style={{ flex: 1 }} />
+
         {mostrarIban && (
           <View style={estilos.ibanBloque}>
             <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>

@@ -90,6 +90,8 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
           ))}
         </View>
 
+        <View style={{ flex: 1 }} />
+
         <View style={estilos.totales}>
           <View style={estilos.filaTotal}>
             <Text style={{ color: COLOR_TEXTO_SECUNDARIO }}>Base imponible</Text>
@@ -106,7 +108,7 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
         </View>
 
         {(condiciones || formaPago) && (
-          <View style={[estilos.pie, { marginTop: 32 }]}>
+          <View style={[estilos.pie, { marginTop: 20 }]}>
             {condiciones && (
               <>
                 <Text style={estilos.pieTitulo}>Condiciones</Text>
@@ -116,6 +118,9 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
             {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
           </View>
         )}
+
+        <View style={{ flex: 1 }} />
+
         {mostrarIban && (
           <View style={estilos.ibanCaja}>
             <Text style={estilos.ibanEtiqueta}>PAGO POR TRANSFERENCIA</Text>
