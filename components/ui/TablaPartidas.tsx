@@ -72,74 +72,104 @@ export function TablaPartidas({
         return (
           <div
             key={linea.idLocal}
-            className="grid grid-cols-1 gap-2 border-b border-[#EEF0F6] p-3 last:border-b-0 md:grid-cols-[minmax(0,3fr)_90px_90px_110px_90px_110px_40px] md:items-center md:gap-2 md:px-4 md:py-2"
+            className="grid grid-cols-1 gap-3 border-b border-borde p-4 last:border-b-0 md:grid-cols-[minmax(0,3fr)_90px_90px_110px_90px_110px_40px] md:items-center md:gap-2 md:border-[#EEF0F6] md:px-4 md:py-2"
           >
-            <input
-              value={linea.concepto}
-              onChange={(evento) =>
-                onActualizarLinea(linea.idLocal, { concepto: evento.target.value })
-              }
-              placeholder="Concepto"
-              className="h-10 rounded-lg border border-borde px-2.5 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario md:border-transparent md:hover:border-borde"
-            />
-            <div className="flex items-center gap-2 md:contents">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                Concepto
+              </label>
               <input
-                type="number"
-                min={0}
-                step="1"
-                value={linea.cantidad}
+                value={linea.concepto}
                 onChange={(evento) =>
-                  onActualizarLinea(linea.idLocal, {
-                    cantidad: parseFloat(evento.target.value) || 0,
-                  })
+                  onActualizarLinea(linea.idLocal, { concepto: evento.target.value })
                 }
-                className="h-10 w-20 rounded-lg border border-borde px-2 text-right text-sm tabular-nums text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario md:w-full"
+                placeholder="Concepto"
+                className="h-10 w-full rounded-lg border border-borde px-2.5 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario md:border-transparent md:hover:border-borde"
               />
-              <select
-                value={linea.unidad}
-                onChange={(evento) =>
-                  onActualizarLinea(linea.idLocal, { unidad: evento.target.value })
-                }
-                className="h-10 rounded-lg border border-borde px-2 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-              >
-                {UNIDADES.map((unidad) => (
-                  <option key={unidad.valor} value={unidad.valor}>
-                    {unidad.etiqueta}
-                  </option>
-                ))}
-              </select>
             </div>
-            <div className="flex items-center gap-2 md:contents">
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={linea.precioUnitario}
-                onChange={(evento) =>
-                  onActualizarLinea(linea.idLocal, {
-                    precioUnitario: parseFloat(evento.target.value) || 0,
-                  })
-                }
-                className="h-10 flex-1 rounded-lg border border-borde px-2 text-right text-sm tabular-nums text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-              />
-              <select
-                value={linea.tipoIva}
-                onChange={(evento) =>
-                  onActualizarLinea(linea.idLocal, { tipoIva: Number(evento.target.value) })
-                }
-                className="h-10 rounded-lg border border-borde px-2 text-right text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
-              >
-                {TIPOS_IVA.map((tipo) => (
-                  <option key={tipo} value={tipo}>
-                    {tipo} %
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 gap-2 md:contents">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                  Cantidad
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step="1"
+                  value={linea.cantidad}
+                  onChange={(evento) =>
+                    onActualizarLinea(linea.idLocal, {
+                      cantidad: parseFloat(evento.target.value) || 0,
+                    })
+                  }
+                  className="h-10 w-full rounded-lg border border-borde px-2 text-right text-sm tabular-nums text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                  Unidad
+                </label>
+                <select
+                  value={linea.unidad}
+                  onChange={(evento) =>
+                    onActualizarLinea(linea.idLocal, { unidad: evento.target.value })
+                  }
+                  className="h-10 w-full rounded-lg border border-borde px-2 text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                >
+                  {UNIDADES.map((unidad) => (
+                    <option key={unidad.valor} value={unidad.valor}>
+                      {unidad.etiqueta}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 md:contents">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                  Precio
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={linea.precioUnitario}
+                  onChange={(evento) =>
+                    onActualizarLinea(linea.idLocal, {
+                      precioUnitario: parseFloat(evento.target.value) || 0,
+                    })
+                  }
+                  className="h-10 w-full rounded-lg border border-borde px-2 text-right text-sm tabular-nums text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                  IVA
+                </label>
+                <select
+                  value={linea.tipoIva}
+                  onChange={(evento) =>
+                    onActualizarLinea(linea.idLocal, { tipoIva: Number(evento.target.value) })
+                  }
+                  className="h-10 w-full rounded-lg border border-borde px-2 text-right text-sm text-texto focus:border-secundario focus:outline-none focus:ring-1 focus:ring-secundario"
+                >
+                  {TIPOS_IVA.map((tipo) => (
+                    <option key={tipo} value={tipo}>
+                      {tipo} %
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="flex items-center justify-between md:contents">
-              <span className="text-sm font-semibold tabular-nums text-texto">
-                {formatearEuros(importe)}
-              </span>
+              <div>
+                <span className="mb-1 block text-xs font-medium text-texto-secundario md:hidden">
+                  Importe
+                </span>
+                <span className="text-sm font-semibold tabular-nums text-texto">
+                  {formatearEuros(importe)}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => onEliminarLinea(linea.idLocal)}
