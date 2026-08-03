@@ -120,4 +120,5 @@ export type EmpresaPDF = {
   telefono: string | null;
   email: string | null;
   logoUrl?: string | null;
+  iban?: string | null;
 };

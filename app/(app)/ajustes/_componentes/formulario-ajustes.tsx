@@ -20,6 +20,7 @@ export type EmpresaAjustes = {
   direccion: string | null;
   telefono: string | null;
   email: string | null;
+  iban: string | null;
   iva_defecto: number;
   condiciones_defecto: string | null;
   serie_presupuesto: string;
@@ -46,6 +47,7 @@ export function FormularioAjustes({
   const [direccion, setDireccion] = useState(empresa.direccion ?? "");
   const [telefono, setTelefono] = useState(empresa.telefono ?? "");
   const [email, setEmail] = useState(empresa.email ?? "");
+  const [iban, setIban] = useState(empresa.iban ?? "");
   const [ivaDefecto, setIvaDefecto] = useState(empresa.iva_defecto);
   const [condiciones, setCondiciones] = useState(empresa.condiciones_defecto ?? "");
   const [seriePresupuesto, setSeriePresupuesto] = useState(empresa.serie_presupuesto);
@@ -168,6 +170,7 @@ export function FormularioAjustes({
         direccion: direccion || null,
         telefono: telefono || null,
         email: email || null,
+        iban: iban.trim().toUpperCase() || null,
         iva_defecto: ivaDefecto,
         condiciones_defecto: condiciones || null,
         serie_presupuesto: seriePresupuestoLimpia,
@@ -347,6 +350,17 @@ export function FormularioAjustes({
         <p className="-mt-2.5 text-xs text-texto-secundario">
           Súbelo si ya has emitido facturas fuera de Prezu este año: la próxima que emitas
           desde aquí llevará este número.
+        </p>
+
+        <Campo
+          id="iban"
+          label="IBAN para transferencias"
+          value={iban}
+          onChange={(evento) => setIban(evento.target.value)}
+          placeholder="ES00 0000 0000 0000 0000 0000"
+        />
+        <p className="-mt-2.5 text-xs text-texto-secundario">
+          Si lo rellenas, saldrá impreso en tus facturas.
         </p>
 
         <Textarea

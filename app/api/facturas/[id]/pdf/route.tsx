@@ -32,6 +32,7 @@ type FilaFacturaDB = {
     condiciones_defecto: string | null;
     logo_url: string | null;
     pdf_plantilla: IdPlantillaPDF | null;
+    iban: string | null;
   } | null;
 };
 
@@ -50,7 +51,7 @@ export async function GET(
   const { data } = await supabase
     .from("facturas")
     .select(
-      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla)",
+      "id, numero, anio, serie, tipo, rectifica_a, fecha_emision, vencimiento, forma_pago, base_imponible, total_iva, total, cliente_nombre, cliente_nif, cliente_direccion, empresas(nombre, nif, direccion, ciudad, telefono, email, condiciones_defecto, logo_url, pdf_plantilla, iban)",
     )
     .eq("id", id)
     .eq("empresa_id", empresaId)
@@ -107,6 +108,7 @@ export async function GET(
         telefono: factura.empresas?.telefono ?? null,
         email: factura.empresas?.email ?? null,
         logoUrl: urlLogo,
+        iban: factura.empresas?.iban ?? null,
       },
       cliente: {
         nombre: factura.cliente_nombre,

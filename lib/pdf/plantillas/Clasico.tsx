@@ -9,6 +9,7 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
   const { baseImponible, totalIva, total, etiquetaIva, condiciones, formaPago, rectificaA } = datos;
   const etiquetas = etiquetasDocumento(datos.tipo);
   const contactoNegocio = [empresa.telefono, empresa.email].filter(Boolean).join(" · ");
+  const mostrarIban = datos.tipo !== "presupuesto" && Boolean(empresa.iban);
 
   return (
     <Document>
@@ -106,7 +107,7 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
 
         <View style={{ flex: 1 }} />
 
-        {(condiciones || formaPago) && (
+        {(condiciones || formaPago || mostrarIban) && (
           <View style={estilos.pie}>
             {condiciones && (
               <>
@@ -115,6 +116,9 @@ export function DocumentoClasico(datos: DatosDocumentoPDF) {
               </>
             )}
             {formaPago && <Text style={{ marginTop: 6 }}>Forma de pago: {formaPago}</Text>}
+            {mostrarIban && (
+              <Text style={{ marginTop: formaPago ? 2 : 6 }}>IBAN: {empresa.iban}</Text>
+            )}
           </View>
         )}
       </Page>
