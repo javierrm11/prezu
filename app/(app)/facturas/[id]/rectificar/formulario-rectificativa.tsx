@@ -80,10 +80,20 @@ export function FormularioRectificativa({
   }
 
   function anadirLinea(prefill?: Partial<CamposLinea>) {
-    setLineas((actuales) => [
-      ...actuales,
-      { ...lineaVacia(ivaDefecto), ...prefill, idLocal: crypto.randomUUID() },
-    ]);
+    setLineas((actuales) => {
+      // Si se elige una partida predefinida y hay una línea sin
+      // concepto (la que arranca vacía por defecto), se rellena esa
+      // en vez de añadir otra al lado.
+      const idxVacia = prefill ? actuales.findIndex((linea) => !linea.concepto.trim()) : -1;
+
+      if (idxVacia !== -1) {
+        return actuales.map((linea, indice) =>
+          indice === idxVacia ? { ...linea, ...prefill } : linea,
+        );
+      }
+
+      return [...actuales, { ...lineaVacia(ivaDefecto), ...prefill, idLocal: crypto.randomUUID() }];
+    });
   }
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
